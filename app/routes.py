@@ -36,7 +36,7 @@ class TORSubmission(BaseModel):
 
 @router.post("/send-tor")
 async def send_tor(data: TORSubmission) -> JSONResponse:
-    if not BOT_TOKEN or BOT_TOKEN == "YOUR_BOT_TOKEN":
+    if not BOT_TOKEN:
         return JSONResponse(
             {
                 "success": False,

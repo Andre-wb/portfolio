@@ -5,32 +5,32 @@
 'use strict';
 
 
-const TG_USERNAME  = window.TG_USERNAME || 'your_username';
+const TG_USERNAME  = window.TG_USERNAME || 'andr3ywb';
 const BOT_API_URL  = '/send-tor';
 const LS_KEY       = 'tor_quiz_v4';
 const STEPS = [
 
-  /* ── 0: Тип проекта */
+  /*   0: Тип проекта */
   {
     id: 'project_type',
-    question: '🚀 Что вы хотите разработать?',
+    question: 'Что вы хотите разработать?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'site',       label: '🌐 Сайт' },
-      { value: 'webapp',     label: '💻 Веб-приложение' },
-      { value: 'tgbot',      label: '🤖 Telegram-бот' },
-      { value: 'tgbot_site', label: '🔗 Telegram-бот + Сайт' },
-      { value: 'custom',     label: '✏️ Свой вариант / не знаю',
+      { value: 'site',       label: 'Сайт' },
+      { value: 'webapp',     label: 'Веб-приложение' },
+      { value: 'tgbot',      label: 'Telegram-бот' },
+      { value: 'tgbot_site', label: 'Telegram-бот + Сайт' },
+      { value: 'custom',     label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите ваш вариант...' },
     ],
     show: () => true,
   },
 
-  /* ── 1: Идея проекта */
+  /*   1: Идея проекта */
   {
     id: 'project_idea',
-    question: '💡 Опишите идею проекта',
+    question: 'Опишите идею проекта',
     subtitle: 'Что должен делать ваш продукт? Чем занимается ваш бизнес?',
     type: 'text', required: true,
     placeholder: 'Например: онлайн-магазин спортивного питания с каталогом, корзиной и оплатой картой…',
@@ -38,406 +38,406 @@ const STEPS = [
   },
 
 
-  /* ── 2 ── */
+  /*   2   */
   {
     id: 'site_type',
-    question: '🏗️ Какой тип сайта вам нужен?',
+    question: 'Какой тип сайта вам нужен?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'landing',   label: '📄 Лендинг (одностраничный сайт)' },
-      { value: 'corporate', label: '🏢 Корпоративный сайт' },
-      { value: 'shop',      label: '🛒 Интернет-магазин' },
-      { value: 'portal',    label: '🔧 Портал / Сервис' },
-      { value: 'custom',    label: '✏️ Свой вариант / не знаю',
+      { value: 'landing',   label: 'Лендинг (одностраничный сайт)' },
+      { value: 'corporate', label: 'Корпоративный сайт' },
+      { value: 'shop',      label: 'Интернет-магазин' },
+      { value: 'portal',    label: 'Портал / Сервис' },
+      { value: 'custom',    label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите тип сайта...' },
     ],
     show: a => a.project_type?.value === 'site',
   },
 
-  /* ── 3 ── */
+  /*   3   */
   {
     id: 'site_goal',
-    question: '🎯 Какова основная цель сайта?',
+    question: 'Какова основная цель сайта?',
     subtitle: 'Что сайт должен давать вашему бизнесу?',
     type: 'text', required: true,
     placeholder: 'Например: привлечь новых клиентов, продавать товары, рассказать об услугах…',
     show: a => a.project_type?.value === 'site',
   },
 
-  /* ── 4 ── */
+  /*   4   */
   {
     id: 'site_functions',
-    question: '⚙️ Какие функции нужны на сайте?',
+    question: 'Какие функции нужны на сайте?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'registration', label: '👤 Регистрация пользователей' },
-      { value: 'cabinet',      label: '🗂️ Личный кабинет' },
-      { value: 'comments',     label: '💬 Комментарии' },
-      { value: 'search',       label: '🔍 Поиск' },
-      { value: 'admin',        label: '🛠️ Админ-панель' },
-      { value: 'feedback',     label: '📩 Форма обратной связи' },
-      { value: 'uploads',      label: '📁 Загрузка файлов' },
-      { value: 'payment',      label: '💳 Онлайн-оплата' },
-      { value: 'custom',       label: '✏️ Свой вариант / не знаю',
+      { value: 'registration', label: 'Регистрация пользователей' },
+      { value: 'cabinet',      label: 'Личный кабинет' },
+      { value: 'comments',     label: 'Комментарии' },
+      { value: 'search',       label: 'Поиск' },
+      { value: 'admin',        label: 'Админ-панель' },
+      { value: 'feedback',     label: 'Форма обратной связи' },
+      { value: 'uploads',      label: 'Загрузка файлов' },
+      { value: 'payment',      label: 'Онлайн-оплата' },
+      { value: 'custom',       label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите нужные функции...' },
     ],
     show: a => a.project_type?.value === 'site',
   },
 
-  /* ── 5 ── Регистрация: способ */
+  /*   5   Регистрация: способ */
   {
     id: 'site_reg_method',
-    question: '🔐 Как пользователи будут регистрироваться?',
+    question: 'Как пользователи будут регистрироваться?',
     subtitle: 'Можно выбрать несколько способов',
     type: 'multi', required: true,
     options: [
-      { value: 'email',    label: '📧 Email + пароль' },
-      { value: 'social',   label: '🌐 Социальные сети (VK, Google и др.)' },
-      { value: 'telegram', label: '✈️ Telegram' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'email',    label: 'Email + пароль' },
+      { value: 'social',   label: 'Социальные сети (VK, Google и др.)' },
+      { value: 'telegram', label: 'Telegram' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите способ регистрации...' },
     ],
     show: a => a.project_type?.value === 'site' &&
-               (a.site_functions?.values || []).includes('registration'),
+        (a.site_functions?.values || []).includes('registration'),
   },
 
-  /* ── 6 ── Личный кабинет: описание */
+  /*   6   Личный кабинет: описание */
   {
     id: 'site_cabinet_desc',
-    question: '🗂️ Что пользователь делает в личном кабинете?',
+    question: 'Что пользователь делает в личном кабинете?',
     subtitle: 'Опишите возможности личного кабинета',
     type: 'text', required: true,
     placeholder: 'Просматривает заказы, редактирует профиль, скачивает документы…',
     show: a => a.project_type?.value === 'site' &&
-               (a.site_functions?.values || []).includes('cabinet'),
+        (a.site_functions?.values || []).includes('cabinet'),
   },
 
-  /* ── 7 ── Админ-панель: описание */
+  /*   7   Админ-панель: описание */
   {
     id: 'site_admin_desc',
-    question: '🛠️ Какие функции нужны администратору?',
+    question: 'Какие функции нужны администратору?',
     subtitle: 'Что администратор должен уметь делать?',
     type: 'text', required: true,
     placeholder: 'Управление пользователями, редактирование контента, просмотр статистики…',
     show: a => a.project_type?.value === 'site' &&
-               (a.site_functions?.values || []).includes('admin'),
+        (a.site_functions?.values || []).includes('admin'),
   },
 
-  /* ── 8 ── Оплата: система */
+  /*   8   Оплата: система */
   {
     id: 'site_payment_method',
-    question: '💳 Какая система оплаты нужна?',
+    question: 'Какая система оплаты нужна?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'stripe', label: '💳 Stripe' },
-      { value: 'paypal', label: '🅿️ PayPal' },
-      { value: 'crypto', label: '₿ Криптовалюта' },
-      { value: 'custom', label: '✏️ Свой вариант / не знаю',
+      { value: 'stripe', label: 'Stripe' },
+      { value: 'paypal', label: 'PayPal' },
+      { value: 'crypto', label: 'Криптовалюта' },
+      { value: 'custom', label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Укажите систему оплаты...' },
     ],
     show: a => a.project_type?.value === 'site' &&
-               (a.site_functions?.values || []).includes('payment'),
+        (a.site_functions?.values || []).includes('payment'),
   },
 
-  /* ── 9 ── Интернет-магазин: функции */
+  /*   9   Интернет-магазин: функции */
   {
     id: 'shop_features',
-    question: '🛒 Какие функции нужны в интернет-магазине?',
+    question: 'Какие функции нужны в интернет-магазине?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'catalog',        label: '📦 Каталог товаров' },
-      { value: 'cart',           label: '🛒 Корзина' },
-      { value: 'filters',        label: '🔽 Фильтры товаров' },
-      { value: 'reviews',        label: '⭐ Отзывы покупателей' },
-      { value: 'delivery',       label: '🚚 Система доставки' },
-      { value: 'admin_products', label: '🗄️ Управление товарами через админку' },
-      { value: 'custom',         label: '✏️ Свой вариант / не знаю',
+      { value: 'catalog',        label: 'Каталог товаров' },
+      { value: 'cart',           label: 'Корзина' },
+      { value: 'filters',        label: 'Фильтры товаров' },
+      { value: 'reviews',        label: 'Отзывы покупателей' },
+      { value: 'delivery',       label: 'Система доставки' },
+      { value: 'admin_products', label: 'Управление товарами через админку' },
+      { value: 'custom',         label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите дополнительные функции...' },
     ],
     show: a => a.project_type?.value === 'site' && a.site_type?.value === 'shop',
   },
 
-  /* ── 10 ── Дизайн */
+  /*   10   Дизайн */
   {
     id: 'site_design',
-    question: '🎨 Как обстоят дела с дизайном?',
+    question: 'Как обстоят дела с дизайном?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: '✅ Есть готовый дизайн (Figma / макеты)' },
-      { value: 'examples', label: '🔗 Есть примеры сайтов',
+      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)' },
+      { value: 'examples', label: 'Есть примеры сайтов',
         hasText: true, textPlaceholder: 'Вставьте ссылки на понравившиеся сайты...' },
-      { value: 'develop',  label: '🎨 Нужно разработать дизайн с нуля' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'develop',  label: 'Нужно разработать дизайн с нуля' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите ситуацию с дизайном...' },
     ],
     show: a => a.project_type?.value === 'site',
   },
 
-  /* ── 11 ── Контент */
+  /*   11   Контент */
   {
     id: 'site_content',
-    question: '📝 Есть ли готовый контент для сайта?',
+    question: 'Есть ли готовый контент для сайта?',
     subtitle: 'Тексты, изображения, материалы — можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'texts',       label: '📄 Есть тексты / описания' },
-      { value: 'images',      label: '🖼️ Есть изображения / фото' },
-      { value: 'need_create', label: '✏️ Контент нужно создать' },
-      { value: 'custom',      label: '💬 Свой вариант / не знаю',
+      { value: 'texts',       label: 'Есть тексты / описания' },
+      { value: 'images',      label: 'Есть изображения / фото' },
+      { value: 'need_create', label: 'Контент нужно создать' },
+      { value: 'custom',      label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите ситуацию с контентом...' },
     ],
     show: a => a.project_type?.value === 'site',
   },
 
-  /* ── 12 ── */
+  /*   12   */
   {
     id: 'webapp_type',
-    question: '💻 Какой тип веб-приложения?',
+    question: 'Какой тип веб-приложения?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'saas',   label: '☁️ SaaS-платформа (сервис по подписке)' },
-      { value: 'crm',    label: '📊 CRM-система' },
-      { value: 'social', label: '👥 Социальная платформа' },
-      { value: 'files',  label: '📁 Файловый сервис / облачное хранилище' },
-      { value: 'custom', label: '✏️ Свой вариант / не знаю',
+      { value: 'saas',   label: 'SaaS-платформа (сервис по подписке)' },
+      { value: 'crm',    label: 'CRM-система' },
+      { value: 'social', label: 'Социальная платформа' },
+      { value: 'files',  label: 'Файловый сервис / облачное хранилище' },
+      { value: 'custom', label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите тип приложения...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /* ── 13 ── */
+  /*   13   */
   {
     id: 'webapp_users',
-    question: '👥 Какие роли будут в системе?',
+    question: 'Какие роли будут в системе?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'users_only',   label: '👤 Только обычные пользователи' },
-      { value: 'users_admin',  label: '👤 + 👨‍💼 Пользователи + Администратор' },
-      { value: 'multi_roles',  label: '👥 Несколько ролей (менеджер, клиент, руководитель…)' },
-      { value: 'custom',       label: '✏️ Свой вариант / не знаю',
+      { value: 'users_only',   label: 'Только обычные пользователи' },
+      { value: 'users_admin',  label: 'Пользователи + Администратор' },
+      { value: 'multi_roles',  label: 'Несколько ролей (менеджер, клиент, руководитель…)' },
+      { value: 'custom',       label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите роли и их права...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /* ── 14 ── */
+  /*   14   */
   {
     id: 'webapp_functions',
-    question: '⚙️ Какие основные функции нужны?',
+    question: 'Какие основные функции нужны?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'registration',  label: '👤 Регистрация / авторизация' },
-      { value: 'cabinet',       label: '🗂️ Личный кабинет' },
-      { value: 'uploads',       label: '📁 Загрузка и хранение файлов' },
-      { value: 'chat',          label: '💬 Чат / мессенджер' },
-      { value: 'notifications', label: '🔔 Уведомления' },
-      { value: 'subscriptions', label: '💎 Подписки / тарифы' },
-      { value: 'payment',       label: '💳 Оплата' },
-      { value: 'custom',        label: '✏️ Свой вариант / не знаю',
+      { value: 'registration',  label: 'Регистрация / авторизация' },
+      { value: 'cabinet',       label: 'Личный кабинет' },
+      { value: 'uploads',       label: 'Загрузка и хранение файлов' },
+      { value: 'chat',          label: 'Чат / мессенджер' },
+      { value: 'notifications', label: 'Уведомления' },
+      { value: 'subscriptions', label: 'Подписки / тарифы' },
+      { value: 'payment',       label: 'Оплата' },
+      { value: 'custom',        label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите нужные функции...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /* ── 15 ── */
+  /*   15   */
   {
     id: 'webapp_scale',
-    question: '📊 Сколько пользователей ожидается?',
+    question: 'Сколько пользователей ожидается?',
     subtitle: 'Предполагаемое количество одновременных пользователей',
     type: 'single', required: true,
     options: [
-      { value: 'under_100',  label: '👤 До 100 пользователей' },
-      { value: 'under_1000', label: '👥 До 1000 пользователей' },
-      { value: 'over_1000',  label: '🏢 1000+ пользователей' },
-      { value: 'custom',     label: '✏️ Свой вариант / не знаю',
+      { value: 'under_100',  label: 'До 100 пользователей' },
+      { value: 'under_1000', label: 'До 1000 пользователей' },
+      { value: 'over_1000',  label: '1000+ пользователей' },
+      { value: 'custom',     label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Укажите примерное количество...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /* ── 16 ── */
+  /*   16   */
   {
     id: 'webapp_design',
-    question: '🎨 Как обстоят дела с дизайном приложения?',
+    question: 'Как обстоят дела с дизайном приложения?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: '✅ Есть готовый дизайн (Figma / макеты)' },
-      { value: 'examples', label: '🔗 Есть примеры приложений',
+      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)' },
+      { value: 'examples', label: 'Есть примеры приложений',
         hasText: true, textPlaceholder: 'Вставьте ссылки на примеры...' },
-      { value: 'develop',  label: '🎨 Нужно разработать дизайн с нуля' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'develop',  label: 'Нужно разработать дизайн с нуля' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
 
-  /* ── 17 ── */
+  /*   17   */
   {
     id: 'bot_task',
-    question: '🤖 Какова основная задача Telegram-бота?',
+    question: 'Какова основная задача Telegram-бота?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'support',    label: '🎧 Поддержка пользователей' },
-      { value: 'automation', label: '⚡ Автоматизация процессов' },
-      { value: 'orders',     label: '📦 Приём заказов' },
-      { value: 'info',       label: '📢 Информационный / рассылочный бот' },
-      { value: 'custom',     label: '✏️ Свой вариант / не знаю',
+      { value: 'support',    label: 'Поддержка пользователей' },
+      { value: 'automation', label: 'Автоматизация процессов' },
+      { value: 'orders',     label: 'Приём заказов' },
+      { value: 'info',       label: 'Информационный / рассылочный бот' },
+      { value: 'custom',     label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите задачу бота...' },
     ],
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /* ── 18 ── */
+  /*   18   */
   {
     id: 'bot_db',
-    question: '🗄️ Нужна ли боту база данных?',
+    question: 'Нужна ли боту база данных?',
     subtitle: 'База данных позволяет хранить информацию о пользователях, заказах и т.д.',
     type: 'single', required: true,
     options: [
-      { value: 'yes', label: '✅ Да, нужна' },
-      { value: 'no',  label: '❌ Нет, бот простой без хранения данных' },
+      { value: 'yes', label: 'Да, нужна' },
+      { value: 'no',  label: 'Нет, бот простой без хранения данных' },
     ],
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /* ── 19 ── */
+  /*   19   */
   {
     id: 'bot_db_what',
-    question: '📦 Что нужно хранить в базе данных?',
+    question: 'Что нужно хранить в базе данных?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'users',    label: '👤 Информацию о пользователях' },
-      { value: 'orders',   label: '📦 Заказы' },
-      { value: 'messages', label: '💬 Сообщения / историю чатов' },
-      { value: 'files',    label: '📁 Файлы / медиа' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'users',    label: 'Информацию о пользователях' },
+      { value: 'orders',   label: 'Заказы' },
+      { value: 'messages', label: 'Сообщения / историю чатов' },
+      { value: 'files',    label: 'Файлы / медиа' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите данные...' },
     ],
     show: a => a.project_type?.value === 'tgbot' && a.bot_db?.value === 'yes',
   },
 
-  /* ── 20 ── */
+  /*   20   */
   {
     id: 'bot_admin',
-    question: '🛠️ Нужна ли административная панель?',
+    question: 'Нужна ли административная панель?',
     subtitle: 'Веб-интерфейс для управления ботом и просмотра данных',
     type: 'single', required: true,
     options: [
-      { value: 'yes', label: '✅ Да, нужна веб-панель' },
-      { value: 'no',  label: '❌ Нет, управление только через бота' },
+      { value: 'yes', label: 'Да, нужна веб-панель' },
+      { value: 'no',  label: 'Нет, управление только через бота' },
     ],
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /* ── 21 ── */
+  /*   21   */
   {
     id: 'bot_services',
-    question: '🔌 Нужно ли подключить внешние сервисы?',
+    question: 'Нужно ли подключить внешние сервисы?',
     subtitle: 'Можно выбрать несколько (или пропустить)',
     type: 'multi', required: false,
     options: [
-      { value: 'site',     label: '🌐 Сайт (API-интеграция)' },
-      { value: 'payments', label: '💳 Платёжная система' },
-      { value: 'crm',      label: '📊 CRM-система' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'site',     label: 'Сайт (API-интеграция)' },
+      { value: 'payments', label: 'Платёжная система' },
+      { value: 'crm',      label: 'CRM-система' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите интеграции...' },
     ],
     show: a => a.project_type?.value === 'tgbot',
   },
 
 
-  /* ── 22 ── */
+  /*   22   */
   {
     id: 'botsite_site_type',
-    question: '🌐 Какой тип сайта нужен?',
+    question: 'Какой тип сайта нужен?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'landing', label: '📄 Лендинг' },
-      { value: 'service', label: '🔧 Сервис / SaaS' },
-      { value: 'shop',    label: '🛒 Интернет-магазин' },
-      { value: 'custom',  label: '✏️ Свой вариант / не знаю',
+      { value: 'landing', label: 'Лендинг' },
+      { value: 'service', label: 'Сервис / SaaS' },
+      { value: 'shop',    label: 'Интернет-магазин' },
+      { value: 'custom',  label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите тип сайта...' },
     ],
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /* ── 23 ── */
+  /*   23   */
   {
     id: 'botsite_site_functions',
-    question: '⚙️ Основные функции сайта',
+    question: 'Основные функции сайта',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'registration', label: '👤 Регистрация / авторизация' },
-      { value: 'cabinet',      label: '🗂️ Личный кабинет' },
-      { value: 'catalog',      label: '📦 Каталог / витрина' },
-      { value: 'payments',     label: '💳 Платежи' },
-      { value: 'admin',        label: '🛠️ Админ-панель' },
-      { value: 'custom',       label: '✏️ Свой вариант / не знаю',
+      { value: 'registration', label: 'Регистрация / авторизация' },
+      { value: 'cabinet',      label: 'Личный кабинет' },
+      { value: 'catalog',      label: 'Каталог / витрина' },
+      { value: 'payments',     label: 'Платежи' },
+      { value: 'admin',        label: 'Админ-панель' },
+      { value: 'custom',       label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите функции...' },
     ],
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /* ── 24 ── */
+  /*   24   */
   {
     id: 'botsite_bot_functions',
-    question: '🤖 Основные функции Telegram-бота',
+    question: 'Основные функции Telegram-бота',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'notifications', label: '🔔 Уведомления пользователям' },
-      { value: 'account',       label: '👤 Управление аккаунтом' },
-      { value: 'orders',        label: '📦 Оформление / отслеживание заказов' },
-      { value: 'support',       label: '🎧 Поддержка клиентов' },
-      { value: 'custom',        label: '✏️ Свой вариант / не знаю',
+      { value: 'notifications', label: 'Уведомления пользователям' },
+      { value: 'account',       label: 'Управление аккаунтом' },
+      { value: 'orders',        label: 'Оформление / отслеживание заказов' },
+      { value: 'support',       label: 'Поддержка клиентов' },
+      { value: 'custom',        label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите функции бота...' },
     ],
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /* ── 25 ── */
+  /*   25   */
   {
     id: 'botsite_interaction',
-    question: '🔗 Как сайт и бот будут взаимодействовать?',
+    question: 'Как сайт и бот будут взаимодействовать?',
     subtitle: 'Можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'notifications', label: '🔔 Бот отправляет уведомления о событиях на сайте' },
-      { value: 'manage_site',   label: '🛠️ Управление сайтом через бота' },
-      { value: 'tg_auth',       label: '✈️ Авторизация на сайте через Telegram' },
-      { value: 'custom',        label: '✏️ Свой вариант / не знаю',
+      { value: 'notifications', label: 'Бот отправляет уведомления о событиях на сайте' },
+      { value: 'manage_site',   label: 'Управление сайтом через бота' },
+      { value: 'tg_auth',       label: 'Авторизация на сайте через Telegram' },
+      { value: 'custom',        label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите взаимодействие...' },
     ],
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /* ── 26 ── */
+  /*   26   */
   {
     id: 'botsite_design',
-    question: '🎨 Как обстоят дела с дизайном сайта?',
+    question: 'Как обстоят дела с дизайном сайта?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: '✅ Есть готовый дизайн',
+      { value: 'ready',    label: 'Есть готовый дизайн',
         hasText: true, textPlaceholder: 'Ссылка на Figma или описание файлов...' },
-      { value: 'examples', label: '🔗 Есть примеры (похожие сайты)',
+      { value: 'examples', label: 'Есть примеры (похожие сайты)',
         hasText: true, textPlaceholder: 'Ссылки на примеры сайтов...' },
-      { value: 'develop',  label: '🎨 Нужно разработать дизайн с нуля' },
-      { value: 'custom',   label: '✏️ Свой вариант / не знаю',
+      { value: 'develop',  label: 'Нужно разработать дизайн с нуля' },
+      { value: 'custom',   label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите ситуацию...' },
     ],
     show: a => a.project_type?.value === 'tgbot_site',
@@ -447,26 +447,26 @@ const STEPS = [
      ОБЩИЙ БЛОК
      ══════════════════════════════════════════════════════════════ */
 
-  /* ── 27 ── */
+  /*   27   */
   {
     id: 'deadline',
-    question: '⏰ Когда нужен запуск проекта?',
+    question: 'Когда нужен запуск проекта?',
     subtitle: 'Выберите примерные сроки',
     type: 'single', required: true,
     options: [
-      { value: 'asap',       label: '🔥 Как можно быстрее' },
-      { value: '1_month',    label: '📅 1 месяц' },
-      { value: '2_3_months', label: '📆 2–3 месяца' },
-      { value: 'custom',     label: '✏️ Свой вариант / не знаю',
+      { value: 'asap',       label: 'Как можно быстрее' },
+      { value: '1_month',    label: '1 месяц' },
+      { value: '2_3_months', label: '2–3 месяца' },
+      { value: 'custom',     label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Укажите желаемые сроки...' },
     ],
     show: () => true,
   },
 
-  /* ── 28 ── */
+  /*   28   */
   {
     id: 'budget',
-    question: '💰 Какой бюджет на проект?',
+    question: 'Какой бюджет на проект?',
     subtitle: 'Минимальная стоимость — 1 000 рублей. Укажите реальную цифру.',
     type: 'number', required: true,
     placeholder: 'Например: 50000',
@@ -474,30 +474,30 @@ const STEPS = [
     show: () => true,
   },
 
-  /* ── 29 ── */
+  /*   29   */
   {
     id: 'contact_type',
-    question: '📞 Как с вами связаться?',
+    question: 'Как с вами связаться?',
     subtitle: 'Выберите способ и укажите контакт',
     type: 'single', required: true,
     requireSubText: true,
     options: [
-      { value: 'telegram', label: '✈️ Telegram',
+      { value: 'telegram', label: 'Telegram',
         hasText: true, textPlaceholder: '@username или +7 900 000-00-00' },
-      { value: 'email',    label: '📧 Email',
+      { value: 'email',    label: 'Email',
         hasText: true, textPlaceholder: 'your@email.com' },
-      { value: 'phone',    label: '📱 Телефон',
+      { value: 'phone',    label: 'Телефон',
         hasText: true, textPlaceholder: '+7 (999) 999-99-99' },
-      { value: 'custom',   label: '✏️ Другой способ',
+      { value: 'custom',   label: 'Другой способ',
         hasText: true, textPlaceholder: 'Укажите удобный способ связи...' },
     ],
     show: () => true,
   },
 
-  /* ── 30 ── */
+  /*   30   */
   {
     id: 'extra_info',
-    question: '📋 Дополнительная информация',
+    question: 'Дополнительная информация',
     subtitle: 'Любые пожелания, уточнения или вопросы (необязательно)',
     type: 'text', required: false,
     placeholder: 'Например: нужна поддержка на русском, интеграция с 1С, или у вас уже есть домен…',
@@ -639,7 +639,7 @@ function buildOptions(step, isMulti) {
   return `<div class="options-list">${items}</div>`;
 }
 
-/* ── Restore saved answer ────────────────────────────────────────── */
+/*    Restore saved answer                         */
 function restoreAnswer(step) {
   const ans = state.answers[step.id];
   if (!ans) return;
@@ -900,7 +900,7 @@ function generateTZ() {
   add(`Бюджет: ${budget}`);
   add('');
 
-  const ctLabel = { telegram:'✈Telegram', email:'Email', phone:'Телефон', custom:'Другой' };
+  const ctLabel = { telegram:'Telegram', email:'Email', phone:'Телефон', custom:'Другой' };
   const ct = a.contact_type;
   add(`Контакт клиента: ${ctLabel[ct?.value] || ct?.value || 'Не указано'}: ${ct?.text || ''}`);
   add('');
@@ -992,7 +992,7 @@ function tzSite(a, add) {
 }
 
 function tzWebapp(a, add) {
-  add('💻 ВЕБ-ПРИЛОЖЕНИЕ');
+  add('ВЕБ-ПРИЛОЖЕНИЕ');
   add('');
 
   const tMap = { saas:'SaaS-платформа', crm:'CRM-система', social:'Социальная платформа',
@@ -1031,13 +1031,13 @@ function tzBot(a, add) {
   add('TELEGRAM-БОТ');
   add('');
 
-  const tMap = { support:'Поддержка пользователей', automation:'⚡ Автоматизация процессов',
+  const tMap = { support:'Поддержка пользователей', automation:'Автоматизация процессов',
     orders:'Приём заказов', info:'Информационный бот',
     custom: a.bot_task?.text || 'Свой вариант' };
   add(`Задача бота: ${tMap[a.bot_task?.value] || 'Не указано'}`);
   add('');
 
-  add(`🗄База данных: ${a.bot_db?.value === 'yes' ? 'Да' : a.bot_db?.value === 'no' ? 'Нет' : 'Не указано'}`);
+  add(`База данных: ${a.bot_db?.value === 'yes' ? 'Да' : a.bot_db?.value === 'no' ? 'Нет' : 'Не указано'}`);
   if (a.bot_db?.value === 'yes' && a.bot_db_what?.values?.length) {
     add('  Что хранить:');
     const dl = { users:'Пользователи', orders:'Заказы', messages:'Сообщения', files:'Файлы',
@@ -1059,7 +1059,7 @@ function tzBot(a, add) {
 }
 
 function tzBotSite(a, add) {
-  add('🔗 TELEGRAM-БОТ + САЙТ');
+  add('TELEGRAM-БОТ + САЙТ');
   add('');
 
   const stMap = { landing:'Лендинг', service:'Сервис', shop:'Интернет-магазин',
@@ -1118,7 +1118,7 @@ function renderResult() {
   resultScreen.classList.remove('hidden');
 
   if (progressFill)  progressFill.style.width = '100%';
-  if (progressLabel) progressLabel.textContent = '✓ Готово';
+  if (progressLabel) progressLabel.textContent = 'Готово';
   if (backBtn)       backBtn.disabled = false;
 
   const torText   = generateTZ();
@@ -1189,7 +1189,7 @@ async function doSendBot() {
   const btn    = document.getElementById('botBtn');
   const status = document.getElementById('sendStatus');
 
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Отправляю…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Отправляю…'; }
   if (status) { status.className = 'send-status'; }
 
   try {
