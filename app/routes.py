@@ -1,12 +1,10 @@
 import os
-
 import httpx
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-
 from app.tor_logic import format_for_telegram
 
 load_dotenv()
@@ -22,9 +20,17 @@ TELEGRAM_USERNAME: str = os.getenv("TELEGRAM_USERNAME", "andr3ywb")
 
 # Маршруты и переадресации
 @router.get("/", response_class=HTMLResponse)
-async def index(request: Request) -> HTMLResponse:
+async def root(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         "main.html",
+        {"request": request}
+    )
+
+
+@router.get("/tor_builder", response_class=HTMLResponse)
+async def tor_builder(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        "tor_builder.html",
         {"request": request, "telegram_username": TELEGRAM_USERNAME},
     )
 
