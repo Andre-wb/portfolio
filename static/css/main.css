@@ -29,7 +29,6 @@
     font-family: Unbounded, sans-serif;
 }
 html {
-    scroll-behavior:smooth;
     width: 100%;
     overflow-x: hidden
 }
@@ -79,6 +78,9 @@ body {
     font-family: 'JetBrains Mono', sans-serif;
     font-size: 1.2vw;
     color: var(--muted);
+    @media (min-width: 1024px) {
+        max-width: 43vw;
+    }
 }
 
 header nav a {
@@ -182,17 +184,17 @@ header nav {
         gap: 40px;
     }
     .introduce-about h1 {
-        font-size: 12vw;
+        font-size: 14vw;
         transform: none;
         text-align: center;
     }
     .introduce-about h2 {
-        font-size: clamp(18px, 4vw, 40px);
+        font-size: 6vw;
         transform: none;
         text-align: center;
     }
     .introduce-about h3 {
-        font-size: clamp(12px, 2vw, 18px);
+        font-size: 3vw;
         text-align: center;
     }
     .introduce-image {
