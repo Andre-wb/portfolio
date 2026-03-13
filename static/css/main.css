@@ -30,6 +30,8 @@
 }
 html {
     scroll-behavior:smooth;
+    width: 100%;
+    overflow-x: hidden
 }
 body {
     background: var(--bg);
@@ -38,7 +40,9 @@ body {
     align-items: center;
     z-index: 1;
     position: relative;
-    width: 100vw;
+    min-height: 100vh;
+    left: 0;
+    right: 0;
 }
 @font-face {
     font-family: 'Unbounded';
@@ -54,7 +58,7 @@ body {
     font-style: normal;
     font-display: swap;
 }
-.introduce_about h1 {
+.introduce-about h1 {
     font-size: 6vw;
     font-weight: 500;
     transform: scaleX(1.3);
@@ -63,14 +67,14 @@ body {
     line-height: 1.05;
     margin-bottom: 24px;
 }
-.introduce_about h2 {
+.introduce-about h2 {
     font-size: 3vw;
     font-weight: 300;
     transform-origin: left;
     color: var(--accent2);
     margin-bottom: 20px;
 }
-.introduce_about h3 {
+.introduce-about h3 {
     font-weight: 300;
     font-family: 'JetBrains Mono', sans-serif;
     font-size: 1.2vw;
@@ -144,4 +148,94 @@ header nav {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.body-section-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 5vw;
+    gap: 4vw;
+}
+.introduce-about {
+    flex: 1;
+    min-width: 0;
+}
+.introduce-image {
+
+}
+
+/* Планшет */
+@media (max-width: 1024px) {
+    .body-section {
+        height: auto;
+        min-height: 100vh;
+        padding: 120px 0 60px;
+        width: 100vw;
+    }
+    .body-section-container {
+        flex-direction: column-reverse;
+        align-items: center;
+        text-align: center;
+        gap: 40px;
+    }
+    .introduce-about h1 {
+        font-size: 12vw;
+        transform: none;
+        text-align: center;
+    }
+    .introduce-about h2 {
+        font-size: clamp(18px, 4vw, 40px);
+        transform: none;
+        text-align: center;
+    }
+    .introduce-about h3 {
+        font-size: clamp(12px, 2vw, 18px);
+        text-align: center;
+    }
+    .introduce-image {
+        width: clamp(180px, 50vw, 320px);
+        aspect-ratio: 3 / 4;
+    }
+    .social-links {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .social-link {
+        width: clamp(36px, 5vw, 48px);
+        padding: 6px;
+    }
+    .btn-tz {
+        font-size: clamp(12px, 2vw, 16px);
+    }
+}
+
+/* Мобилка */
+@media (max-width: 480px) {
+    .body-section-container {
+        padding: 0 6vw;
+        gap: 28px;
+    }
+    .introduce-about h1 {
+        font-size: clamp(28px, 10vw, 48px);
+    }
+    .introduce-about h2 {
+        font-size: clamp(16px, 5vw, 28px);
+    }
+    .introduce-about h3 {
+        font-size: 13px;
+    }
+    .introduce-image {
+        width: clamp(140px, 60vw, 240px);
+    }
+    .social-links {
+        gap: 10px;
+    }
+    .btn-tz {
+        font-size: 13px;
+        padding: 10px 16px;
+        margin-left: 0;
+    }
 }
