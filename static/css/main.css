@@ -380,6 +380,7 @@ header nav {
 }
 
 .project-desc {
+    font-family: 'JetBrains Mono', monospace;
     font-size: clamp(14px, 1.2vw, 18px);
     color: var(--muted);
     line-height: 1.7;
