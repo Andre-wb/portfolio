@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/lenis@1.1.9/dist/lenis.min.js"></script>
     <script src="/static/js/animations.js" defer></script>
     <script src="/static/js/smooth_scroll.js"></script>
+    <script src="/static/js/projects_slide_animation.js"></script>
 </head>
 <body>
 <header>
@@ -42,6 +43,170 @@
         </div>
         <div class="introduce-image">
 
+        </div>
+    </div>
+</section>
+<section class="projects-section" id="projects">
+    <div class="projects-container">
+
+        <div class="section-title-wrapper">
+            <h2 class="section-title" id="projects-title">Избранное</h2>
+        </div>
+
+        <div class="project-card" data-project="vortex">
+            <div class="project-content">
+                <div class="project-meta">
+                    <span class="project-number">01</span>
+                    <span class="project-status">Хакатон · Участие</span>
+                </div>
+                <h3 class="project-name">VORTEX</h3>
+                <p class="project-desc">Децентрализованный P2P мессенджер с E2E шифрованием. Работает без интернета в локальной сети. Rust криптоядро, WebRTC звонки, мультихоп-маршрутизация.</p>
+                <div class="project-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">Rust</span>
+                    <span class="tech-tag">WebRTC</span>
+                    <span class="tech-tag">WebSocket</span>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link primary">GitHub</a>
+                    <a href="#" class="project-link">Демо</a>
+                </div>
+            </div>
+            <div class="project-visual">
+                <div class="visual-inner">
+                    <div class="network-mesh"></div>
+                    <div class="node node-1"></div>
+                    <div class="node node-2"></div>
+                    <div class="node node-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card" data-project="artifex">
+            <div class="project-content">
+                <div class="project-meta">
+                    <span class="project-number">02</span>
+                    <span class="project-status">Хакатон · 2 место</span>
+                </div>
+                <h3 class="project-name">Artifex</h3>
+                <p class="project-desc">Школьный электронный дневник с ИИ-помощником, геймификацией и трекером настроения. Командный проект, руководил разработкой.</p>
+                <div class="project-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">JWT</span>
+                    <span class="tech-tag">AI</span>
+                    <span class="tech-tag">SQLAlchemy</span>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link primary">GitHub</a>
+                    <a href="#" class="project-link">Демо</a>
+                </div>
+            </div>
+            <div class="project-visual">
+                <div class="visual-inner">
+                    <div class="orbital-system">
+                        <div class="orbit orbit-1"></div>
+                        <div class="orbit orbit-2"></div>
+                        <div class="planet"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card" data-project="realestate">
+            <div class="project-content">
+                <div class="project-meta">
+                    <span class="project-number">03</span>
+                    <span class="project-status">Коммерческий</span>
+                </div>
+                <h3 class="project-name">Приёмка квартир</h3>
+                <p class="project-desc">Сайт-портфолио для специалиста по приёмке квартир. 3D эффекты, форма с прикреплением файлов, интеграция Telegram-бота и email-уведомлений.</p>
+                <div class="project-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Flask</span>
+                    <span class="tech-tag">TeleBot</span>
+                    <span class="tech-tag">SMTP</span>
+                    <span class="tech-tag">3D CSS</span>
+                </div>
+                <div class="project-links">
+                    <span class="project-link disabled">Приватный</span>
+                    <a href="#" class="project-link">Демо</a>
+                </div>
+            </div>
+            <div class="project-visual">
+                <div class="visual-inner">
+                    <div class="building-3d">
+                        <div class="floor floor-1"></div>
+                        <div class="floor floor-2"></div>
+                        <div class="floor floor-3"></div>
+                        <div class="roof"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card" data-project="lethalhome">
+            <div class="project-content">
+                <div class="project-meta">
+                    <span class="project-number">04</span>
+                    <span class="project-status">Соло проект</span>
+                </div>
+                <h3 class="project-name">LethalHome</h3>
+                <p class="project-desc">Информационный портал по игре Lethal Company. Полный цикл: от дизайна до деплоя. Система комментариев, авторизация, поиск по контенту.</p>
+                <div class="project-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Flask</span>
+                    <span class="tech-tag">SQLite</span>
+                    <span class="tech-tag">JS</span>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link primary">GitHub</a>
+                    <a href="#" class="project-link">Демо</a>
+                </div>
+            </div>
+            <div class="project-visual lethal-theme">
+                <div class="visual-inner">
+                    <div class="radar-screen">
+                        <div class="radar-sweep"></div>
+                        <div class="blip blip-1"></div>
+                        <div class="blip blip-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card" data-project="orbityx">
+            <div class="project-content">
+                <div class="project-meta">
+                    <span class="project-number">05</span>
+                    <span class="project-status">Пет-проект · WIP</span>
+                </div>
+                <h3 class="project-name">Orbityx</h3>
+                <p class="project-desc">Криптовалютный трекер в реальном времени. Кастомная TypeScript библиотека для свечных графиков. WebSocket обновления данных.</p>
+                <div class="project-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Flask</span>
+                    <span class="tech-tag">TypeScript</span>
+                    <span class="tech-tag">WebSocket</span>
+                    <span class="tech-tag">ASGI</span>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link primary">GitHub</a>
+                    <span class="project-link disabled">Демо</span>
+                </div>
+            </div>
+            <div class="project-visual">
+                <div class="visual-inner">
+                    <div class="candle-chart">
+                        <div class="candle green"></div>
+                        <div class="candle red"></div>
+                        <div class="candle green tall"></div>
+                        <div class="candle red"></div>
+                        <div class="candle green"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

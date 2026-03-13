@@ -37,6 +37,7 @@ body {
     color: var(--text);
     display: flex;
     align-items: center;
+    flex-direction: column;
     z-index: 1;
     position: relative;
     min-height: 100vh;
@@ -241,3 +242,575 @@ header nav {
         margin-left: 0;
     }
 }
+/* ============================================
+   PROJECTS SECTION - 3D Scroll Effects
+   ============================================ */
+
+.projects-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+    overflow: visible;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+}
+
+.projects-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10vh 5vw 20vh;
+    position: relative;
+}
+
+/* ============================================
+   SECTION TITLE - 3D FLIP EFFECT
+   ============================================ */
+
+.section-title-wrapper {
+    position: relative;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10vh;
+    perspective: 1200px;
+}
+
+.section-title {
+    font-size: clamp(48px, 12vw, 140px);
+    font-weight: 200;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    transform-style: preserve-3d;
+    will-change: transform, filter, opacity;
+    text-align: center;
+    line-height: 1;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--accent2);
+    transition: width 0.8s ease;
+    box-shadow: 0 0 20px var(--accent2);
+}
+
+.section-title.visible::after {
+    width: 200px;
+}
+
+/* ============================================
+   PROJECT CARDS - 3D TILT ON SCROLL
+   ============================================ */
+
+.project-card {
+    position: relative;
+    width: 100%;
+    min-height: 70vh;
+    margin-bottom: 15vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4vw;
+    align-items: center;
+    transform-style: preserve-3d;
+    will-change: transform, opacity, filter;
+    opacity: 0.3;
+    transform: rotateX(45deg) translateZ(-200px) scale(0.8);
+    filter: blur(10px);
+}
+
+.project-card:nth-child(even) {
+    direction: rtl;
+}
+
+.project-card:nth-child(even) > * {
+    direction: ltr;
+}
+
+.project-card.visible {
+    opacity: 1;
+    transform: rotateX(0deg) translateZ(0) scale(1);
+    filter: blur(0);
+}
+
+/* Card inner content styling */
+.project-content {
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.project-number {
+    color: var(--accent2);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.project-status {
+    color: var(--muted2);
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+}
+
+.project-name {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.project-desc {
+    font-size: clamp(14px, 1.2vw, 18px);
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 90%;
+    font-weight: 300;
+}
+
+.project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2.5rem;
+}
+
+.tech-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    padding: 0.4rem 0.9rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.tech-tag:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    transform: translateY(-2px);
+}
+
+.project-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.project-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-link.primary {
+    background: var(--accent2);
+    color: var(--bg);
+    font-weight: 500;
+}
+
+.project-link.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 225, 255, 0.3);
+}
+
+.project-link:not(.primary) {
+    color: var(--text);
+    border: 1px solid var(--border);
+    background: transparent;
+}
+
+.project-link:not(.primary):hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+.project-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ============================================
+   PROJECT VISUALS - ANIMATED ABSTRACT SHAPES
+   ============================================ */
+
+.project-visual {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.visual-inner {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Vortex - Network Mesh */
+.network-mesh {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background:
+            radial-gradient(circle at 30% 30%, var(--accent-glow) 0%, transparent 50%),
+            radial-gradient(circle at 70% 70%, rgba(0, 225, 255, 0.2) 0%, transparent 50%);
+    opacity: 0.6;
+}
+
+.node {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--accent2);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--accent2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.node-1 { top: 30%; left: 30%; animation-delay: 0s; }
+.node-2 { top: 60%; left: 60%; animation-delay: 0.6s; }
+.node-3 { top: 45%; left: 45%; animation-delay: 1.2s; }
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* Artifex - Orbital System */
+.orbital-system {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.orbit {
+    position: absolute;
+    border: 1px solid var(--border-hi);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.orbit-1 {
+    width: 100%;
+    height: 100%;
+    animation: rotate 10s linear infinite;
+}
+
+.orbit-2 {
+    width: 60%;
+    height: 60%;
+    animation: rotate 7s linear infinite reverse;
+}
+
+.orbit::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.planet {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 30px var(--accent-glow);
+}
+
+@keyframes rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* LethalHome - Radar Screen */
+.radar-screen {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border: 2px solid var(--border-hi);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--surface2) 0%, var(--surface) 100%);
+    overflow: hidden;
+}
+
+.radar-sweep {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    background: linear-gradient(45deg, transparent 50%, rgba(239, 68, 68, 0.3) 100%);
+    transform-origin: 0 0;
+    animation: sweep 4s linear infinite;
+    border-radius: 0 0 100% 0;
+}
+
+.blip {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--red);
+    animation: blip 2s ease-in-out infinite;
+}
+
+.blip-1 { top: 30%; left: 60%; animation-delay: 1s; }
+.blip-2 { top: 70%; left: 30%; animation-delay: 2.5s; }
+
+@keyframes sweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes blip {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* Orbityx - Candle Chart */
+.candle-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 150px;
+    padding: 20px;
+}
+
+.candle {
+    width: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    position: relative;
+    animation: grow 1s ease-out forwards;
+    transform-origin: bottom;
+    transform: scaleY(0);
+}
+
+.candle.green { background: var(--green); border-color: var(--green); }
+.candle.red { background: var(--red); border-color: var(--red); }
+.candle.tall { height: 120px; animation-delay: 0.2s; }
+.candle:not(.tall) { height: 80px; }
+.candle:nth-child(1) { animation-delay: 0s; }
+.candle:nth-child(2) { animation-delay: 0.1s; }
+.candle:nth-child(3) { animation-delay: 0.2s; height: 100px; }
+.candle:nth-child(4) { animation-delay: 0.3s; }
+.candle:nth-child(5) { animation-delay: 0.4s; height: 60px; }
+
+.candle::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: inherit;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
+}
+
+.candle::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: inherit;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -8px;
+}
+
+@keyframes grow {
+    to { transform: scaleY(1); }
+}
+
+/* Real Estate - 3D Building */
+.building-3d {
+    position: relative;
+    width: 120px;
+    height: 180px;
+    transform-style: preserve-3d;
+    transform: rotateX(-20deg) rotateY(45deg);
+    animation: buildingFloat 6s ease-in-out infinite;
+}
+
+.floor {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    left: 0;
+}
+
+.floor-1 { bottom: 0; transform: translateZ(0); }
+.floor-2 { bottom: 55px; transform: translateZ(10px); }
+.floor-3 { bottom: 110px; transform: translateZ(20px); }
+
+.roof {
+    position: absolute;
+    bottom: 165px;
+    left: 50%;
+    transform: translateX(-50%) translateZ(30px);
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 40px solid var(--accent);
+    filter: drop-shadow(0 0 15px var(--accent-glow));
+}
+
+@keyframes buildingFloat {
+    0%, 100% { transform: rotateX(-20deg) rotateY(45deg) translateY(0); }
+    50% { transform: rotateX(-20deg) rotateY(45deg) translateY(-10px); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .project-card {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        gap: 2rem;
+    }
+
+    .project-card:nth-child(even) {
+        direction: ltr;
+    }
+
+    .project-visual {
+        min-height: 300px;
+        order: -1;
+    }
+
+    .section-title-wrapper {
+        height: 40vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-container {
+        padding: 5vh 4vw 10vh;
+    }
+
+    .project-content {
+        padding: 1rem;
+    }
+
+    .project-stack {
+        gap: 0.4rem;
+    }
+
+    .tech-tag {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+/* ============================================
+   SMOOTH TRANSITIONS OVERRIDE
+   ============================================ */
+
+/* Убираем резкие CSS-переходы, все через JS */
+.section-title,
+.project-card {
+    transition: none !important;
+    will-change: transform, filter, opacity;
+}
+
+/* Финальное состояние visible — мягкое приземление */
+.section-title.visible,
+.project-card.visible {
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+    filter 0.6s ease-out,
+    opacity 0.4s ease-out !important;
+}
+
+/* Увеличиваем высоту секций для более длинного скролла */
+.section-title-wrapper {
+    height: 80vh; /* Было 60vh */
+    margin-bottom: 15vh;
+}
+
+.project-card {
+    margin-bottom: 25vh; /* Было 15vh — больше пространства между карточками */
+    min-height: 60vh; /* Меньше высота карточки, больше скролла */
+}
+
+/* Плавное появление визуальных элементов внутри карточки */
+.project-visual .visual-inner {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+}
+
+.project-card.visible .project-visual .visual-inner {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Медленное появление текста */
+.project-content > * {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.project-card.visible .project-content > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.project-card.visible .project-meta { transition-delay: 0.1s; }
+.project-card.visible .project-name { transition-delay: 0.2s; }
+.project-card.visible .project-desc { transition-delay: 0.3s; }
+.project-card.visible .project-stack { transition-delay: 0.4s; }
+.project-card.visible .project-links { transition-delay: 0.5s; }
