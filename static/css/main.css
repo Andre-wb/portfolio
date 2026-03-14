@@ -90,7 +90,7 @@ header nav a {
     font-family: 'JetBrains Mono', sans-serif;
 }
 header {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
@@ -144,6 +144,7 @@ header nav {
     border-radius: 2em;
     border: none;
     width: 20vw;
+    min-width: 300px;
     backdrop-filter: blur(12px);
 }
 .body-section {
@@ -381,7 +382,7 @@ header nav {
 
 .project-desc {
     font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(16px, 1.5vw, 20px);
     color: var(--muted);
     line-height: 1.7;
     margin-bottom: 2rem;
@@ -398,7 +399,7 @@ header nav {
 
 .tech-tag {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     color: var(--accent);
     padding: 0.4rem 0.9rem;
     background: var(--surface2);
@@ -420,7 +421,7 @@ header nav {
 
 .project-link {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-decoration: none;
     padding: 0.8rem 1.5rem;
     border-radius: 6px;

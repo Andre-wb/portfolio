@@ -55,13 +55,49 @@ class ProjectGallery {
     }
 
     open(projectId) {
-        // Здесь загрузка изображений по projectId
-        // Пример структуры данных:
         const projectImages = {
-            'vortex': ['/static/img/vortex/1.jpg', '/static/img/vortex/2.jpg'],
-            'artifex': ['/static/img/artifex/1.jpg', '/static/img/artifex/2.jpg'],
-
-        };
+            'vortex': [
+                '/static/assets/vortex/vortex1.png',
+                '/static/assets/vortex/vortex2.png',
+                '/static/assets/vortex/vortex3.png',
+                '/static/assets/vortex/vortex4.png',
+                '/static/assets/vortex/vortex5.png',
+                '/static/assets/vortex/vortex6.png',
+                '/static/assets/vortex/vortex7.png',
+                '/static/assets/vortex/vortex8.png',
+                '/static/assets/vortex/vortex9.png',
+            ],
+            'artifex': [
+                '/static/assets/artifex/artifex1.png',
+                '/static/assets/artifex/artifex2.png',
+                '/static/assets/artifex/artifex3.png',
+                '/static/assets/artifex/artifex4.png',
+                '/static/assets/artifex/artifex5.png',
+                '/static/assets/artifex/artifex6.png',
+            ],
+            'lethalhome': [
+                '/static/assets/lethalhome/lethalhome1.png',
+                '/static/assets/lethalhome/lethalhome2.png',
+                '/static/assets/lethalhome/lethalhome3.png',
+                '/static/assets/lethalhome/lethalhome4.png',
+                '/static/assets/lethalhome/lethalhome5.png',
+                '/static/assets/lethalhome/lethalhome6.png',
+                '/static/assets/lethalhome/lethalhome7.png',
+                '/static/assets/lethalhome/lethalhome8.png',
+            ],
+            'realestate': [
+                '/static/assets/realestate/realestate1.png',
+                '/static/assets/realestate/realestate2.png',
+                '/static/assets/realestate/realestate3.png',
+                '/static/assets/realestate/realestate4.png',
+                '/static/assets/realestate/realestate5.png',
+                '/static/assets/realestate/realestate6.png',
+            ],
+            'orbityx': [
+                '/static/assets/orbityx/orbityx1.png',
+                '/static/assets/orbityx/orbityx2.png',
+            ],
+        }
 
         this.images = projectImages[projectId] || [];
         this.currentIndex = 0;
