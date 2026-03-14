@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/static/css/main.css"/>
     <script src="https://unpkg.com/lenis@1.1.9/dist/lenis.min.js"></script>
     <script src="/static/js/animations.js" defer></script>
+    <script src="/static/js/slider.js" defer></script>
     <script src="/static/js/smooth_scroll.js"></script>
     <script src="/static/js/projects_slide_animation.js"></script>
 </head>
@@ -70,7 +71,7 @@
                 </div>
                 <div class="project-links">
                     <a href="https://github.com/Andre-wb/Vortex" class="project-link primary">GitHub</a>
-                    <a href="#" class="project-link">Демо</a>
+                    <a href="#" class="project-link">Галерея</a>
                 </div>
             </div>
             <div class="project-visual">
@@ -100,7 +101,7 @@
                 </div>
                 <div class="project-links">
                     <a href="https://github.com/Andre-wb/Artifex" class="project-link primary">GitHub</a>
-                    <a href="#" class="project-link">Демо</a>
+                    <a href="#" class="project-link">Галерея</a>
                 </div>
             </div>
             <div class="project-visual">
@@ -130,8 +131,8 @@
                     <span class="tech-tag">3D CSS</span>
                 </div>
                 <div class="project-links">
-                    <span class="project-link disabled">Приватный</span>
-                    <a href="#" class="project-link">Демо</a>
+                    <a href="https://portfolioforalexey.pythonanywhere.com" class="project-link primary">Сайт</a>
+                    <a href="#" class="project-link">Галерея</a>
                 </div>
             </div>
             <div class="project-visual">
@@ -162,7 +163,7 @@
                 </div>
                 <div class="project-links">
                     <a href="https://github.com/Andre-wb/lethalhome" class="project-link primary">GitHub</a>
-                    <a href="#" class="project-link">Демо</a>
+                    <a href="#" class="project-link">Галерея</a>
                 </div>
             </div>
             <div class="project-visual lethal-theme">
@@ -193,7 +194,7 @@
                 </div>
                 <div class="project-links">
                     <a href="https://github.com/Andre-wb/Orbityx" class="project-link primary">GitHub</a>
-                    <span class="project-link">Демо</span>
+                    <a href="#" class="project-link">Галерея</a>
                 </div>
             </div>
             <div class="project-visual">
@@ -210,5 +211,34 @@
         </div>
     </div>
 </section>
+<!-- Gallery Modal -->
+<div class="gallery-modal" id="galleryModal">
+    <div class="gallery-backdrop"></div>
+    <div class="gallery-container">
+        <button class="gallery-close" aria-label="Закрыть">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+
+        <div class="gallery-slider">
+            <div class="gallery-track" id="galleryTrack">
+                <!-- Слайды вставляются динамически -->
+            </div>
+        </div>
+
+        <div class="gallery-nav">
+            <button class="gallery-btn prev" id="prevBtn">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="gallery-dots" id="galleryDots"></div>
+            <button class="gallery-btn next" id="nextBtn">
+                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+
+        <div class="gallery-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">5</span>
+        </div>
+    </div>
+</div>
 </body>
 </html>
