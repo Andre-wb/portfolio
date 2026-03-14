@@ -143,9 +143,9 @@ header nav {
     justify-content: space-around;
     border-radius: 2em;
     border: none;
-    width: 20vw;
     min-width: 300px;
     backdrop-filter: blur(12px);
+    gap: 2em;
 }
 .body-section {
     height: 100vh;
