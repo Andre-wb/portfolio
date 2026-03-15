@@ -12,12 +12,16 @@
     <script src="/static/js/slider.js" defer></script>
     <script src="/static/js/smooth_scroll.js"></script>
     <script src="/static/js/projects_slide_animation.js"></script>
+    <script src="/static/js/stars.js" defer></script>
+    <script src="/static/js/terminal.js" defer></script>
+
 </head>
 <body>
 <header>
     <nav>
-        <a href="#introduce">Про меня</a>
+        <a href="#introduce">Обо мне</a>
         <a href="#projects">Кейсы</a>
+        <a href="#about">Профиль</a>
         <a href="/tor_builder">Составить ТЗ</a>
     </nav>
 </header>
@@ -44,7 +48,14 @@
             </div>
         </div>
         <div class="introduce-image">
-
+            <div class="photo-frame">
+                <img src="/static/images/andrey-photo.png"
+                     alt="Андрей Караваев"
+                     class="profile-photo"
+                     loading="lazy">
+                <div class="photo-glow"></div>
+                <div class="scan-line"></div>
+            </div>
         </div>
     </div>
 </section>
@@ -212,7 +223,24 @@
         </div>
     </div>
 </section>
-<!-- Gallery Modal -->
+<section class="about body-section" id="about">
+    <div class="terminal-window">
+        <div class="terminal-topbar">
+            <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+            </div>
+            <span class="terminal-title">~/profile — zsh</span>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+            <div class="terminal-line">
+                <span class="prompt">andrey@portfolio:~$</span>
+                <span class="cursor-blink"> █</span>
+            </div>
+        </div>
+    </div>
+</section>
 <div class="gallery-modal" id="galleryModal">
     <div class="gallery-backdrop"></div>
     <div class="gallery-container">
