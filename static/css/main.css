@@ -175,7 +175,6 @@ header nav {
 .introduce-about {
     min-width: 0;
     overflow: visible;
-    padding-right: 1vw;
 }
 
 /* Обёртка h1 ограничивает область до масштабирования,
