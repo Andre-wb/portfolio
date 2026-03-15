@@ -4,6 +4,11 @@
         const section = document.getElementById('projects');
         if (!section) return;
 
+        /* ── Определение touch-устройства ───────────────────────── */
+        const isTouchDevice = ('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            (navigator.msMaxTouchPoints > 0);
+
         /* ── Canvas ─────────────────────────────────────────────── */
         const canvas = document.createElement('canvas');
         Object.assign(canvas.style, {
@@ -77,23 +82,22 @@
             }
         }, 200);
 
-        /* ── Курсор ─────────────────────────────────────────────────
-         * dirX/dirY  — направление движения (-1 … +1), задаётся курсором
-         * smDirX/Y   — плавно сглаженное направление
-         * По умолчанию курсор считается в центре → нет движения.
-         * ────────────────────────────────────────────────────────── */
+        /* ── Курсор (только для non-touch устройств) ─────────────── */
         let dirX = 0, dirY = 0;
         let smDirX = 0, smDirY = 0;
 
-        document.addEventListener('mousemove', e => {
-            const r = section.getBoundingClientRect();
-            // Нормализуем относительно центра секции: -1 … +1
-            dirX = ((e.clientX - r.left) / W - 0.5) * 2;
-            dirY = ((e.clientY - r.top)  / H - 0.5) * 2;
-        });
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', e => {
+                const r = section.getBoundingClientRect();
+                // Нормализуем относительно центра секции: -1 … +1
+                dirX = ((e.clientX - r.left) / W - 0.5) * 2;
+                dirY = ((e.clientY - r.top)  / H - 0.5) * 2;
+            });
+        }
 
         /* ── Плавное переключение скролл ↔ курсор ─────────────────
          * cursorAlpha: 0 = скролл рулит, 1 = курсор рулит
+         * Для touch-устройств cursorAlpha всегда равен 0
          * ────────────────────────────────────────────────────────── */
         let cursorAlpha = 0;
 
@@ -104,21 +108,28 @@
             requestAnimationFrame(draw);
             tick++;
 
-            // Плавно сглаживаем направление курсора
-            smDirX += (dirX - smDirX) * 0.04;
-            smDirY += (dirY - smDirY) * 0.04;
+            if (!isTouchDevice) {
+                // Плавно сглаживаем направление курсора (только для non-touch)
+                smDirX += (dirX - smDirX) * 0.04;
+                smDirY += (dirY - smDirY) * 0.04;
 
-            // Плавно переключаем режим
-            const targetAlpha = isScrolling ? 0 : 1;
-            cursorAlpha += (targetAlpha - cursorAlpha) * 0.06;
+                // Плавно переключаем режим (только для non-touch)
+                const targetAlpha = isScrolling ? 0 : 1;
+                cursorAlpha += (targetAlpha - cursorAlpha) * 0.06;
+            } else {
+                // Для touch-устройств курсорный эффект отключен
+                smDirX = 0;
+                smDirY = 0;
+                cursorAlpha = 0;
+            }
 
             ctx.clearRect(0, 0, W, H);
 
             stars.forEach(s => {
                 const L = LAYERS[s.li];
 
-                // Когда не скроллим — двигаем базовую позицию в направлении курсора
-                if (!isScrolling || cursorAlpha > 0.01) {
+                // Движение под влиянием курсора (только если cursorAlpha > 0)
+                if (cursorAlpha > 0.01) {
                     const vx = smDirX * L.speed * L.cursor * cursorAlpha;
                     const vy = smDirY * L.speed * L.cursor * cursorAlpha;
                     s.x = ((s.x + vx) % W + W) % W;

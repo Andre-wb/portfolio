@@ -76,9 +76,6 @@ class ProjectGallery {
                 '/static/assets/artifex/artifex6.png',
             ],
             'lethalhome': [
-                '/static/assets/lethalhome/lethalhome1.png',
-                '/static/assets/lethalhome/lethalhome2.png',
-                '/static/assets/lethalhome/lethalhome3.png',
                 '/static/assets/lethalhome/lethalhome4.png',
                 '/static/assets/lethalhome/lethalhome5.png',
                 '/static/assets/lethalhome/lethalhome6.png',

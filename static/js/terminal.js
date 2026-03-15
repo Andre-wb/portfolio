@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(220);
         await printLines([
             'Андрей Караваев — fullstack-разработчик, 16 лет.',
-            'Специализация: frontend, backend, системное программирование, безопасность.',
+            'Специализация: frontend, backend, системное программирование, кибербезопасность.',
         ], 120);
 
         // ── stack ───────────────────────────────────────────
