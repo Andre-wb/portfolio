@@ -10,7 +10,10 @@ from app.tor_logic import format_for_telegram
 load_dotenv()
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+templates_dir = os.path.join(BASE_DIR, "templates")
+templates = Jinja2Templates(directory=templates_dir)
 
 # Переменные для интеграции телеграм-бота (обозначены в .env)
 BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
