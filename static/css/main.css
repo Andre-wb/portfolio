@@ -236,6 +236,229 @@ header {
     justify-content: center;
     z-index: 2;
 }
+/* ============================================
+   BURGER MENU - Mobile Navigation
+   ============================================ */
+
+.header-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+.burger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.burger-line {
+    width: 100%;
+    height: 2px;
+    background: var(--accent2);
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+    border-radius: 2px;
+}
+
+.burger-menu.active .burger-line:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.burger-menu.active .burger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.burger-menu.active .burger-line:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: min(320px, 80vw);
+    height: 100vh;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 4;
+}
+
+.mobile-nav.active {
+    right: 0;
+    z-index: 4;
+}
+
+.mobile-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.mobile-nav-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2rem;
+    color: var(--accent2);
+    font-weight: 500;
+}
+
+.mobile-nav-close {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-nav-close:hover {
+    color: var(--accent2);
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex: 1;
+}
+
+.mobile-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    background: linear-gradient(90deg, transparent 0%, transparent 100%);
+}
+
+.mobile-link:hover,
+.mobile-link:focus {
+    color: var(--accent2);
+    background: linear-gradient(90deg, var(--surface2) 0%, transparent 100%);
+    transform: translateX(10px);
+}
+
+.mobile-link-tz {
+    background: var(--accent2);
+    color: var(--bg);
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.mobile-link-tz:hover,
+.mobile-link-tz:focus {
+    color: var(--bg);
+    background: var(--accent);
+    transform: translateX(0);
+    box-shadow: 0 0 20px var(--accent2);
+}
+
+.mobile-nav-social {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.mobile-social-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.mobile-social-link:hover {
+    color: var(--accent2);
+}
+
+/* Overlay для затемнения фона */
+.mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(3, 5, 11, 0.8);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.mobile-nav-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 3;
+}
+
+/* ============================================
+   MEDIA QUERIES - Mobile Menu
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .header-container {
+        justify-content: space-between;
+        padding: 4vw;
+    }
+
+    .desktop-nav {
+        display: none;
+    }
+
+    .burger-menu {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-link {
+        font-size: 1.25rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .mobile-nav-social {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+}
 .body-section-introduce {
     display: flex;
     align-items: center;

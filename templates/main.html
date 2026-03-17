@@ -14,16 +14,42 @@
     <script src="/static/js/projects_slide_animation.js"></script>
     <script src="/static/js/stars.js" defer></script>
     <script src="/static/js/terminal.js" defer></script>
+    <script src="/static/js/burger.js" defer></script>
 
 </head>
 <body>
 <header>
-    <nav>
-        <a href="#introduce">Обо мне</a>
-        <a href="#projects">Кейсы</a>
-        <a href="#about">Профиль</a>
-        <a href="/tor_builder">Составить ТЗ</a>
-    </nav>
+    <div class="header-container">
+        <nav class="desktop-nav">
+            <a href="#introduce">Обо мне</a>
+            <a href="#projects">Кейсы</a>
+            <a href="#about">Профиль</a>
+            <a href="/tor_builder">Составить ТЗ</a>
+        </nav>
+
+        <button class="burger-menu" aria-label="Меню" aria-expanded="false">
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+        </button>
+
+        <nav class="mobile-nav">
+            <div class="mobile-nav-header">
+                <span class="mobile-nav-title">Навигация</span>
+            </div>
+            <div class="mobile-nav-links">
+                <a href="#introduce" class="mobile-link">Обо мне</a>
+                <a href="#projects" class="mobile-link">Кейсы</a>
+                <a href="#about" class="mobile-link">Профиль</a>
+                <a href="/tor_builder" class="mobile-link mobile-link-tz">Составить ТЗ</a>
+            </div>
+            <div class="mobile-nav-social">
+                <a href="https://github.com/Andre-wb" class="mobile-social-link" target="_blank">GitHub</a>
+                <a href="https://t.me/andr3ywb" class="mobile-social-link" target="_blank">Telegram</a>
+                <a href="mailto:andreykaravaev640@gmail.com" class="mobile-social-link" target="_blank">Email</a>
+            </div>
+        </nav>
+    </div>
 </header>
 <section class="introduce body-section" id="introduce">
     <div class="body-section-introduce body-section-container">
