@@ -15,9 +15,25 @@
     <script src="/static/js/stars.js" defer></script>
     <script src="/static/js/terminal.js" defer></script>
     <script src="/static/js/burger.js" defer></script>
-
+    <script src="/static/js/cookies.js" defer></script>
 </head>
 <body>
+<div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-content">
+        <div class="cookie-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
+        </div>
+        <div class="cookie-text">
+            <h4>Про куки</h4>
+            <p>Я использую файлы cookie, чтобы сделать ваш опыт на сайте лучше. Продолжая использовать сайт, вы соглашаетесь на их использование.</p>
+        </div>
+        <div class="cookie-actions">
+            <button class="cookie-btn cookie-btn-primary" id="acceptCookies">Принять</button>
+            <button class="cookie-btn cookie-btn-secondary" id="declineCookies">Отклонить</button>
+        </div>
+    </div>
+</div>
+<div class="mobile-nav-overlay"></div>
 <header>
     <div class="header-container">
         <nav class="desktop-nav">
@@ -34,14 +50,11 @@
         </button>
 
         <nav class="mobile-nav">
-            <div class="mobile-nav-header">
-                <span class="mobile-nav-title">Навигация</span>
-            </div>
             <div class="mobile-nav-links">
                 <a href="#introduce" class="mobile-link">Обо мне</a>
                 <a href="#projects" class="mobile-link">Кейсы</a>
                 <a href="#about" class="mobile-link">Профиль</a>
-                <a href="/tor_builder" class="mobile-link mobile-link-tz">Составить ТЗ</a>
+                <a href="/tor_builder" class="mobile-link-tz">Составить ТЗ</a>
             </div>
             <div class="mobile-nav-social">
                 <a href="https://github.com/Andre-wb" class="mobile-social-link" target="_blank">GitHub</a>

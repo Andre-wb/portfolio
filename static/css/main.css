@@ -261,13 +261,15 @@ header {
     display: none;
     flex-direction: column;
     justify-content: space-between;
-    width: 30px;
-    height: 20px;
+    width: 50px;
+    height: 40px;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0;
-    z-index: 1001;
+    z-index: 5;
+    backdrop-filter: blur(5px);
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .burger-line {
@@ -279,7 +281,7 @@ header {
 }
 
 .burger-menu.active .burger-line:nth-child(1) {
-    transform: translateY(9px) rotate(45deg);
+    transform: translateY(14px) rotate(45deg);
 }
 
 .burger-menu.active .burger-line:nth-child(2) {
@@ -287,7 +289,7 @@ header {
 }
 
 .burger-menu.active .burger-line:nth-child(3) {
-    transform: translateY(-9px) rotate(-45deg);
+    transform: translateY(-14px) rotate(-45deg);
 }
 
 .mobile-nav {
@@ -298,9 +300,9 @@ header {
     height: 100vh;
     background: var(--surface);
     backdrop-filter: blur(20px);
-    border-left: 1px solid var(--border);
     padding: 2rem 1.5rem;
     transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: 25px 0 0 25px;
     display: flex;
     flex-direction: column;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
@@ -351,6 +353,8 @@ header {
 .mobile-nav-links {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
     flex: 1;
@@ -367,11 +371,8 @@ header {
     background: linear-gradient(90deg, transparent 0%, transparent 100%);
 }
 
-.mobile-link:hover,
-.mobile-link:focus {
-    color: var(--accent2);
-    background: linear-gradient(90deg, var(--surface2) 0%, transparent 100%);
-    transform: translateX(10px);
+.mobile-link:active {
+    transform: translateY(5px);
 }
 
 .mobile-link-tz {
@@ -379,21 +380,25 @@ header {
     color: var(--bg);
     text-align: center;
     margin-top: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    border-radius: 8px;
 }
 
-.mobile-link-tz:hover,
-.mobile-link-tz:focus {
-    color: var(--bg);
-    background: var(--accent);
-    transform: translateX(0);
-    box-shadow: 0 0 20px var(--accent2);
+.mobile-link-tz:active {
+    transform: translateY(5px);
 }
 
 .mobile-nav-social {
+    font-size: 16px;
     display: flex;
-    justify-content: space-around;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
 .mobile-social-link {
@@ -425,7 +430,7 @@ header {
 .mobile-nav-overlay.active {
     opacity: 1;
     visibility: visible;
-    z-index: 3;
+    z-index: 1;
 }
 
 /* ============================================
@@ -452,11 +457,8 @@ header {
         font-size: 1.25rem;
         padding: 0.6rem 0.8rem;
     }
-
-    .mobile-nav-social {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
+    .mobile-link-tz {
+        font-size: 1.25rem;
     }
 }
 .body-section-introduce {
@@ -568,6 +570,9 @@ header nav {
         min-height: 100vh;
         padding: 100px 0 60px;
         width: 100vw;
+    }
+    .introduce {
+        padding-top: 80px;
     }
     .body-section-container {
         grid-template-columns: 1fr;
@@ -1620,4 +1625,196 @@ header nav {
     );
     mask-composite: intersect;
     filter: drop-shadow(0 20px 50px var(--surface2));
+}
+/* ============================================
+   COOKIE BANNER - Cyberpunk Style
+   ============================================ */
+
+.cookie-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: none; /* Скрыт по умолчанию, JS покажет */
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Чтобы кликать сквозь фон, контейнер не блочит */
+}
+
+.cookie-content {
+    max-width: 1100px;
+    width: fit-content;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-hi);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow), 0 10px 40px -10px rgba(0, 225, 255, 0.2);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    pointer-events: all;
+    animation: slideUpCookie 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform-origin: bottom center;
+}
+
+/* Анимация появления */
+@keyframes slideUpCookie {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Иконка */
+.cookie-icon {
+    color: var(--accent2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    background: var(--surface2);
+}
+
+.cookie-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Текст */
+.cookie-text h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+}
+
+.cookie-text p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 500px;
+}
+
+/* Кнопки */
+.cookie-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.cookie-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.cookie-btn-primary {
+    background: var(--accent2);
+    color: var(--bg);
+    border: 1px solid var(--accent2);
+}
+
+.cookie-btn-primary:hover {
+    background: transparent;
+    color: var(--accent2);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.cookie-btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.cookie-btn-secondary:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: var(--surface2);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   COOKIE BANNER - Mobile Styles
+   ============================================ */
+@media (max-width: 768px) {
+    .cookie-banner {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .cookie-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+        width: 100%;
+    }
+
+    .cookie-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cookie-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .cookie-text h4 {
+        font-size: 1rem;
+    }
+
+    .cookie-text p {
+        font-size: 0.8rem;
+        max-width: 100%;
+    }
+
+    .cookie-actions {
+        width: 100%;
+        justify-content: stretch;
+        gap: 10px;
+    }
+
+    .cookie-btn {
+        flex: 1;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 0.85rem;
+    }
+}
+
+/* Для совсем маленьких экранов */
+@media (max-width: 380px) {
+    .cookie-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .cookie-btn {
+        width: 100%;
+    }
 }

@@ -3,11 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const burgerBtn = document.querySelector('.burger-menu');
     const mobileNav = document.querySelector('.mobile-nav');
     const closeBtn = document.querySelector('.mobile-nav-close');
-    const overlay = document.createElement('div');
-
-    // Создаем оверлей
-    overlay.className = 'mobile-nav-overlay';
-    document.body.appendChild(overlay);
+    const overlay = document.querySelector('.mobile-nav-overlay');
 
     // Функция открытия меню
     function openMenu() {
