@@ -1,16 +1,11 @@
-/*
-   Функционал составления шаблона технического задания
-   Полное дерево вопросов и вариантов
-   */
 'use strict';
 
+const TG_USERNAME = window.TG_USERNAME || 'andr3ywb';
+const BOT_API_URL = '/send-tor';
+const LS_KEY      = 'tor_quiz_v5';
 
-const TG_USERNAME  = window.TG_USERNAME || 'andr3ywb';
-const BOT_API_URL  = '/send-tor';
-const LS_KEY       = 'tor_quiz_v4';
 const STEPS = [
 
-  /*   0: Тип проекта */
   {
     id: 'project_type',
     question: 'Что вы хотите разработать?',
@@ -27,7 +22,6 @@ const STEPS = [
     show: () => true,
   },
 
-  /*   1: Идея проекта */
   {
     id: 'project_idea',
     question: 'Опишите идею проекта',
@@ -37,8 +31,7 @@ const STEPS = [
     show: () => true,
   },
 
-
-  /*   2   */
+  // САЙТ
   {
     id: 'site_type',
     question: 'Какой тип сайта вам нужен?',
@@ -55,7 +48,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'site',
   },
 
-  /*   3   */
   {
     id: 'site_goal',
     question: 'Какова основная цель сайта?',
@@ -65,7 +57,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'site',
   },
 
-  /*   4   */
   {
     id: 'site_functions',
     question: 'Какие функции нужны на сайте?',
@@ -86,7 +77,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'site',
   },
 
-  /*   5   Регистрация: способ */
   {
     id: 'site_reg_method',
     question: 'Как пользователи будут регистрироваться?',
@@ -103,7 +93,6 @@ const STEPS = [
         (a.site_functions?.values || []).includes('registration'),
   },
 
-  /*   6   Личный кабинет: описание */
   {
     id: 'site_cabinet_desc',
     question: 'Что пользователь делает в личном кабинете?',
@@ -114,7 +103,6 @@ const STEPS = [
         (a.site_functions?.values || []).includes('cabinet'),
   },
 
-  /*   7   Админ-панель: описание */
   {
     id: 'site_admin_desc',
     question: 'Какие функции нужны администратору?',
@@ -125,7 +113,6 @@ const STEPS = [
         (a.site_functions?.values || []).includes('admin'),
   },
 
-  /*   8   Оплата: система */
   {
     id: 'site_payment_method',
     question: 'Какая система оплаты нужна?',
@@ -142,7 +129,6 @@ const STEPS = [
         (a.site_functions?.values || []).includes('payment'),
   },
 
-  /*   9   Интернет-магазин: функции */
   {
     id: 'shop_features',
     question: 'Какие функции нужны в интернет-магазине?',
@@ -161,14 +147,14 @@ const STEPS = [
     show: a => a.project_type?.value === 'site' && a.site_type?.value === 'shop',
   },
 
-  /*   10   Дизайн */
   {
     id: 'site_design',
     question: 'Как обстоят дела с дизайном?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)' },
+      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)',
+        hasText: true, textPlaceholder: 'Ссылка на Figma или описание файлов...' },
       { value: 'examples', label: 'Есть примеры сайтов',
         hasText: true, textPlaceholder: 'Вставьте ссылки на понравившиеся сайты...' },
       { value: 'develop',  label: 'Нужно разработать дизайн с нуля' },
@@ -178,15 +164,16 @@ const STEPS = [
     show: a => a.project_type?.value === 'site',
   },
 
-  /*   11   Контент */
   {
     id: 'site_content',
     question: 'Есть ли готовый контент для сайта?',
     subtitle: 'Тексты, изображения, материалы — можно выбрать несколько',
     type: 'multi', required: true,
     options: [
-      { value: 'texts',       label: 'Есть тексты / описания' },
-      { value: 'images',      label: 'Есть изображения / фото' },
+      { value: 'texts',       label: 'Есть тексты / описания',
+        hasText: true, textPlaceholder: 'Опишите кратко, что именно...' },
+      { value: 'images',      label: 'Есть изображения / фото',
+        hasText: true, textPlaceholder: 'Опишите кратко, что именно...' },
       { value: 'need_create', label: 'Контент нужно создать' },
       { value: 'custom',      label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите ситуацию с контентом...' },
@@ -194,7 +181,25 @@ const STEPS = [
     show: a => a.project_type?.value === 'site',
   },
 
-  /*   12   */
+  {
+    id: 'site_hosting',
+    question: 'Как обстоят дела с хостингом и доменом?',
+    subtitle: 'Выберите один вариант',
+    type: 'single', required: true,
+    options: [
+      { value: 'has_both',   label: 'Есть домен и хостинг',
+        hasText: true, textPlaceholder: 'Укажите домен и название хостинга...' },
+      { value: 'has_domain', label: 'Есть только домен',
+        hasText: true, textPlaceholder: 'Укажите доменное имя...' },
+      { value: 'has_host',   label: 'Есть только хостинг',
+        hasText: true, textPlaceholder: 'Укажите название хостинга...' },
+      { value: 'delegate',   label: 'Доверяю выбор специалисту — подберите коммерчески выгодный вариант' },
+      { value: 'need_help',  label: 'Нужна помощь с выбором, но решение за мной' },
+    ],
+    show: a => a.project_type?.value === 'site',
+  },
+
+  // ВЕБ-ПРИЛОЖЕНИЕ
   {
     id: 'webapp_type',
     question: 'Какой тип веб-приложения?',
@@ -211,23 +216,22 @@ const STEPS = [
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /*   13   */
   {
     id: 'webapp_users',
     question: 'Какие роли будут в системе?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'users_only',   label: 'Только обычные пользователи' },
-      { value: 'users_admin',  label: 'Пользователи + Администратор' },
-      { value: 'multi_roles',  label: 'Несколько ролей (менеджер, клиент, руководитель…)' },
-      { value: 'custom',       label: 'Свой вариант / не знаю',
+      { value: 'users_only',  label: 'Только обычные пользователи' },
+      { value: 'users_admin', label: 'Пользователи + Администратор' },
+      { value: 'multi_roles', label: 'Несколько ролей (менеджер, клиент, руководитель…)',
+        hasText: true, textPlaceholder: 'Опишите роли и их права...' },
+      { value: 'custom',      label: 'Свой вариант / не знаю',
         hasText: true, textPlaceholder: 'Опишите роли и их права...' },
     ],
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /*   14   */
   {
     id: 'webapp_functions',
     question: 'Какие основные функции нужны?',
@@ -247,7 +251,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /*   15   */
   {
     id: 'webapp_scale',
     question: 'Сколько пользователей ожидается?',
@@ -263,14 +266,14 @@ const STEPS = [
     show: a => a.project_type?.value === 'webapp',
   },
 
-  /*   16   */
   {
     id: 'webapp_design',
     question: 'Как обстоят дела с дизайном приложения?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)' },
+      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)',
+        hasText: true, textPlaceholder: 'Ссылка на Figma или описание файлов...' },
       { value: 'examples', label: 'Есть примеры приложений',
         hasText: true, textPlaceholder: 'Вставьте ссылки на примеры...' },
       { value: 'develop',  label: 'Нужно разработать дизайн с нуля' },
@@ -280,8 +283,25 @@ const STEPS = [
     show: a => a.project_type?.value === 'webapp',
   },
 
+  {
+    id: 'webapp_hosting',
+    question: 'Как обстоят дела с хостингом и доменом?',
+    subtitle: 'Выберите один вариант',
+    type: 'single', required: true,
+    options: [
+      { value: 'has_both',   label: 'Есть домен и хостинг',
+        hasText: true, textPlaceholder: 'Укажите домен и название хостинга...' },
+      { value: 'has_domain', label: 'Есть только домен',
+        hasText: true, textPlaceholder: 'Укажите доменное имя...' },
+      { value: 'has_host',   label: 'Есть только хостинг',
+        hasText: true, textPlaceholder: 'Укажите название хостинга...' },
+      { value: 'delegate',   label: 'Доверяю выбор специалисту — подберите коммерчески выгодный вариант' },
+      { value: 'need_help',  label: 'Нужна помощь с выбором, но решение за мной' },
+    ],
+    show: a => a.project_type?.value === 'webapp',
+  },
 
-  /*   17   */
+  // TELEGRAM-БОТ
   {
     id: 'bot_task',
     question: 'Какова основная задача Telegram-бота?',
@@ -298,7 +318,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /*   18   */
   {
     id: 'bot_db',
     question: 'Нужна ли боту база данных?',
@@ -311,7 +330,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /*   19   */
   {
     id: 'bot_db_what',
     question: 'Что нужно хранить в базе данных?',
@@ -328,7 +346,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot' && a.bot_db?.value === 'yes',
   },
 
-  /*   20   */
   {
     id: 'bot_admin',
     question: 'Нужна ли административная панель?',
@@ -341,7 +358,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot',
   },
 
-  /*   21   */
   {
     id: 'bot_services',
     question: 'Нужно ли подключить внешние сервисы?',
@@ -357,8 +373,21 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot',
   },
 
+  {
+    id: 'bot_hosting',
+    question: 'Как обстоят дела с хостингом для бота?',
+    subtitle: 'Бот должен работать на сервере круглосуточно',
+    type: 'single', required: true,
+    options: [
+      { value: 'has_server', label: 'Есть свой сервер / VPS',
+        hasText: true, textPlaceholder: 'Укажите провайдера или параметры...' },
+      { value: 'delegate',   label: 'Доверяю выбор специалисту — подберите коммерчески выгодный вариант' },
+      { value: 'need_help',  label: 'Нужна помощь с выбором, но решение за мной' },
+    ],
+    show: a => a.project_type?.value === 'tgbot',
+  },
 
-  /*   22   */
+  // TELEGRAM-БОТ + САЙТ
   {
     id: 'botsite_site_type',
     question: 'Какой тип сайта нужен?',
@@ -374,7 +403,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /*   23   */
   {
     id: 'botsite_site_functions',
     question: 'Основные функции сайта',
@@ -392,7 +420,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /*   24   */
   {
     id: 'botsite_bot_functions',
     question: 'Основные функции Telegram-бота',
@@ -409,7 +436,6 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /*   25   */
   {
     id: 'botsite_interaction',
     question: 'Как сайт и бот будут взаимодействовать?',
@@ -425,14 +451,13 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /*   26   */
   {
     id: 'botsite_design',
     question: 'Как обстоят дела с дизайном сайта?',
     subtitle: 'Выберите один вариант',
     type: 'single', required: true,
     options: [
-      { value: 'ready',    label: 'Есть готовый дизайн',
+      { value: 'ready',    label: 'Есть готовый дизайн (Figma / макеты)',
         hasText: true, textPlaceholder: 'Ссылка на Figma или описание файлов...' },
       { value: 'examples', label: 'Есть примеры (похожие сайты)',
         hasText: true, textPlaceholder: 'Ссылки на примеры сайтов...' },
@@ -443,11 +468,25 @@ const STEPS = [
     show: a => a.project_type?.value === 'tgbot_site',
   },
 
-  /* ══════════════════════════════════════════════════════════════
-     ОБЩИЙ БЛОК
-     ══════════════════════════════════════════════════════════════ */
+  {
+    id: 'botsite_hosting',
+    question: 'Как обстоят дела с хостингом и доменом?',
+    subtitle: 'Выберите один вариант',
+    type: 'single', required: true,
+    options: [
+      { value: 'has_both',   label: 'Есть домен и хостинг',
+        hasText: true, textPlaceholder: 'Укажите домен и название хостинга...' },
+      { value: 'has_domain', label: 'Есть только домен',
+        hasText: true, textPlaceholder: 'Укажите доменное имя...' },
+      { value: 'has_host',   label: 'Есть только хостинг',
+        hasText: true, textPlaceholder: 'Укажите название хостинга...' },
+      { value: 'delegate',   label: 'Доверяю выбор специалисту — подберите коммерчески выгодный вариант' },
+      { value: 'need_help',  label: 'Нужна помощь с выбором, но решение за мной' },
+    ],
+    show: a => a.project_type?.value === 'tgbot_site',
+  },
 
-  /*   27   */
+  // ОБЩИЙ БЛОК
   {
     id: 'deadline',
     question: 'Когда нужен запуск проекта?',
@@ -463,7 +502,6 @@ const STEPS = [
     show: () => true,
   },
 
-  /*   28   */
   {
     id: 'budget',
     question: 'Какой бюджет на проект?',
@@ -474,7 +512,6 @@ const STEPS = [
     show: () => true,
   },
 
-  /*   29   */
   {
     id: 'contact_type',
     question: 'Как с вами связаться?',
@@ -494,13 +531,12 @@ const STEPS = [
     show: () => true,
   },
 
-  /*   30   */
   {
     id: 'extra_info',
     question: 'Дополнительная информация',
     subtitle: 'Любые пожелания, уточнения или вопросы (необязательно)',
     type: 'text', required: false,
-    placeholder: 'Например: нужна поддержка на русском, интеграция с 1С, или у вас уже есть домен…',
+    placeholder: 'Например: нужна поддержка на русском, интеграция с 1С…',
     show: () => true,
   },
 ];
@@ -512,24 +548,11 @@ let state = {
   done:          false,
 };
 
-function saveState() {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (_) {}
-}
+function saveState()  { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (_) {} }
+function loadState()  { try { const r = localStorage.getItem(LS_KEY); if (r) Object.assign(state, JSON.parse(r)); } catch (_) {} }
+function clearState() { localStorage.removeItem(LS_KEY); state = { currentStepId: STEPS[0].id, answers: {}, history: [STEPS[0].id], done: false }; }
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) Object.assign(state, JSON.parse(raw));
-  } catch (_) {}
-}
-
-function clearState() {
-  localStorage.removeItem(LS_KEY);
-  state = { currentStepId: STEPS[0].id, answers: {}, history: [STEPS[0].id], done: false };
-}
-
-function getStep(id) { return STEPS.find(s => s.id === id); }
-
+function getStep(id)    { return STEPS.find(s => s.id === id); }
 function visibleSteps() { return STEPS.filter(s => s.show(state.answers)); }
 
 function nextStep(currentId) {
@@ -547,13 +570,11 @@ function progress() {
 
 function render() {
   if (state.done) { renderResult(); return; }
-
   const step = getStep(state.currentStepId);
   if (!step || !step.show(state.answers)) {
     const first = visibleSteps()[0];
     if (first) { state.currentStepId = first.id; state.history = [first.id]; saveState(); }
   }
-
   updateProgress();
   renderStep(getStep(state.currentStepId));
 }
@@ -564,21 +585,18 @@ function updateProgress() {
   const label = document.getElementById('progressLabel');
   if (fill)  fill.style.width = pct + '%';
   if (label) label.textContent = `${cur} / ${total}`;
-
   const backBtn = document.getElementById('progressBackBtn');
   if (backBtn) backBtn.disabled = state.history.length <= 1;
 }
 
 function renderStep(step) {
-  const quizScreen  = document.getElementById('quizScreen');
+  const quizScreen   = document.getElementById('quizScreen');
   const resultScreen = document.getElementById('resultScreen');
-  const bottomNav   = document.getElementById('bottomNav');
-  const card        = document.getElementById('questionCard');
-
+  const bottomNav    = document.getElementById('bottomNav');
+  const card         = document.getElementById('questionCard');
   quizScreen.classList.remove('hidden');
   resultScreen.classList.add('hidden');
   bottomNav.classList.remove('hidden');
-
   card.innerHTML = buildCardHTML(step);
   restoreAnswer(step);
   bindEvents(step);
@@ -592,7 +610,6 @@ function buildCardHTML(step) {
   else if (step.type === 'number') body = buildNumberInput(step);
   else if (step.type === 'single') body = buildOptions(step, false);
   else if (step.type === 'multi')  body = buildOptions(step, true);
-
   return `
     <div class="q-step">Вопрос ${cur} из ${total}</div>
     <h2 class="q-title">${step.question}</h2>
@@ -639,19 +656,15 @@ function buildOptions(step, isMulti) {
   return `<div class="options-list">${items}</div>`;
 }
 
-/*    Restore saved answer                         */
 function restoreAnswer(step) {
   const ans = state.answers[step.id];
   if (!ans) return;
-
   if (step.type === 'text') {
     const el = document.getElementById('mainTextInput');
     if (el) el.value = ans;
-
   } else if (step.type === 'number') {
     const el = document.getElementById('mainNumInput');
     if (el) el.value = ans;
-
   } else if (step.type === 'single' && ans.value) {
     const btn = document.querySelector(`.opt-btn[data-value="${ans.value}"]`);
     if (btn) {
@@ -661,7 +674,6 @@ function restoreAnswer(step) {
         if (sub) { sub.classList.add('show'); sub.value = ans.text; }
       }
     }
-
   } else if (step.type === 'multi' && ans.values?.length) {
     ans.values.forEach(v => {
       const btn = document.querySelector(`.opt-btn[data-value="${v}"]`);
@@ -679,21 +691,9 @@ function restoreAnswer(step) {
 
 function bindEvents(step) {
   const textEl = document.getElementById('mainTextInput');
-  if (textEl) {
-    textEl.addEventListener('input', () => {
-      state.answers[step.id] = textEl.value;
-      saveState();
-    });
-  }
-
+  if (textEl) textEl.addEventListener('input', () => { state.answers[step.id] = textEl.value; saveState(); });
   const numEl = document.getElementById('mainNumInput');
-  if (numEl) {
-    numEl.addEventListener('input', () => {
-      state.answers[step.id] = numEl.value;
-      saveState();
-    });
-  }
-
+  if (numEl) numEl.addEventListener('input', () => { state.answers[step.id] = numEl.value; saveState(); });
   document.querySelectorAll('.opt-sub-input').forEach(sub => {
     sub.addEventListener('input', () => {
       const val = sub.dataset.opt;
@@ -713,20 +713,13 @@ function bindEvents(step) {
 function selectSingle(stepId, value, btnEl) {
   const step = getStep(stepId);
   if (!step) return;
-
   document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
   document.querySelectorAll('.opt-sub-input').forEach(s => s.classList.remove('show'));
-
   btnEl.classList.add('selected');
   const sub = document.getElementById(`sub_${stepId}_${value}`);
-  if (sub) { sub.classList.add('show'); }
-
+  if (sub) sub.classList.add('show');
   const opt = step.options.find(o => o.value === value);
-  state.answers[stepId] = {
-    value,
-    label: opt?.label || value,
-    text:  sub?.value || '',
-  };
+  state.answers[stepId] = { value, label: opt?.label || value, text: sub?.value || '' };
   saveState();
   hideErr();
 }
@@ -744,7 +737,6 @@ function flushMulti(stepId) {
   const step = getStep(stepId);
   if (!step) return;
   const values = [], labels = [], texts = {};
-
   document.querySelectorAll('.opt-btn.selected').forEach(b => {
     const v = b.dataset.value;
     const opt = step.options.find(o => o.value === v);
@@ -753,7 +745,6 @@ function flushMulti(stepId) {
     const sub = document.getElementById(`sub_${stepId}_${v}`);
     if (sub?.value) texts[v] = sub.value;
   });
-
   state.answers[stepId] = { values, labels, texts };
   saveState();
 }
@@ -761,45 +752,28 @@ function flushMulti(stepId) {
 function validate() {
   const step = getStep(state.currentStepId);
   if (!step) return true;
-
   if (step.type === 'multi') flushMulti(step.id);
-
   const ans = state.answers[step.id];
-
   if (!step.required) return true;
-
   if (step.type === 'text') {
     if (!ans?.trim()) { showErr('Пожалуйста, заполните это поле'); return false; }
-
   } else if (step.type === 'number') {
     if (!ans || isNaN(Number(ans)) || Number(ans) < (step.min || 0)) {
-      showErr(`Минимальная сумма: ${(step.min || 0).toLocaleString('ru-RU')} ₽`);
-      return false;
+      showErr(`Минимальная сумма: ${(step.min || 0).toLocaleString('ru-RU')} ₽`); return false;
     }
-
   } else if (step.type === 'single') {
     if (!ans?.value) { showErr('Пожалуйста, выберите один из вариантов'); return false; }
     if (step.requireSubText && !ans.text?.trim()) {
-      showErr('Пожалуйста, укажите контактные данные в поле ниже выбранного пункта');
-      return false;
+      showErr('Пожалуйста, укажите контактные данные в поле ниже выбранного пункта'); return false;
     }
-
   } else if (step.type === 'multi') {
     if (!ans?.values?.length) { showErr('Пожалуйста, выберите хотя бы один вариант'); return false; }
   }
-
   return true;
 }
 
-function showErr(msg) {
-  const el = document.getElementById('errMsg');
-  if (el) { el.textContent = msg; el.classList.add('show'); }
-}
-function hideErr() {
-  const el = document.getElementById('errMsg');
-  if (el) el.classList.remove('show');
-}
-
+function showErr(msg) { const el = document.getElementById('errMsg'); if (el) { el.textContent = msg; el.classList.add('show'); } }
+function hideErr()    { const el = document.getElementById('errMsg'); if (el) el.classList.remove('show'); }
 
 function goNext() {
   const step = getStep(state.currentStepId);
@@ -818,14 +792,9 @@ function goNext() {
   } else if (step.type === 'multi') {
     flushMulti(step.id);
   }
-
   if (!validate()) return;
-
   const next = nextStep(state.currentStepId);
-  if (!next) {
-    state.done = true; saveState(); renderResult(); return;
-  }
-
+  if (!next) { state.done = true; saveState(); renderResult(); return; }
   state.history.push(next.id);
   state.currentStepId = next.id;
   saveState();
@@ -833,12 +802,7 @@ function goNext() {
 }
 
 function goBack() {
-  if (state.done) {
-    state.done = false;
-    saveState();
-    render();
-    return;
-  }
+  if (state.done) { state.done = false; saveState(); render(); return; }
   if (state.history.length <= 1) return;
   state.history.pop();
   state.currentStepId = state.history[state.history.length - 1];
@@ -850,259 +814,301 @@ function updateNavBtns() {
   const backBtn = document.getElementById('backBtn');
   const nextBtn = document.getElementById('nextBtn');
   if (backBtn) backBtn.disabled = state.history.length <= 1;
-  if (nextBtn) nextBtn.textContent = nextStep(state.currentStepId) ? 'Далее →' : '✅ Готово';
+  if (nextBtn) nextBtn.textContent = nextStep(state.currentStepId) ? 'Далее →' : 'Готово';
 }
 
+// Хелпер: форматирование хостинга
+function hostingLine(ans) {
+  if (!ans?.value) return 'Не указано';
+  const map = {
+    has_both:   `Домен и хостинг: ${ans.text || 'имеются'}`,
+    has_domain: `Только домен: ${ans.text || 'имеется'}`,
+    has_host:   `Только хостинг: ${ans.text || 'имеется'}`,
+    delegate:   'Выбор и настройку берёт на себя специалист',
+    need_help:  'Нужна помощь с выбором, решение за клиентом',
+    has_server: `Сервер/VPS: ${ans.text || 'имеется'}`,
+  };
+  return map[ans.value] || ans.text || 'Не указано';
+}
 
 function generateTZ() {
-  const a = state.answers;
+  const a     = state.answers;
   const pType = a.project_type?.value;
+  const lines = [];
 
-  const L = [];
-  const add  = s  => L.push(s);
+  const add  = s  => lines.push(s);
+  const sec  = s  => { add(''); add(s); add(''); };
+  const sub  = s  => add('  ' + s);
+  const item = s  => add('    - ' + s);
 
   add('Техническое задание на разработку');
-  add('');
 
   const ptLabel = {
     site:       'Сайт',
     webapp:     'Веб-приложение',
     tgbot:      'Telegram-бот',
     tgbot_site: 'Telegram-бот + Сайт',
-    custom:     `${a.project_type?.text || 'Свой вариант'}`,
+    custom:     a.project_type?.text || 'Свой вариант',
   }[pType] || 'Не указано';
 
-  add(`Тип проекта: ${ptLabel}`);
+  sub(`Тип проекта: ${ptLabel}`);
   add('');
-  add('Идея:');
-  add(a.project_idea || 'Не указано');
-  add('');
-  add('');
+  sub('Описание проекта:');
+  add('  ' + (a.project_idea || 'Не указано'));
 
-  if (pType === 'site')       tzSite(a, add);
-  if (pType === 'webapp')     tzWebapp(a, add);
-  if (pType === 'tgbot')      tzBot(a, add);
-  if (pType === 'tgbot_site') tzBotSite(a, add);
+  if (pType === 'site')       tzSite(a, add, sec, sub, item);
+  if (pType === 'webapp')     tzWebapp(a, add, sec, sub, item);
+  if (pType === 'tgbot')      tzBot(a, add, sec, sub, item);
+  if (pType === 'tgbot_site') tzBotSite(a, add, sec, sub, item);
 
-  add('');
-  add('Общие параметры');
-  add('');
+  sec('Общие параметры');
 
   const dlLabel = {
-    asap:       'Как можно быстрее',
+    asap:         'Как можно быстрее',
     '1_month':    '1 месяц',
     '2_3_months': '2–3 месяца',
-    custom:     a.deadline?.text || 'Свой вариант',
+    custom:       a.deadline?.text || 'Свой вариант',
   }[a.deadline?.value] || 'Не указано';
-  add(`Сроки запуска: ${dlLabel}`);
+  sub(`Сроки запуска: ${dlLabel}`);
 
-  const budget = a.budget ? `${Number(a.budget).toLocaleString('ru-RU')} ₽` : 'Не указано';
-  add(`Бюджет: ${budget}`);
-  add('');
+  const budget = a.budget ? `${Number(a.budget).toLocaleString('ru-RU')} руб.` : 'Не указано';
+  sub(`Бюджет: ${budget}`);
 
-  const ctLabel = { telegram:'Telegram', email:'Email', phone:'Телефон', custom:'Другой' };
+  const ctLabel = { telegram: 'Telegram', email: 'Email', phone: 'Телефон', custom: 'Другой способ' };
   const ct = a.contact_type;
-  add(`Контакт клиента: ${ctLabel[ct?.value] || ct?.value || 'Не указано'}: ${ct?.text || ''}`);
-  add('');
+  sub(`Способ связи: ${ctLabel[ct?.value] || ct?.value || 'Не указано'}`);
+  if (ct?.text) sub(`Контакт: ${ct.text}`);
 
   if (a.extra_info?.trim()) {
-    add('Дополнительно');
-    add(a.extra_info);
     add('');
+    sub('Дополнительно:');
+    add('  ' + a.extra_info);
   }
 
-  add('Сделано через @TorBuilderBot');
+  add('');
+  add('Составлено через сайт Андрея Караваева');
 
-  return L.join('\n');
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
-function tzSite(a, add) {
-  add('Сайт');
-  add('');
+function tzSite(a, add, sec, sub, item) {
+  sec('Сайт');
 
-  const siteTypes = { landing:'Лендинг', corporate:'Корпоративный сайт',
-    shop:'Интернет-магазин', portal:'Портал / Сервис',
-    custom: a.site_type?.text || 'Свой вариант' };
-  add(`Тип сайта: ${siteTypes[a.site_type?.value] || 'Не указано'}`);
-  add(`Основная цель: ${a.site_goal || 'Не указано'}`);
-  add('');
+  const siteTypes = {
+    landing: 'Лендинг', corporate: 'Корпоративный сайт',
+    shop: 'Интернет-магазин', portal: 'Портал / Сервис',
+    custom: a.site_type?.text || 'Свой вариант',
+  };
+  sub(`Тип: ${siteTypes[a.site_type?.value] || 'Не указано'}`);
+  sub(`Основная цель: ${a.site_goal || 'Не указано'}`);
 
   if (a.site_functions?.values?.length) {
-    add('ФУНКЦИИ САЙТА');
-    const fl = { registration:'Регистрация пользователей', cabinet:'Личный кабинет',
-      comments:'Комментарии', search:'Поиск', admin:'Админ-панель',
-      feedback:'Форма обратной связи', uploads:'Загрузка файлов', payment:'Онлайн-оплата',
-      custom: a.site_functions.texts?.custom || 'Свой вариант' };
-    a.site_functions.values.forEach(v => add(`  • ${fl[v] || v}`));
     add('');
+    sub('Функции:');
+    const fl = {
+      registration: 'Регистрация пользователей', cabinet: 'Личный кабинет',
+      comments: 'Комментарии', search: 'Поиск', admin: 'Админ-панель',
+      feedback: 'Форма обратной связи', uploads: 'Загрузка файлов', payment: 'Онлайн-оплата',
+      custom: a.site_functions.texts?.custom || 'Свой вариант',
+    };
+    a.site_functions.values.forEach(v => item(fl[v] || v));
 
     if (a.site_functions.values.includes('registration') && a.site_reg_method?.values?.length) {
-      add('Способ регистрации');
-      const rl = { email:'Email + пароль', social:'Социальные сети', telegram:'Telegram',
-        custom: a.site_reg_method.texts?.custom || 'Свой вариант' };
-      a.site_reg_method.values.forEach(v => add(`  • ${rl[v] || v}`));
       add('');
+      sub('Способ регистрации:');
+      const rl = { email: 'Email + пароль', social: 'Социальные сети', telegram: 'Telegram',
+        custom: a.site_reg_method.texts?.custom || 'Свой вариант' };
+      a.site_reg_method.values.forEach(v => item(rl[v] || v));
     }
 
     if (a.site_functions.values.includes('cabinet') && a.site_cabinet_desc) {
-      add('Личный кабинет — возможности пользователя');
-      add(a.site_cabinet_desc);
       add('');
+      sub('Возможности личного кабинета:');
+      add('  ' + a.site_cabinet_desc);
     }
 
     if (a.site_functions.values.includes('admin') && a.site_admin_desc) {
-      add('Функции администратора');
-      add(a.site_admin_desc);
       add('');
+      sub('Функции администратора:');
+      add('  ' + a.site_admin_desc);
     }
 
     if (a.site_functions.values.includes('payment') && a.site_payment_method?.values?.length) {
-      add('Платёжные системы');
-      const pl = { stripe:'Stripe', paypal:'PayPal', crypto:'Криптовалюта',
-        custom: a.site_payment_method.texts?.custom || 'Свой вариант' };
-      a.site_payment_method.values.forEach(v => add(`  • ${pl[v] || v}`));
       add('');
+      sub('Платёжные системы:');
+      const pl = { stripe: 'Stripe', paypal: 'PayPal', crypto: 'Криптовалюта',
+        custom: a.site_payment_method.texts?.custom || 'Свой вариант' };
+      a.site_payment_method.values.forEach(v => item(pl[v] || v));
     }
   }
 
   if (a.site_type?.value === 'shop' && a.shop_features?.values?.length) {
-    add('Функции интернет магазина');
-    const sl = { catalog:'Каталог товаров', cart:'Корзина', filters:'Фильтры товаров',
-      reviews:'Отзывы покупателей', delivery:'Система доставки',
-      admin_products:'Управление товарами через админку',
-      custom: a.shop_features.texts?.custom || 'Свой вариант' };
-    a.shop_features.values.forEach(v => add(`  • ${sl[v] || v}`));
     add('');
+    sub('Функции интернет-магазина:');
+    const sl = {
+      catalog: 'Каталог товаров', cart: 'Корзина', filters: 'Фильтры',
+      reviews: 'Отзывы покупателей', delivery: 'Доставка',
+      admin_products: 'Управление товарами через админку',
+      custom: a.shop_features.texts?.custom || 'Свой вариант',
+    };
+    a.shop_features.values.forEach(v => item(sl[v] || v));
   }
 
-  const dsMap = { ready:'Готовый дизайн имеется',
-    examples:`Есть примеры: ${a.site_design?.text || 'не указаны'}`,
-    develop:'Дизайн нужно разработать',
-    custom: a.site_design?.text || 'Свой вариант' };
-  add(`Дизайн: ${dsMap[a.site_design?.value] || 'Не указано'}`);
   add('');
+  const dsMap = {
+    ready:    a.site_design?.text
+        ? `Готовый дизайн (Figma): ${a.site_design.text}`
+        : 'Готовый дизайн предоставлен',
+    examples: `Примеры для референса: ${a.site_design?.text || 'не указаны'}`,
+    develop:  'Дизайн разрабатывается с нуля',
+    custom:   a.site_design?.text || 'Свой вариант',
+  };
+  sub(`Дизайн: ${dsMap[a.site_design?.value] || 'Не указано'}`);
 
   if (a.site_content?.values?.length) {
-    add('Контент');
-    const cl = { texts:'Есть тексты', images:'Есть изображения',
-      need_create:'Нужно создать контент', custom: a.site_content.texts?.custom || 'Свой вариант' };
-    a.site_content.values.forEach(v => add(`  • ${cl[v] || v}`));
     add('');
+    sub('Контент:');
+    const cl = {
+      texts: 'Тексты предоставлены', images: 'Изображения предоставлены',
+      need_create: 'Нужно создать',
+      custom: a.site_content.texts?.custom || 'Свой вариант',
+    };
+    a.site_content.values.forEach(v => item(cl[v] || v));
   }
+
+  add('');
+  sub(`Хостинг и домен: ${hostingLine(a.site_hosting)}`);
 }
 
-function tzWebapp(a, add) {
-  add('ВЕБ-ПРИЛОЖЕНИЕ');
-  add('');
+function tzWebapp(a, add, sec, sub, item) {
+  sec('Веб-приложение');
 
-  const tMap = { saas:'SaaS-платформа', crm:'CRM-система', social:'Социальная платформа',
-    files:'Файловый сервис', custom: a.webapp_type?.text || 'Свой вариант' };
-  add(`Тип приложения: ${tMap[a.webapp_type?.value] || 'Не указано'}`);
+  const tMap = { saas: 'SaaS-платформа', crm: 'CRM-система', social: 'Социальная платформа',
+    files: 'Файловый сервис', custom: a.webapp_type?.text || 'Свой вариант' };
+  sub(`Тип: ${tMap[a.webapp_type?.value] || 'Не указано'}`);
 
-  const uMap = { users_only:'Только пользователи', users_admin:'Пользователи + Администратор',
-    multi_roles:`Несколько ролей: ${a.webapp_users?.text || ''}`,
-    custom: a.webapp_users?.text || 'Свой вариант' };
-  add(`Роли в системе: ${uMap[a.webapp_users?.value] || 'Не указано'}`);
-  add('');
+  const uMap = {
+    users_only:  'Только пользователи',
+    users_admin: 'Пользователи + Администратор',
+    multi_roles: `Несколько ролей: ${a.webapp_users?.text || ''}`,
+    custom:      a.webapp_users?.text || 'Свой вариант',
+  };
+  sub(`Роли в системе: ${uMap[a.webapp_users?.value] || 'Не указано'}`);
 
   if (a.webapp_functions?.values?.length) {
-    add('ФУНКЦИИ');
-    const fl = { registration:'Регистрация / авторизация', cabinet:'Личный кабинет',
-      uploads:'Загрузка файлов', chat:'Чат / мессенджер', notifications:'Уведомления',
-      subscriptions:'Подписки / тарифы', payment:'Оплата',
-      custom: a.webapp_functions.texts?.custom || 'Свой вариант' };
-    a.webapp_functions.values.forEach(v => add(`  • ${fl[v] || v}`));
     add('');
+    sub('Функции:');
+    const fl = {
+      registration: 'Регистрация / авторизация', cabinet: 'Личный кабинет',
+      uploads: 'Загрузка файлов', chat: 'Чат / мессенджер',
+      notifications: 'Уведомления', subscriptions: 'Подписки / тарифы', payment: 'Оплата',
+      custom: a.webapp_functions.texts?.custom || 'Свой вариант',
+    };
+    a.webapp_functions.values.forEach(v => item(fl[v] || v));
   }
 
-  const sMap = { under_100:'До 100 пользователей', under_1000:'До 1 000 пользователей',
-    over_1000:'1 000+ пользователей', custom: a.webapp_scale?.text || 'Свой вариант' };
-  add(`Ожидаемый масштаб: ${sMap[a.webapp_scale?.value] || 'Не указано'}`);
   add('');
+  const sMap = { under_100: 'До 100 пользователей', under_1000: 'До 1 000 пользователей',
+    over_1000: '1 000+ пользователей', custom: a.webapp_scale?.text || 'Свой вариант' };
+  sub(`Ожидаемый масштаб: ${sMap[a.webapp_scale?.value] || 'Не указано'}`);
 
-  const dMap = { ready:'Готовый дизайн имеется',
-    examples:`Примеры: ${a.webapp_design?.text || ''}`,
-    develop:'Разработать с нуля', custom: a.webapp_design?.text || 'Свой вариант' };
-  add(`Дизайн: ${dMap[a.webapp_design?.value] || 'Не указано'}`);
-  add('');
+  const dMap = {
+    ready:    a.webapp_design?.text
+        ? `Готовый дизайн (Figma): ${a.webapp_design.text}`
+        : 'Готовый дизайн предоставлен',
+    examples: `Примеры для референса: ${a.webapp_design?.text || 'не указаны'}`,
+    develop:  'Дизайн разрабатывается с нуля',
+    custom:   a.webapp_design?.text || 'Свой вариант',
+  };
+  sub(`Дизайн: ${dMap[a.webapp_design?.value] || 'Не указано'}`);
+
+  sub(`Хостинг и домен: ${hostingLine(a.webapp_hosting)}`);
 }
 
-function tzBot(a, add) {
-  add('TELEGRAM-БОТ');
-  add('');
+function tzBot(a, add, sec, sub, item) {
+  sec('Telegram-бот');
 
-  const tMap = { support:'Поддержка пользователей', automation:'Автоматизация процессов',
-    orders:'Приём заказов', info:'Информационный бот',
-    custom: a.bot_task?.text || 'Свой вариант' };
-  add(`Задача бота: ${tMap[a.bot_task?.value] || 'Не указано'}`);
-  add('');
+  const tMap = {
+    support: 'Поддержка пользователей', automation: 'Автоматизация процессов',
+    orders: 'Приём заказов', info: 'Информационный бот',
+    custom: a.bot_task?.text || 'Свой вариант',
+  };
+  sub(`Задача: ${tMap[a.bot_task?.value] || 'Не указано'}`);
+  sub(`База данных: ${a.bot_db?.value === 'yes' ? 'Да' : 'Нет'}`);
 
-  add(`База данных: ${a.bot_db?.value === 'yes' ? 'Да' : a.bot_db?.value === 'no' ? 'Нет' : 'Не указано'}`);
   if (a.bot_db?.value === 'yes' && a.bot_db_what?.values?.length) {
-    add('  Что хранить:');
-    const dl = { users:'Пользователи', orders:'Заказы', messages:'Сообщения', files:'Файлы',
+    add('');
+    sub('Что хранить в базе:');
+    const dl = { users: 'Пользователи', orders: 'Заказы', messages: 'Сообщения', files: 'Файлы',
       custom: a.bot_db_what.texts?.custom || 'Свой вариант' };
-    a.bot_db_what.values.forEach(v => add(`    • ${dl[v] || v}`));
+    a.bot_db_what.values.forEach(v => item(dl[v] || v));
   }
-  add('');
 
-  add(`Административная панель: ${a.bot_admin?.value === 'yes' ? 'Да' : a.bot_admin?.value === 'no' ? 'Нет' : 'Не указано'}`);
   add('');
+  sub(`Административная панель: ${a.bot_admin?.value === 'yes' ? 'Да' : 'Нет'}`);
 
   if (a.bot_services?.values?.length) {
-    add('ВНЕШНИЕ ИНТЕГРАЦИИ');
-    const sl = { site:'Сайт', payments:'Платёжная система', crm:'CRM',
-      custom: a.bot_services.texts?.custom || 'Свой вариант' };
-    a.bot_services.values.forEach(v => add(`  • ${sl[v] || v}`));
     add('');
+    sub('Внешние интеграции:');
+    const sl = { site: 'Сайт', payments: 'Платёжная система', crm: 'CRM',
+      custom: a.bot_services.texts?.custom || 'Свой вариант' };
+    a.bot_services.values.forEach(v => item(sl[v] || v));
   }
+
+  add('');
+  sub(`Хостинг сервера: ${hostingLine(a.bot_hosting)}`);
 }
 
-function tzBotSite(a, add) {
-  add('TELEGRAM-БОТ + САЙТ');
-  add('');
+function tzBotSite(a, add, sec, sub, item) {
+  sec('Telegram-бот + Сайт');
 
-  const stMap = { landing:'Лендинг', service:'Сервис', shop:'Интернет-магазин',
+  const stMap = { landing: 'Лендинг', service: 'Сервис / SaaS', shop: 'Интернет-магазин',
     custom: a.botsite_site_type?.text || 'Свой вариант' };
-  add(`Тип сайта: ${stMap[a.botsite_site_type?.value] || 'Не указано'}`);
-  add('');
+  sub(`Тип сайта: ${stMap[a.botsite_site_type?.value] || 'Не указано'}`);
 
   if (a.botsite_site_functions?.values?.length) {
-    add('ФУНКЦИИ САЙТА');
-    const fl = { registration:'Регистрация', cabinet:'Личный кабинет', catalog:'Каталог',
-      payments:'Платежи', admin:'Админ-панель', custom: a.botsite_site_functions.texts?.custom || 'Свой вариант' };
-    a.botsite_site_functions.values.forEach(v => add(`  • ${fl[v] || v}`));
     add('');
+    sub('Функции сайта:');
+    const fl = { registration: 'Регистрация', cabinet: 'Личный кабинет', catalog: 'Каталог',
+      payments: 'Платежи', admin: 'Админ-панель',
+      custom: a.botsite_site_functions.texts?.custom || 'Свой вариант' };
+    a.botsite_site_functions.values.forEach(v => item(fl[v] || v));
   }
 
   if (a.botsite_bot_functions?.values?.length) {
-    add('ФУНКЦИИ БОТА');
-    const bl = { notifications:'Уведомления', account:'Управление аккаунтом',
-      orders:'Заказы', support:'Поддержка', custom: a.botsite_bot_functions.texts?.custom || 'Свой вариант' };
-    a.botsite_bot_functions.values.forEach(v => add(`  • ${bl[v] || v}`));
     add('');
+    sub('Функции бота:');
+    const bl = { notifications: 'Уведомления', account: 'Управление аккаунтом',
+      orders: 'Заказы', support: 'Поддержка',
+      custom: a.botsite_bot_functions.texts?.custom || 'Свой вариант' };
+    a.botsite_bot_functions.values.forEach(v => item(bl[v] || v));
   }
 
   if (a.botsite_interaction?.values?.length) {
-    add('ВЗАИМОДЕЙСТВИЕ БОТА И САЙТА');
-    const il = {
-      notifications:'Бот отправляет уведомления о событиях на сайте',
-      manage_site:'Управление сайтом через бота',
-      tg_auth:'Авторизация на сайте через Telegram',
-      custom: a.botsite_interaction.texts?.custom || 'Свой вариант',
-    };
-    a.botsite_interaction.values.forEach(v => add(`  • ${il[v] || v}`));
     add('');
+    sub('Взаимодействие бота и сайта:');
+    const il = {
+      notifications: 'Бот отправляет уведомления о событиях на сайте',
+      manage_site:   'Управление сайтом через бота',
+      tg_auth:       'Авторизация на сайте через Telegram',
+      custom:        a.botsite_interaction.texts?.custom || 'Свой вариант',
+    };
+    a.botsite_interaction.values.forEach(v => item(il[v] || v));
   }
 
+  add('');
   const dMap = {
-    ready:   `Готовый дизайн: ${a.botsite_design?.text || 'имеется'}`,
-    examples:`Примеры: ${a.botsite_design?.text || 'не указаны'}`,
-    develop: 'Разработать с нуля',
+    ready:    a.botsite_design?.text
+        ? `Готовый дизайн (Figma): ${a.botsite_design.text}`
+        : 'Готовый дизайн предоставлен',
+    examples: `Примеры для референса: ${a.botsite_design?.text || 'не указаны'}`,
+    develop:  'Дизайн разрабатывается с нуля',
     custom:   a.botsite_design?.text || 'Свой вариант',
   };
-  add(`Дизайн: ${dMap[a.botsite_design?.value] || 'Не указано'}`);
+  sub(`Дизайн: ${dMap[a.botsite_design?.value] || 'Не указано'}`);
+
   add('');
+  sub(`Хостинг и домен: ${hostingLine(a.botsite_hosting)}`);
 }
 
 function renderResult() {
@@ -1126,46 +1132,56 @@ function renderResult() {
 
   const a = state.answers;
   const ct = a.contact_type;
-  const ctLabelMap = { telegram:'Telegram', email:'Email', phone:'Телефон', custom:'Другой способ' };
+  const ctLabelMap = { telegram: 'Telegram', email: 'Email', phone: 'Телефон', custom: 'Другой способ' };
   window._contact = ct ? `${ctLabelMap[ct.value] || ct.value}: ${ct.text || ''}` : '';
-
-  const encoded  = encodeURIComponent(torText.slice(0, 4000));
-  const tgDirect = `https://t.me/${TG_USERNAME}?text=${encoded}`;
 
   resultScreen.innerHTML = `
     <div class="result-wrap">
       <div class="result-hero">
         <h1>ТЗ сформировано!</h1>
-        <p>Ваше техническое задание готово. Скопируйте его или отправьте напрямую.</p>
+        <p>Ваше техническое задание готово. Прикрепите файлы если есть, затем отправьте.</p>
       </div>
-
       <div class="tor-card">
         <div class="tor-card-header">
           <span>Техническое задание</span>
-          <span style="font-size:11px;color:var(--muted2)">прокрутите вниз ↓</span>
+          <span style="font-size:11px;color:var(--muted2)">прокрутите вниз</span>
         </div>
         <pre class="tor-text" id="torPre">${escH(torText)}</pre>
       </div>
 
+      <div class="file-upload-card">
+        <div class="file-upload-label">Прикрепить файлы (необязательно)</div>
+        <p class="file-upload-hint">Макеты, изображения, документы — всё что поможет понять проект. До 10 файлов, до 50 МБ каждый.</p>
+        <label class="file-drop-zone" id="fileDropZone">
+          <input type="file" id="fileInput" multiple accept="*/*" style="display:none"
+            onchange="handleFileSelect(this.files)" />
+          <div class="file-drop-icon">📎</div>
+          <div class="file-drop-text">Нажмите или перетащите файлы сюда</div>
+        </label>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
       <div class="actions">
-
-        <button class="act-btn act-copy" id="copyBtn" onclick="doCopy()">
-          Скопировать ТЗ
-        </button>
-
-        <button class="act-btn act-bot" id="botBtn" onclick="doSendBot()">
-          Отправить через бота (вы остаётесь анонимным — я напишу вам сам)
-        </button>
-
+        <button class="act-btn act-copy" id="copyBtn" onclick="doCopy()">Скопировать ТЗ</button>
+        <button class="act-btn act-bot" id="botBtn" onclick="doSendBot()">Отправить через бота (я напишу вам сам)</button>
         <div id="sendStatus" class="send-status"></div>
-
-        <button class="act-btn act-restart" onclick="doRestart()">
-          Начать заново
-        </button>
-
+        <button class="act-btn act-restart" onclick="doRestart()">Начать заново</button>
       </div>
     </div>
   `;
+
+  // Drag & drop
+  const zone = document.getElementById('fileDropZone');
+  if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      handleFileSelect(e.dataTransfer.files);
+    });
+    zone.addEventListener('click', () => document.getElementById('fileInput').click());
+  }
 }
 
 async function doCopy() {
@@ -1179,40 +1195,71 @@ async function doCopy() {
     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
     document.body.removeChild(ta);
   }
-  if (btn) {
-    btn.textContent = 'Скопировано!';
-    setTimeout(() => { btn.textContent = 'Скопировать ТЗ'; }, 2500);
-  }
+  if (btn) { btn.textContent = 'Скопировано!'; setTimeout(() => { btn.textContent = 'Скопировать ТЗ'; }, 2500); }
+}
+
+// Хранилище выбранных файлов
+window._selectedFiles = [];
+
+function handleFileSelect(fileList) {
+  const files = Array.from(fileList);
+  const existing = window._selectedFiles;
+
+  files.forEach(f => {
+    if (existing.length >= 10) return;
+    if (f.size > 50 * 1024 * 1024) {
+      alert(`Файл "${f.name}" слишком большой (макс. 50 МБ)`);
+      return;
+    }
+    existing.push(f);
+  });
+
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  if (!list) return;
+  list.innerHTML = window._selectedFiles.map((f, i) => `
+    <div class="file-item">
+      <span class="file-name">${escH(f.name)}</span>
+      <span class="file-size">${(f.size / 1024).toFixed(0)} КБ</span>
+      <button class="file-remove" onclick="removeFile(${i})" title="Удалить">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeFile(idx) {
+  window._selectedFiles.splice(idx, 1);
+  renderFileList();
 }
 
 async function doSendBot() {
   const btn    = document.getElementById('botBtn');
   const status = document.getElementById('sendStatus');
-
   if (btn) { btn.disabled = true; btn.textContent = 'Отправляю…'; }
-  if (status) { status.className = 'send-status'; }
+  if (status) status.className = 'send-status';
 
   try {
-    const res  = await fetch(BOT_API_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ tor_text: window._torText || '', contact: window._contact || '' }),
-    });
+    const fd = new FormData();
+    fd.append('tor_text', window._torText || '');
+    fd.append('contact',  window._contact || '');
+    (window._selectedFiles || []).forEach(f => fd.append('files', f, f.name));
+
+    const res  = await fetch(BOT_API_URL, { method: 'POST', body: fd });
     const data = await res.json();
+
     if (data.success) {
       if (status) {
-        status.textContent = 'ТЗ успешно отправлено! Я получил его и напишу вам в ближайшее время.';
+        const fileCount = (window._selectedFiles || []).length;
+        const fileMsg   = fileCount ? ` Файлов отправлено: ${fileCount}.` : '';
+        status.textContent = `ТЗ успешно отправлено!${fileMsg} Я напишу вам в ближайшее время.`;
         status.className = 'send-status ok';
       }
       if (btn) btn.textContent = 'Отправлено!';
-    } else {
-      throw new Error(data.error || 'Ошибка API');
-    }
+    } else { throw new Error(data.error || 'Ошибка API'); }
   } catch (e) {
-    if (status) {
-      status.textContent = `Не удалось отправить через бота: ${e.message}. Используйте кнопку прямой отправки в Telegram.`;
-      status.className = 'send-status err';
-    }
+    if (status) { status.textContent = `Не удалось отправить: ${e.message}`; status.className = 'send-status err'; }
     if (btn) { btn.disabled = false; btn.textContent = 'Попробовать снова'; }
   }
 }
@@ -1223,21 +1270,13 @@ function doRestart() {
   render();
 }
 
+function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s)  { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-function escH(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function esc(s) {
-  return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doSendBot, doRestart });
+Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doSendBot, doRestart, handleFileSelect, removeFile });
 
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
-  if (!state.currentStepId) {
-    state.currentStepId = STEPS[0].id;
-    state.history       = [STEPS[0].id];
-  }
+  if (!state.currentStepId) { state.currentStepId = STEPS[0].id; state.history = [STEPS[0].id]; }
   render();
 });
