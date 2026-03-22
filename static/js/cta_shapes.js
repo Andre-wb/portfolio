@@ -26,7 +26,7 @@
     const PH        = 1.30;
     const PD        = 0.5;
     const PR        = 0.16;
-    const FONT_SIZE = 0.5;
+    const FONT_SIZE = 0.4;
 
     const CONFIGS = [
         { layer:'back',  text:'PYTHON',
@@ -347,8 +347,8 @@
         window.addEventListener('resize', resize);
 
         const FONT_URLS = [
-            '/static/css/Audiowide/Audiowide_Regular.json',
-            '/css/Audiowide/Audiowide_Regular.json',
+            '/static/css/Climate_Crisis/Climate_Crisis_Regular.json',
+            '/css/Climate_Crisis/Climate_Crisis_Regular.json',
         ];
 
         const loader = new THREE.FontLoader();

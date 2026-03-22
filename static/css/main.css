@@ -225,6 +225,10 @@ header nav a {
     text-decoration: none;
     color: var(--text);
     font-family: 'JetBrains Mono', sans-serif;
+    transition: 0.5s;
+}
+header nav a:hover, header nav a:focus, header nav a:active {
+    color: var(--accent2);
 }
 header {
     position: fixed;

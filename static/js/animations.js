@@ -128,4 +128,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         runIdleCycle(btn, originalText, 3500);
     });
+
+    const navLinks = document.querySelectorAll('.desktop-nav a');
+    navLinks.forEach(link => {
+        const originalText = link.textContent.trim();
+
+        link.addEventListener('mouseenter', () => {
+            clearInterval(link._scrambleInterval);
+            link.textContent = originalText;
+            scrambleTo(link, originalText, 400);
+        });
+
+        link.addEventListener('mouseleave', () => {
+            clearInterval(link._scrambleInterval);
+            link.textContent = originalText;
+        });
+    });
 });
