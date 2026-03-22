@@ -620,9 +620,30 @@ function buildCardHTML(step) {
 }
 
 function buildTextArea(step) {
-  return `<textarea class="txt-area" id="mainTextInput"
-    placeholder="${esc(step.placeholder || 'Введите ваш ответ...')}"
-    rows="5"></textarea>`;
+  const fid = `files_main_${step.id}`;
+  return `
+    <div class="input-toggle-wrap">
+      <div class="input-toggle-bar">
+        <button type="button" class="itoggle active" id="tog_text_main"
+          onclick="switchInputMode('main','text','${step.id}')">Текст</button>
+        <button type="button" class="itoggle" id="tog_file_main"
+          onclick="switchInputMode('main','file','${step.id}')">Файлы</button>
+      </div>
+      <div id="mode_text_main">
+        <textarea class="txt-area" id="mainTextInput"
+          placeholder="${esc(step.placeholder || 'Введите ваш ответ...')}"
+          rows="5"></textarea>
+      </div>
+      <div id="mode_file_main" class="file-inline-zone" style="display:none">
+        <label class="file-drop-zone-inline">
+          <input type="file" id="${fid}" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
+            onchange="addInlineFiles(this.files,'${step.id}','main')" />
+          <span class="file-drop-icon-sm">📎</span>
+          <span class="file-drop-text-sm">Нажмите или перетащите файлы (до 10 шт., до 50 МБ каждый)</span>
+        </label>
+        <div class="file-list-inline" id="flist_main_${step.id}"></div>
+      </div>
+    </div>`;
 }
 
 function buildNumberInput(step) {
@@ -637,10 +658,30 @@ function buildNumberInput(step) {
 
 function buildOptions(step, isMulti) {
   const items = step.options.map(opt => {
-    const subId = `sub_${step.id}_${opt.value}`;
+    const subId  = `sub_${step.id}_${opt.value}`;
+    const fileId = `files_${step.id}_${opt.value}`;
     const sub = opt.hasText ? `
-      <textarea class="opt-sub-input" id="${subId}" data-opt="${opt.value}"
-        placeholder="${esc(opt.textPlaceholder || 'Уточните...')}" rows="2"></textarea>` : '';
+      <div class="input-toggle-wrap sub-wrap" id="wrap_${subId}" style="display:none">
+        <div class="input-toggle-bar small">
+          <button type="button" class="itoggle active" id="tog_text_${subId}"
+            onclick="switchInputMode('${subId}','text','${step.id}')">Текст</button>
+          <button type="button" class="itoggle" id="tog_file_${subId}"
+            onclick="switchInputMode('${subId}','file','${step.id}')">Файлы</button>
+        </div>
+        <div id="mode_text_${subId}">
+          <textarea class="opt-sub-input" id="${subId}" data-opt="${opt.value}"
+            placeholder="${esc(opt.textPlaceholder || 'Уточните...')}" rows="2"></textarea>
+        </div>
+        <div id="mode_file_${subId}" class="file-inline-zone" style="display:none">
+          <label class="file-drop-zone-inline">
+            <input type="file" id="${fileId}" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
+              onchange="addInlineFiles(this.files,'${step.id}','${subId}')" />
+            <span class="file-drop-icon-sm">📎</span>
+            <span class="file-drop-text-sm">Нажмите — до 10 файлов, до 50 МБ каждый</span>
+          </label>
+          <div class="file-list-inline" id="flist_${subId}"></div>
+        </div>
+      </div>` : '';
     return `
       <div class="opt-wrap">
         <button type="button"
@@ -669,9 +710,12 @@ function restoreAnswer(step) {
     const btn = document.querySelector(`.opt-btn[data-value="${ans.value}"]`);
     if (btn) {
       btn.classList.add('selected');
+      const subId = `sub_${step.id}_${ans.value}`;
+      const wrap  = document.getElementById(`wrap_${subId}`);
+      if (wrap) wrap.style.display = 'block';
       if (ans.text) {
-        const sub = document.getElementById(`sub_${step.id}_${ans.value}`);
-        if (sub) { sub.classList.add('show'); sub.value = ans.text; }
+        const sub = document.getElementById(subId);
+        if (sub) sub.value = ans.text;
       }
     }
   } else if (step.type === 'multi' && ans.values?.length) {
@@ -679,14 +723,19 @@ function restoreAnswer(step) {
       const btn = document.querySelector(`.opt-btn[data-value="${v}"]`);
       if (btn) {
         btn.classList.add('selected');
+        const subId = `sub_${step.id}_${v}`;
+        const wrap  = document.getElementById(`wrap_${subId}`);
+        if (wrap) wrap.style.display = 'block';
         const t = ans.texts?.[v];
         if (t) {
-          const sub = document.getElementById(`sub_${step.id}_${v}`);
-          if (sub) { sub.classList.add('show'); sub.value = t; }
+          const sub = document.getElementById(subId);
+          if (sub) sub.value = t;
         }
       }
     });
   }
+  // Restore inline file lists
+  renderAllInlineFileLists();
 }
 
 function bindEvents(step) {
@@ -714,11 +763,14 @@ function selectSingle(stepId, value, btnEl) {
   const step = getStep(stepId);
   if (!step) return;
   document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelectorAll('.opt-sub-input').forEach(s => s.classList.remove('show'));
+  // Hide all sub-wraps
+  document.querySelectorAll('.sub-wrap').forEach(s => s.style.display = 'none');
   btnEl.classList.add('selected');
-  const sub = document.getElementById(`sub_${stepId}_${value}`);
-  if (sub) sub.classList.add('show');
-  const opt = step.options.find(o => o.value === value);
+  const subId = `sub_${stepId}_${value}`;
+  const wrap  = document.getElementById(`wrap_${subId}`);
+  if (wrap) wrap.style.display = 'block';
+  const sub   = document.getElementById(subId);
+  const opt   = step.options.find(o => o.value === value);
   state.answers[stepId] = { value, label: opt?.label || value, text: sub?.value || '' };
   saveState();
   hideErr();
@@ -726,9 +778,10 @@ function selectSingle(stepId, value, btnEl) {
 
 function toggleMulti(stepId, value, btnEl) {
   btnEl.classList.toggle('selected');
-  const isOn = btnEl.classList.contains('selected');
-  const sub = document.getElementById(`sub_${stepId}_${value}`);
-  if (sub) { isOn ? sub.classList.add('show') : sub.classList.remove('show'); }
+  const isOn  = btnEl.classList.contains('selected');
+  const subId = `sub_${stepId}_${value}`;
+  const wrap  = document.getElementById(`wrap_${subId}`);
+  if (wrap) wrap.style.display = isOn ? 'block' : 'none';
   flushMulti(stepId);
   hideErr();
 }
@@ -1153,7 +1206,7 @@ function renderResult() {
         <div class="file-upload-label">Прикрепить файлы (необязательно)</div>
         <p class="file-upload-hint">Макеты, изображения, документы — всё что поможет понять проект. До 10 файлов, до 50 МБ каждый.</p>
         <label class="file-drop-zone" id="fileDropZone">
-          <input type="file" id="fileInput" multiple accept="*/*" style="display:none"
+          <input type="file" id="fileInput" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
             onchange="handleFileSelect(this.files)" />
           <div class="file-drop-icon">📎</div>
           <div class="file-drop-text">Нажмите или перетащите файлы сюда</div>
@@ -1180,7 +1233,7 @@ function renderResult() {
       zone.classList.remove('drag-over');
       handleFileSelect(e.dataTransfer.files);
     });
-    zone.addEventListener('click', () => document.getElementById('fileInput').click());
+    // label naturally triggers input click
   }
 }
 
@@ -1199,28 +1252,21 @@ async function doCopy() {
 }
 
 // Хранилище выбранных файлов
-window._selectedFiles = [];
+window._resultFiles = [];
 
 function handleFileSelect(fileList) {
-  const files = Array.from(fileList);
-  const existing = window._selectedFiles;
-
-  files.forEach(f => {
-    if (existing.length >= 10) return;
-    if (f.size > 50 * 1024 * 1024) {
-      alert(`Файл "${f.name}" слишком большой (макс. 50 МБ)`);
-      return;
-    }
-    existing.push(f);
+  Array.from(fileList).forEach(f => {
+    if (window._resultFiles.length >= 10) return;
+    if (f.size > 50 * 1024 * 1024) { alert(`Файл "${f.name}" слишком большой (макс. 50 МБ)`); return; }
+    window._resultFiles.push(f);
   });
-
   renderFileList();
 }
 
 function renderFileList() {
   const list = document.getElementById('fileList');
   if (!list) return;
-  list.innerHTML = window._selectedFiles.map((f, i) => `
+  list.innerHTML = window._resultFiles.map((f, i) => `
     <div class="file-item">
       <span class="file-name">${escH(f.name)}</span>
       <span class="file-size">${(f.size / 1024).toFixed(0)} КБ</span>
@@ -1230,7 +1276,7 @@ function renderFileList() {
 }
 
 function removeFile(idx) {
-  window._selectedFiles.splice(idx, 1);
+  window._resultFiles.splice(idx, 1);
   renderFileList();
 }
 
@@ -1244,7 +1290,7 @@ async function doSendBot() {
     const fd = new FormData();
     fd.append('tor_text', window._torText || '');
     fd.append('contact',  window._contact || '');
-    (window._selectedFiles || []).forEach(f => fd.append('files', f, f.name));
+    getAllCollectedFiles().forEach(f => fd.append('files', f, f.name));
 
     const res  = await fetch(BOT_API_URL, { method: 'POST', body: fd });
     const data = await res.json();
@@ -1264,6 +1310,69 @@ async function doSendBot() {
   }
 }
 
+// File storage: { contextId -> [File, ...] }
+window._inlineFiles = {};
+
+function switchInputMode(ctxId, mode, stepId) {
+  const textDiv = document.getElementById(`mode_text_${ctxId}`);
+  const fileDiv = document.getElementById(`mode_file_${ctxId}`);
+  const togText = document.getElementById(`tog_text_${ctxId}`);
+  const togFile = document.getElementById(`tog_file_${ctxId}`);
+  if (!textDiv || !fileDiv) return;
+
+  if (mode === 'text') {
+    textDiv.style.display = '';
+    fileDiv.style.display = 'none';
+    togText?.classList.add('active');
+    togFile?.classList.remove('active');
+  } else {
+    textDiv.style.display = 'none';
+    fileDiv.style.display = '';
+    togText?.classList.remove('active');
+    togFile?.classList.add('active');
+    renderInlineFileList(ctxId, stepId);
+  }
+}
+
+function addInlineFiles(fileList, stepId, ctxId) {
+  if (!window._inlineFiles[ctxId]) window._inlineFiles[ctxId] = [];
+  const bucket = window._inlineFiles[ctxId];
+  Array.from(fileList).forEach(f => {
+    if (bucket.length >= 10) { alert('Максимум 10 файлов на поле'); return; }
+    if (f.size > 50 * 1024 * 1024) { alert(`${f.name}: превышает 50 МБ`); return; }
+    bucket.push(f);
+  });
+  renderInlineFileList(ctxId, stepId);
+}
+
+function removeInlineFile(ctxId, idx) {
+  if (window._inlineFiles[ctxId]) window._inlineFiles[ctxId].splice(idx, 1);
+  renderInlineFileList(ctxId);
+}
+
+function renderInlineFileList(ctxId) {
+  const list = document.getElementById(`flist_${ctxId}`);
+  if (!list) return;
+  const files = window._inlineFiles[ctxId] || [];
+  list.innerHTML = files.map((f, i) => `
+    <div class="file-item-inline">
+      <span class="file-name">${escH(f.name)}</span>
+      <span class="file-size">${(f.size/1024).toFixed(0)} КБ</span>
+      <button class="file-remove" onclick="removeInlineFile('${ctxId}',${i})" title="Удалить">✕</button>
+    </div>`).join('');
+}
+
+function renderAllInlineFileLists() {
+  Object.keys(window._inlineFiles || {}).forEach(ctxId => renderInlineFileList(ctxId));
+}
+
+function getAllCollectedFiles() {
+  const all = [];
+  Object.values(window._inlineFiles || {}).forEach(bucket => all.push(...bucket));
+  Object.values(window._resultFiles  || {}).forEach(f => all.push(f));
+  return all;
+}
+
 function doRestart() {
   if (!confirm('Вы уверены? Весь прогресс и ответы будут удалены.')) return;
   clearState();
@@ -1273,7 +1382,7 @@ function doRestart() {
 function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function esc(s)  { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doSendBot, doRestart, handleFileSelect, removeFile });
+Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doSendBot, doRestart, handleFileSelect, removeFile, removeInlineFile, addInlineFiles, switchInputMode });
 
 document.addEventListener('DOMContentLoaded', () => {
   loadState();

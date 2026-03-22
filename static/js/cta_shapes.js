@@ -1,7 +1,19 @@
 'use strict';
 
 /* ─────────────────────────────────────────────────────────────
- * CTA — таблички с вырезом текста насквозь через Shape.holes
+ * CTA — таблички с вырезом текста насквозь
+ *
+ * АРХИТЕКТУРА вырезки:
+ *   generateShapes() неправильно группирует контуры: перекладина H,
+ *   ножка T и т.п. попадают в shape.holes чужой буквы и становятся
+ *   "островами" вместо дырок.
+ *
+ *   Решение: парсим font.data напрямую → получаем все сырые субпути →
+ *   классифицируем по ПРОСТРАНСТВЕННОЙ ВЛОЖЕННОСТИ (even-odd depth),
+ *   без какой-либо зависимости от winding order.
+ *
+ *   depth чётная (0, 2…) → внешний контур → дырка в табличке
+ *   depth нечётная (1, 3…) → счётчик (O, P, B…) → отдельный меш
  * ───────────────────────────────────────────────────────────── */
 
 (function () {
@@ -10,11 +22,11 @@
     const VEL_MAX   = 5.0;
     const VEL_DECAY = 0.90;
 
-    const PW   = 3.8;    // ширина таблички
-    const PH   = 1.30;   // высота
-    const PD   = 0.5;   // толщина
-    const PR   = 0.16;   // радиус скругления
-    const FONT_SIZE = 0.6; // размер шрифта (em)
+    const PW        = 3.8;
+    const PH        = 1.30;
+    const PD        = 0.5;
+    const PR        = 0.16;
+    const FONT_SIZE = 0.5;
 
     const CONFIGS = [
         { layer:'back',  text:'PYTHON',
@@ -29,7 +41,122 @@
             pos:[ 0.2,-0.1, 1.5], rot:[ 0.004, 0.006,-0.002], par:{ x: 1.4, y: 1.2}, color:0x00e1ff },
     ];
 
-    /* ── Скруглённый прямоугольник как THREE.Shape ───────── */
+    /* ────────────────────────────────────────────────────────
+     * 1. Парсим font.data напрямую — все субпути как THREE.Path
+     *    (обходим generateShapes, который группирует неправильно)
+     * ──────────────────────────────────────────────────────── */
+    function parseAllPaths(font, text, fontSize) {
+        const scale  = fontSize / font.data.resolution;
+        const glyphs = font.data.glyphs;
+        let offsetX  = 0;
+        const paths  = [];
+
+        for (let ci = 0; ci < text.length; ci++) {
+            const char  = text[ci];
+            const glyph = glyphs[char] || glyphs['?'];
+            if (!glyph) continue;
+
+            if (glyph.o) {
+                // Кэшируем split — дорогая операция
+                const outline = glyph._outline ||
+                    (glyph._outline = glyph.o.split(' '));
+
+                let j = 0, path = null;
+
+                while (j < outline.length) {
+                    const cmd = outline[j++];
+                    switch (cmd) {
+                        case 'm': {
+                            if (path) paths.push(path);
+                            const x = parseFloat(outline[j++]) * scale + offsetX;
+                            const y = parseFloat(outline[j++]) * scale;
+                            path = new THREE.Path();
+                            path.moveTo(x, y);
+                            break;
+                        }
+                        case 'l': {
+                            const x = parseFloat(outline[j++]) * scale + offsetX;
+                            const y = parseFloat(outline[j++]) * scale;
+                            path.lineTo(x, y);
+                            break;
+                        }
+                        case 'q': {
+                            const cpx = parseFloat(outline[j++]) * scale + offsetX;
+                            const cpy = parseFloat(outline[j++]) * scale;
+                            const x   = parseFloat(outline[j++]) * scale + offsetX;
+                            const y   = parseFloat(outline[j++]) * scale;
+                            path.quadraticCurveTo(cpx, cpy, x, y);
+                            break;
+                        }
+                        case 'b': {
+                            const cp1x = parseFloat(outline[j++]) * scale + offsetX;
+                            const cp1y = parseFloat(outline[j++]) * scale;
+                            const cp2x = parseFloat(outline[j++]) * scale + offsetX;
+                            const cp2y = parseFloat(outline[j++]) * scale;
+                            const x    = parseFloat(outline[j++]) * scale + offsetX;
+                            const y    = parseFloat(outline[j++]) * scale;
+                            path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+                            break;
+                        }
+                    }
+                }
+                if (path) paths.push(path);
+            }
+
+            offsetX += glyph.ha * scale;
+        }
+
+        return paths;
+    }
+
+    /* ────────────────────────────────────────────────────────
+     * 2. Ray-casting: точка внутри полигона?
+     * ──────────────────────────────────────────────────────── */
+    function pointInPolygon(pt, poly) {
+        let inside = false;
+        for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+            const xi = poly[i].x, yi = poly[i].y;
+            const xj = poly[j].x, yj = poly[j].y;
+            if (((yi > pt.y) !== (yj > pt.y)) &&
+                (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi)) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    /* ────────────────────────────────────────────────────────
+     * 3. Классификация контуров по глубине вложения (even-odd)
+     *
+     *    Берём первую точку каждого контура и считаем,
+     *    сколько других контуров её содержат.
+     *
+     *    depth % 2 === 0  →  внешний → дырка в табличке
+     *    depth % 2 === 1  →  счётчик → отдельный меш (остров)
+     *
+     *    Это работает независимо от winding order шрифта.
+     * ──────────────────────────────────────────────────────── */
+    function classifyPaths(paths, nPoints) {
+        const samples = paths.map(p => p.getPoints(nPoints));
+        const holePoints   = [];   // Vector2[] для дырок в табличке
+        const islandPoints = [];   // Vector2[] для отдельных мешей
+
+        for (let i = 0; i < samples.length; i++) {
+            const testPt = samples[i][0];
+            let depth = 0;
+            for (let j = 0; j < samples.length; j++) {
+                if (i !== j && pointInPolygon(testPt, samples[j])) depth++;
+            }
+            if (depth % 2 === 0) holePoints.push(samples[i]);
+            else                  islandPoints.push(samples[i]);
+        }
+
+        return { holePoints, islandPoints };
+    }
+
+    /* ────────────────────────────────────────────────────────
+     * 4. Скруглённый прямоугольник
+     * ──────────────────────────────────────────────────────── */
     function makeRoundedRect(w, h, r) {
         const s = new THREE.Shape();
         s.moveTo(-w/2+r, -h/2);
@@ -40,88 +167,93 @@
         return s;
     }
 
-    /* ── Геометрия таблички с вырезом текста ─────────────────
-     * 1. Строим скруглённый прямоугольник
-     * 2. Генерируем формы букв через font.generateShapes
-     * 3. Центрируем текст и добавляем каждую букву как hole
-     * 4. ExtrudeGeometry — дырки проходят насквозь
-     * ────────────────────────────────────────────────────── */
-    function makePlaqueWithCutout(font, text) {
-        const plaqueShape = makeRoundedRect(PW, PH, PR);
+    const EXTRUDE_BASE = {
+        depth:          PD,
+        bevelEnabled:   true,
+        bevelThickness: 0.035,
+        bevelSize:      0.035,
+        bevelSegments:  8,
+        curveSegments:  48,
+    };
 
-        // Получаем формы букв
-        const letterShapes = font.generateShapes(text, FONT_SIZE);
+    /* ────────────────────────────────────────────────────────
+     * 5. Строим геометрии таблички и островов
+     * ──────────────────────────────────────────────────────── */
+    function buildGeometries(font, text) {
+        const N_PTS = 48; // точность аппроксимации кривых
 
-        // Вычисляем bounding box текста для центрирования
+        // Все сырые субпути шрифта
+        const rawPaths = parseAllPaths(font, text, FONT_SIZE);
+
+        // Центрируем: находим общий bbox
+        const allPts = rawPaths.flatMap(p => p.getPoints(N_PTS));
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
-        letterShapes.forEach(shape => {
-            const pts = shape.getPoints(8);
-            pts.forEach(p => {
-                if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y;
-                if (p.y > maxY) maxY = p.y;
+        allPts.forEach(p => {
+            if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+        });
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+
+        // Сдвигаем все пути к центру
+        const centeredPaths = rawPaths.map(path => {
+            const shifted = new THREE.Path();
+            const pts = path.getPoints(N_PTS);
+            shifted.setFromPoints(pts.map(p => new THREE.Vector2(p.x - cx, p.y - cy)));
+            return shifted;
+        });
+
+        // Классифицируем
+        const { holePoints, islandPoints } = classifyPaths(centeredPaths, N_PTS);
+
+        // ── Табличка: добавляем все внешние контуры букв как дырки ──
+        const plaqueShape = makeRoundedRect(PW, PH, PR);
+        holePoints.forEach(pts => {
+            plaqueShape.holes.push(new THREE.Path(pts));
+        });
+
+        const plaqueGeo = new THREE.ExtrudeGeometry(plaqueShape, EXTRUDE_BASE);
+        plaqueGeo.translate(0, 0, -PD / 2);
+
+        // ── Острова (O, P, B, R, D…): отдельные меши, та же глубина ──
+        const islandGeos = islandPoints.map(pts => {
+            const shape = new THREE.Shape(pts);
+            const geo   = new THREE.ExtrudeGeometry(shape, {
+                depth:         PD,
+                bevelEnabled:  false,
+                curveSegments: 48,
             });
-        });
-        const textW  = maxX - minX;
-        const textH  = maxY - minY;
-        const ox     = -(minX + textW / 2); // смещение по X для центрирования
-        const oy     = -(minY + textH / 2); // смещение по Y
-
-        // Добавляем каждую букву как отверстие в табличке
-        // extractPoints() возвращает точки с правильным winding order
-        letterShapes.forEach(shape => {
-            const extracted = shape.extractPoints(12);
-
-            // Внешний контур буквы — дырка в табличке
-            const outerPts = extracted.shape;
-            if (!outerPts || outerPts.length < 3) return;
-
-            const outerHole = new THREE.Path(
-                outerPts.map(p => new THREE.Vector2(p.x + ox, p.y + oy))
-            );
-            plaqueShape.holes.push(outerHole);
-
-            // Внутренние контуры (островки внутри 'o', 'p', 'R' и т.д.)
-            // Добавляем обратно — они "восстанавливают" материал внутри буквы
-            if (extracted.holes && extracted.holes.length > 0) {
-                extracted.holes.forEach(holePts => {
-                    if (!holePts || holePts.length < 3) return;
-                    const innerHole = new THREE.Path(
-                        holePts.map(p => new THREE.Vector2(p.x + ox, p.y + oy))
-                    );
-                    plaqueShape.holes.push(innerHole);
-                });
-            }
+            geo.translate(0, 0, -PD / 2);
+            return geo;
         });
 
-        const geo = new THREE.ExtrudeGeometry(plaqueShape, {
-            depth:           PD,
-            bevelEnabled:    true,
-            bevelThickness:  0.035,
-            bevelSize:       0.035,
-            bevelSegments:   5,
-            curveSegments:   16,
-        });
-        geo.translate(0, 0, -PD / 2);
-        return geo;
+        return { plaqueGeo, islandGeos };
     }
 
-    /* ── Построить группу ────────────────────────────────── */
+    /* ────────────────────────────────────────────────────────
+     * 6. Группа: табличка + острова, один материал
+     * ──────────────────────────────────────────────────────── */
     function buildGroup(cfg, font) {
         const group = new THREE.Group();
+        const { plaqueGeo, islandGeos } = buildGeometries(font, cfg.text);
 
-        const geo = makePlaqueWithCutout(font, cfg.text);
         const mat = new THREE.MeshStandardMaterial({
             color:     cfg.color,
             metalness: 0.55,
             roughness: 0.20,
-            side:      THREE.DoubleSide, // видно изнутри прорезей
+            side:      THREE.DoubleSide,
         });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.castShadow = mesh.receiveShadow = true;
-        group.add(mesh);
+
+        const plaque = new THREE.Mesh(plaqueGeo, mat);
+        plaque.castShadow = plaque.receiveShadow = true;
+        group.add(plaque);
+
+        islandGeos.forEach(geo => {
+            const m = new THREE.Mesh(geo, mat);
+            m.castShadow = m.receiveShadow = true;
+            group.add(m);
+        });
 
         group.position.set(...cfg.pos);
         group.userData.rot  = cfg.rot;
@@ -214,17 +346,16 @@
         resize();
         window.addEventListener('resize', resize);
 
-        // Пробуем два CDN
         const FONT_URLS = [
-            'https://raw.githubusercontent.com/mrdoob/three.js/r128/examples/fonts/helvetiker_bold.typeface.json',
-            'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json',
+            '/static/css/Audiowide/Audiowide_Regular.json',
+            '/css/Audiowide/Audiowide_Regular.json',
         ];
 
         const loader = new THREE.FontLoader();
         let tried = 0;
 
         function tryLoad() {
-            if (tried >= FONT_URLS.length) return; // без шрифта не запускаем — вырез невозможен
+            if (tried >= FONT_URLS.length) return;
             loader.load(
                 FONT_URLS[tried++],
                 font  => start(camera, rdrs, font),
