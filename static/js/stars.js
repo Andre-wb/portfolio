@@ -28,9 +28,16 @@
          * cursor  — насколько сильно курсор влияет на направление
          * ────────────────────────────────────────────────────────── */
         const LAYERS = [
-            { cnt: 400, scroll: 0.06, speed: 1, cursor: 0.25, sz: [0.25, 0.8],  al: [0.10, 0.35] },
-            { cnt: 200, scroll: 0.18, speed: 3, cursor: 0.60, sz: [0.65, 1.5],  al: [0.28, 0.58] },
-            { cnt: 150, scroll: 0.42, speed: 4, cursor: 1.10, sz: [1.20, 2.6],  al: [0.48, 0.90] },
+            { cnt: 400, scroll: 0.03, speed: 1, cursor: 0.08, sz: [0.12, 0.40], al: [0.04, 0.18] },
+            { cnt: 380, scroll: 0.06, speed: 2, cursor: 0.12, sz: [0.14, 0.48], al: [0.06, 0.22] },
+            { cnt: 360, scroll: 0.10, speed: 3, cursor: 0.18, sz: [0.18, 0.58], al: [0.09, 0.28] },
+            { cnt: 340, scroll: 0.15, speed: 4, cursor: 0.26, sz: [0.24, 0.72], al: [0.13, 0.35] },
+            { cnt: 300, scroll: 0.22, speed: 5, cursor: 0.38, sz: [0.32, 0.92], al: [0.18, 0.44] },
+            { cnt: 260, scroll: 0.31, speed: 6, cursor: 0.52, sz: [0.44, 1.18], al: [0.24, 0.55] },
+            { cnt: 220, scroll: 0.42, speed: 7, cursor: 0.70, sz: [0.60, 1.52], al: [0.32, 0.68] },
+            { cnt: 180, scroll: 0.55, speed: 8, cursor: 0.92, sz: [0.82, 1.95], al: [0.42, 0.83] },
+            { cnt: 130, scroll: 0.70, speed: 9, cursor: 1.20, sz: [1.10, 2.48], al: [0.54, 1.00] },
+            { cnt:  80, scroll: 0.88, speed: 10, cursor: 1.55, sz: [1.48, 3.20], al: [0.68, 1.12] }
         ];
 
         let stars = [], W = 0, H = 0;

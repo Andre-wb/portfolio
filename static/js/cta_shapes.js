@@ -26,16 +26,16 @@
     const PH        = 1.30;
     const PD        = 0.5;
     const PR        = 0.16;
-    const FONT_SIZE = 0.4;
+    const FONT_SIZE = 0.6;
 
     const CONFIGS = [
         { layer:'back',  text:'PYTHON',
             pos:[-2.9, 1.7,-1.3], rot:[ 0.002,-0.004, 0.001], par:{ x:-0.9, y: 0.7}, color:0x3b82f6 },
-        { layer:'back',  text:'RUST',
+        { layer:'back',  text:'CSS',
             pos:[ 2.9,-1.5,-1.0], rot:[-0.001, 0.003,-0.002], par:{ x: 0.8, y:-0.6}, color:0x0ea5e9 },
-        { layer:'mid',   text:'JS',
+        { layer:'mid',   text:'RUST',
             pos:[-1.9,-1.3, 0.0], rot:[ 0.003,-0.005, 0.002], par:{ x: 1.2, y:-1.0}, color:0x10b981 },
-        { layer:'mid',   text:'CSS',
+        { layer:'mid',   text:'JS',
             pos:[ 2.5, 1.3, 0.3], rot:[-0.002, 0.003,-0.003], par:{ x:-1.1, y: 0.9}, color:0x6366f1 },
         { layer:'front', text:'HTML',
             pos:[ 0.2,-0.1, 1.5], rot:[ 0.004, 0.006,-0.002], par:{ x: 1.4, y: 1.2}, color:0x00e1ff },
@@ -172,8 +172,8 @@
         bevelEnabled:   true,
         bevelThickness: 0.035,
         bevelSize:      0.035,
-        bevelSegments:  8,
-        curveSegments:  48,
+        bevelSegments:  100,
+        curveSegments:  100,
     };
 
     /* ────────────────────────────────────────────────────────
@@ -347,8 +347,8 @@
         window.addEventListener('resize', resize);
 
         const FONT_URLS = [
-            '/static/css/Climate_Crisis/Climate_Crisis_Regular.json',
-            '/css/Climate_Crisis/Climate_Crisis_Regular.json',
+            '/static/css/Erica_One/Erica_One_Regular.json',
+            '/css/Erica_One/Erica_One_Regular.json',
         ];
 
         const loader = new THREE.FontLoader();
