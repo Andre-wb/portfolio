@@ -35,6 +35,11 @@ async def tor_builder(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/privacy", response_class=HTMLResponse)
+async def privacy(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse("privacy.html", {"request": request})
+
+
 @router.post("/send-tor")
 async def send_tor(
         tor_text: str = Form(...),

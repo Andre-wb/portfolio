@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const terminal = document.getElementById('terminal-body');
     if (!terminal) return;
 
-    // ── Утилиты ────────────────────────────────────────────────────
 
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -105,10 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
         terminal.scrollTop = terminal.scrollHeight;
     }
 
-    // ── Основной сценарий ───────────────────────────────────────────
 
     async function runTerminal() {
-        // Небольшая пауза после появления окна
         await sleep(600);
 
         // ── whoami ──────────────────────────────────────────
@@ -169,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         appendIdleLine();
     }
 
-    // ── Запуск по IntersectionObserver ─────────────────────────────
 
     let started = false;
     const observer = new IntersectionObserver(entries => {

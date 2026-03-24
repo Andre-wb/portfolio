@@ -1,23 +1,10 @@
 'use strict';
 
-/* ─────────────────────────────────────────────────────────────
- * CTA — таблички с вырезом текста насквозь
- *
- * АРХИТЕКТУРА вырезки:
- *   generateShapes() неправильно группирует контуры: перекладина H,
- *   ножка T и т.п. попадают в shape.holes чужой буквы и становятся
- *   "островами" вместо дырок.
- *
- *   Решение: парсим font.data напрямую → получаем все сырые субпути →
- *   классифицируем по ПРОСТРАНСТВЕННОЙ ВЛОЖЕННОСТИ (even-odd depth),
- *   без какой-либо зависимости от winding order.
- *
- *   depth чётная (0, 2…) → внешний контур → дырка в табличке
- *   depth нечётная (1, 3…) → счётчик (O, P, B…) → отдельный меш
- * ───────────────────────────────────────────────────────────── */
+// Архитектура вырезки букв в 3д табличках из CTA блока
 
 (function () {
 
+    // Настройка размера шрифта, табличек и текста в них
     const VEL_SCALE = 25;
     const VEL_MAX   = 5.0;
     const VEL_DECAY = 0.90;
@@ -41,10 +28,7 @@
             pos:[ 0.2,-0.1, 1.5], rot:[ 0.004, 0.006,-0.002], par:{ x: 1.4, y: 1.2}, color:0x00e1ff },
     ];
 
-    /* ────────────────────────────────────────────────────────
-     * 1. Парсим font.data напрямую — все субпути как THREE.Path
-     *    (обходим generateShapes, который группирует неправильно)
-     * ──────────────────────────────────────────────────────── */
+     // 1. Парсинг файла со шрифтом (.json)
     function parseAllPaths(font, text, fontSize) {
         const scale  = fontSize / font.data.resolution;
         const glyphs = font.data.glyphs;
@@ -57,7 +41,6 @@
             if (!glyph) continue;
 
             if (glyph.o) {
-                // Кэшируем split — дорогая операция
                 const outline = glyph._outline ||
                     (glyph._outline = glyph.o.split(' '));
 
@@ -109,9 +92,7 @@
         return paths;
     }
 
-    /* ────────────────────────────────────────────────────────
-     * 2. Ray-casting: точка внутри полигона?
-     * ──────────────────────────────────────────────────────── */
+     // 2. Проверка наличия точки внутри полигона
     function pointInPolygon(pt, poly) {
         let inside = false;
         for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
@@ -128,13 +109,12 @@
     /* ────────────────────────────────────────────────────────
      * 3. Классификация контуров по глубине вложения (even-odd)
      *
-     *    Берём первую точку каждого контура и считаем,
-     *    сколько других контуров её содержат.
+     *    Берется только одна точка от одного контура и проверяется, сколько других контуров её содержат
      *
      *    depth % 2 === 0  →  внешний → дырка в табличке
      *    depth % 2 === 1  →  счётчик → отдельный меш (остров)
      *
-     *    Это работает независимо от winding order шрифта.
+     *    Буквы с "закрытыми" отверстиями внутри по типу O, R, P могут вырезаться некорректно со сложными шрифтами
      * ──────────────────────────────────────────────────────── */
     function classifyPaths(paths, nPoints) {
         const samples = paths.map(p => p.getPoints(nPoints));
@@ -154,9 +134,7 @@
         return { holePoints, islandPoints };
     }
 
-    /* ────────────────────────────────────────────────────────
-     * 4. Скруглённый прямоугольник
-     * ──────────────────────────────────────────────────────── */
+    // 4. Скругление и сглаживание углов
     function makeRoundedRect(w, h, r) {
         const s = new THREE.Shape();
         s.moveTo(-w/2+r, -h/2);
@@ -167,6 +145,7 @@
         return s;
     }
 
+    // Настройки полигонов у букв. Чем меньше значения сегментов, тем меньше нагрузка на браузер
     const EXTRUDE_BASE = {
         depth:          PD,
         bevelEnabled:   true,
@@ -176,16 +155,13 @@
         curveSegments:  100,
     };
 
-    /* ────────────────────────────────────────────────────────
-     * 5. Строим геометрии таблички и островов
-     * ──────────────────────────────────────────────────────── */
+     // 5. Геометрии таблички и островов
     function buildGeometries(font, text) {
-        const N_PTS = 48; // точность аппроксимации кривых
+        const N_PTS = 48;
 
-        // Все сырые субпути шрифта
         const rawPaths = parseAllPaths(font, text, FONT_SIZE);
 
-        // Центрируем: находим общий bbox
+        // Центрируем
         const allPts = rawPaths.flatMap(p => p.getPoints(N_PTS));
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
@@ -204,10 +180,9 @@
             return shifted;
         });
 
-        // Классифицируем
         const { holePoints, islandPoints } = classifyPaths(centeredPaths, N_PTS);
 
-        // ── Табличка: добавляем все внешние контуры букв как дырки ──
+        // ── Табличка: добавляем все внешние контуры букв как отверстия
         const plaqueShape = makeRoundedRect(PW, PH, PR);
         holePoints.forEach(pts => {
             plaqueShape.holes.push(new THREE.Path(pts));
@@ -216,7 +191,7 @@
         const plaqueGeo = new THREE.ExtrudeGeometry(plaqueShape, EXTRUDE_BASE);
         plaqueGeo.translate(0, 0, -PD / 2);
 
-        // ── Острова (O, P, B, R, D…): отдельные меши, та же глубина ──
+        // ── Острова (O, P, B, R и т.д.): отдельные меши, та же глубина
         const islandGeos = islandPoints.map(pts => {
             const shape = new THREE.Shape(pts);
             const geo   = new THREE.ExtrudeGeometry(shape, {
@@ -231,9 +206,7 @@
         return { plaqueGeo, islandGeos };
     }
 
-    /* ────────────────────────────────────────────────────────
-     * 6. Группа: табличка + острова, один материал
-     * ──────────────────────────────────────────────────────── */
+    // 6. Группа: табличка + острова, один материал
     function buildGroup(cfg, font) {
         const group = new THREE.Group();
         const { plaqueGeo, islandGeos } = buildGeometries(font, cfg.text);
@@ -290,7 +263,7 @@
         scene.add(pt);
     }
 
-    /* ── Renderer ────────────────────────────────────────── */
+    /* ── Рендер ────────────────────────────────────────── */
     function makeRenderer(container, blur) {
         const cv = document.createElement('canvas');
         Object.assign(cv.style, {
@@ -346,6 +319,7 @@
         resize();
         window.addEventListener('resize', resize);
 
+        // Ссылка на код шрифта для вырезки. Работает только с .json файлами! Их можно конвертировать из .ttf
         const FONT_URLS = [
             '/static/css/Erica_One/Erica_One_Regular.json',
             '/css/Erica_One/Erica_One_Regular.json',

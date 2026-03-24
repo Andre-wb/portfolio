@@ -13,7 +13,6 @@ class ProjectGallery {
     }
 
     init() {
-        // Открытие галереи по клику на кнопки
         document.querySelectorAll('.project-link[href="#"]').forEach(btn => {
             if (btn.textContent.trim() === 'Галерея') {
                 btn.addEventListener('click', (e) => {
@@ -24,15 +23,12 @@ class ProjectGallery {
             }
         });
 
-        // Закрытие
         this.modal.querySelector('.gallery-close').addEventListener('click', () => this.close());
         this.modal.querySelector('.gallery-backdrop').addEventListener('click', () => this.close());
 
-        // Навигация
         document.getElementById('prevBtn').addEventListener('click', () => this.prev());
         document.getElementById('nextBtn').addEventListener('click', () => this.next());
 
-        // Клавиатура
         document.addEventListener('keydown', (e) => {
             if (!this.modal.classList.contains('active')) return;
             if (e.key === 'Escape') this.close();
@@ -40,7 +36,6 @@ class ProjectGallery {
             if (e.key === 'ArrowRight') this.next();
         });
 
-        // Свайп на мобиле
         let touchStartX = 0;
         this.track.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
@@ -113,14 +108,12 @@ class ProjectGallery {
     }
 
     render() {
-        // Слайды
         this.track.innerHTML = this.images.map(src => `
             <div class="gallery-slide">
                 <img src="${src}" alt="Screenshot" loading="lazy">
             </div>
         `).join('');
 
-        // Доты
         this.dotsContainer.innerHTML = this.images.map((_, i) => `
             <div class="gallery-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>
         `).join('');
@@ -167,5 +160,4 @@ class ProjectGallery {
     }
 }
 
-// Инициализация
 new ProjectGallery();

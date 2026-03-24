@@ -4,12 +4,10 @@
         const section = document.getElementById('projects');
         if (!section) return;
 
-        /* ── Определение touch-устройства ───────────────────────── */
         const isTouchDevice = ('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0) ||
             (navigator.msMaxTouchPoints > 0);
 
-        /* ── Canvas ─────────────────────────────────────────────── */
         const canvas = document.createElement('canvas');
         Object.assign(canvas.style, {
             position: 'absolute', top: '0', left: '0',
@@ -20,13 +18,7 @@
             section.style.position = 'relative';
         section.prepend(canvas);
         const ctx = canvas.getContext('2d');
-
-        /* ── Слои ───────────────────────────────────────────────────
-         * scroll  — множитель параллакса при скролле
-         * speed   — базовая скорость дрейфа (px/frame) для каждого слоя
-         *           ближние быстрее → усиливает ощущение глубины
-         * cursor  — насколько сильно курсор влияет на направление
-         * ────────────────────────────────────────────────────────── */
+        // Слои звезд с настройкой их количества, скорости и т.д. для параллакс эффекта
         const LAYERS = [
             { cnt: 400, scroll: 0.03, speed: 1, cursor: 0.08, sz: [0.12, 0.40], al: [0.04, 0.18] },
             { cnt: 380, scroll: 0.06, speed: 2, cursor: 0.12, sz: [0.14, 0.48], al: [0.06, 0.22] },
@@ -64,7 +56,6 @@
             });
         }
 
-        /* ── Скролл ─────────────────────────────────────────────── */
         let lastScrollY = window.scrollY;
         let isScrolling = false;
         let scrollTimer = null;
@@ -89,26 +80,19 @@
             }
         }, 200);
 
-        /* ── Курсор (только для non-touch устройств) ─────────────── */
         let dirX = 0, dirY = 0;
         let smDirX = 0, smDirY = 0;
 
         if (!isTouchDevice) {
             document.addEventListener('mousemove', e => {
                 const r = section.getBoundingClientRect();
-                // Нормализуем относительно центра секции: -1 … +1
                 dirX = ((e.clientX - r.left) / W - 0.5) * 2;
                 dirY = ((e.clientY - r.top)  / H - 0.5) * 2;
             });
         }
 
-        /* ── Плавное переключение скролл ↔ курсор ─────────────────
-         * cursorAlpha: 0 = скролл рулит, 1 = курсор рулит
-         * Для touch-устройств cursorAlpha всегда равен 0
-         * ────────────────────────────────────────────────────────── */
         let cursorAlpha = 0;
 
-        /* ── Рендер ─────────────────────────────────────────────── */
         let tick = 0;
 
         function draw() {
@@ -116,15 +100,12 @@
             tick++;
 
             if (!isTouchDevice) {
-                // Плавно сглаживаем направление курсора (только для non-touch)
                 smDirX += (dirX - smDirX) * 0.04;
                 smDirY += (dirY - smDirY) * 0.04;
 
-                // Плавно переключаем режим (только для non-touch)
                 const targetAlpha = isScrolling ? 0 : 1;
                 cursorAlpha += (targetAlpha - cursorAlpha) * 0.06;
             } else {
-                // Для touch-устройств курсорный эффект отключен
                 smDirX = 0;
                 smDirY = 0;
                 cursorAlpha = 0;
@@ -135,7 +116,7 @@
             stars.forEach(s => {
                 const L = LAYERS[s.li];
 
-                // Движение под влиянием курсора (только если cursorAlpha > 0)
+                // Зависимость движения от курсора (это если cursorAlpha > 0)
                 if (cursorAlpha > 0.01) {
                     const vx = smDirX * L.speed * L.cursor * cursorAlpha;
                     const vy = smDirY * L.speed * L.cursor * cursorAlpha;
@@ -143,7 +124,7 @@
                     s.y = ((s.y + vy) % H + H) % H;
                 }
 
-                // Мерцание
+                // Мерцание звезд
                 const tw = 0.60 + 0.40 * Math.sin(tick * s.ts + s.tp);
                 const a  = s.al * tw;
 
@@ -160,7 +141,6 @@
                     ctx.fill();
                 }
 
-                // Ядро
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.sz, 0, 6.2832);
                 ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(3) + ')';
