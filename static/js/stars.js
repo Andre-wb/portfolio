@@ -4,12 +4,10 @@
         const section = document.getElementById('projects');
         if (!section) return;
 
-        /* ── Определение touch-устройства ───────────────────────── */
         const isTouchDevice = ('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0) ||
             (navigator.msMaxTouchPoints > 0);
 
-        /* ── Canvas ─────────────────────────────────────────────── */
         const canvas = document.createElement('canvas');
         Object.assign(canvas.style, {
             position: 'absolute', top: '0', left: '0',
@@ -21,24 +19,45 @@
         section.prepend(canvas);
         const ctx = canvas.getContext('2d');
 
-        /* ── Слои ───────────────────────────────────────────────────
-         * scroll  — множитель параллакса при скролле
-         * speed   — базовая скорость дрейфа (px/frame) для каждого слоя
-         *           ближние быстрее → усиливает ощущение глубины
-         * cursor  — насколько сильно курсор влияет на направление
-         * ────────────────────────────────────────────────────────── */
-        const LAYERS = [
-            { cnt: 400, scroll: 0.03, speed: 1, cursor: 0.08, sz: [0.12, 0.40], al: [0.2, 0.4] },
-            { cnt: 380, scroll: 0.06, speed: 2, cursor: 0.12, sz: [0.14, 0.48], al: [0.3, 0.6] },
-            { cnt: 360, scroll: 0.10, speed: 3, cursor: 0.18, sz: [0.18, 0.58], al: [0.4, 0.8] },
-            { cnt: 340, scroll: 0.15, speed: 4, cursor: 0.26, sz: [0.24, 0.72], al: [0.5, 1.0] },
-            { cnt: 300, scroll: 0.22, speed: 5, cursor: 0.38, sz: [0.32, 0.92], al: [0.6, 1.2] },
-            { cnt: 260, scroll: 0.31, speed: 6, cursor: 0.52, sz: [0.44, 1.18], al: [0.7, 1.4] },
-            { cnt: 220, scroll: 0.42, speed: 7, cursor: 0.70, sz: [0.60, 1.52], al: [0.8, 1.6] },
-            { cnt: 180, scroll: 0.55, speed: 8, cursor: 0.92, sz: [0.82, 1.95], al: [0.9, 1.8] },
-            { cnt: 130, scroll: 0.70, speed: 9, cursor: 1.20, sz: [1.10, 2.48], al: [1.0, 2.0] },
+        // Настройка уменьшения количества и яркости звезд при экране меньше 1024px шириной
+        const isSmallScreen = window.innerWidth < 1024;
+        const densityMultiplier = isSmallScreen ? 0.4 : 1;
+        const alphaMultiplier = isSmallScreen ? 0.6 : 1;
+
+        // Layer 0 = far (small, dim, slow), Layer 8 = near (large, bright, fast)
+        //
+        // scrollFactor: движение звезды в canvas при скролле.
+        //   Итоговая скорость на экране = scrollDy * (1 - scrollFactor)
+        //   > 0 → звезда "отстаёт" от страницы → выглядит далёкой
+        //   < 0 → звезда "обгоняет" страницу → выглядит ближней
+        //   scrollFactor 0.80: экранная скорость = 20% от скролла (медленный фон)
+        //   scrollFactor -0.64: экранная скорость = 164% от скролла (быстрый передний план)
+        const LAYERS_BASE = [
+            { cnt: 350, scrollFactor:  0.80, cursorSpeed: 0.5,  sz: [0.18, 0.525], al: [0.225, 0.525] },
+            { cnt: 320, scrollFactor:  0.62, cursorSpeed: 0.9,  sz: [0.27, 0.72], al: [0.33, 0.675] },
+            { cnt: 290, scrollFactor:  0.44, cursorSpeed: 1.4,  sz: [0.39, 0.93], al: [0.45, 0.87] },
+            { cnt: 260, scrollFactor:  0.26, cursorSpeed: 2.0,  sz: [0.54, 1.20], al: [0.57, 1.05] },
+            { cnt: 220, scrollFactor:  0.08, cursorSpeed: 2.8,  sz: [0.72, 1.50], al: [0.72, 1.275] },
+            { cnt: 180, scrollFactor: -0.10, cursorSpeed: 3.8,  sz: [0.96, 1.92], al: [0.87, 1.50] },
+            { cnt: 140, scrollFactor: -0.28, cursorSpeed: 5.0,  sz: [1.26, 2.43], al: [1.05, 1.83] },
+            { cnt: 100, scrollFactor: -0.46, cursorSpeed: 6.5,  sz: [1.65, 3.075], al: [1.23, 2.25] },
+            { cnt:  80, scrollFactor: -0.64, cursorSpeed: 8.5,  sz: [2.10, 3.825], al: [1.41, 3.00] },
         ];
+
+        const LAYERS = LAYERS_BASE.map(L => ({
+            ...L,
+            cnt: Math.round(L.cnt * densityMultiplier),
+            al: [L.al[0] * alphaMultiplier, L.al[1] * alphaMultiplier]
+        }));
+
         let stars = [], W = 0, H = 0;
+        let lastScrollY = window.scrollY;
+        let scrollActive = false;
+        let scrollTimer = null;
+        let dirX = 0, dirY = 0;
+        let smDirX = 0, smDirY = 0;
+        let cursorBlend = 0; // 0 = scroll-режим, 1 = cursor-режим
+        let tick = 0;
 
         function resize() {
             W = canvas.width  = section.offsetWidth;
@@ -62,95 +81,90 @@
             });
         }
 
-        /* ── Скролл ─────────────────────────────────────────────── */
-        let lastScrollY = window.scrollY;
-        let isScrolling = false;
-        let scrollTimer = null;
-
-        function onScroll() {
-            const dy = window.scrollY - lastScrollY;
-            lastScrollY = window.scrollY;
-            stars.forEach(s => {
-                s.y = ((s.y + dy * LAYERS[s.li].scroll) % H + H) % H;
-            });
-            isScrolling = true;
-            clearTimeout(scrollTimer);
-            scrollTimer = setTimeout(() => { isScrolling = false; }, 150);
-        }
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-
-        const lenisCheck = setInterval(() => {
-            if (window.lenis) {
-                window.lenis.on('scroll', onScroll);
-                clearInterval(lenisCheck);
-            }
-        }, 200);
-
-        /* ── Курсор (только для non-touch устройств) ─────────────── */
-        let dirX = 0, dirY = 0;
-        let smDirX = 0, smDirY = 0;
-
         if (!isTouchDevice) {
             document.addEventListener('mousemove', e => {
                 const r = section.getBoundingClientRect();
-                // Нормализуем относительно центра секции: -1 … +1
                 dirX = ((e.clientX - r.left) / W - 0.5) * 2;
                 dirY = ((e.clientY - r.top)  / H - 0.5) * 2;
             });
         }
 
-        /* ── Плавное переключение скролл ↔ курсор ─────────────────
-         * cursorAlpha: 0 = скролл рулит, 1 = курсор рулит
-         * Для touch-устройств cursorAlpha всегда равен 0
-         * ────────────────────────────────────────────────────────── */
-        let cursorAlpha = 0;
-
-        /* ── Рендер ─────────────────────────────────────────────── */
-        let tick = 0;
+        // Поддержка Lenis — дополнительно слушаем его события для флага scrollActive
+        const lenisCheck = setInterval(() => {
+            if (window.lenis) {
+                window.lenis.on('scroll', () => {
+                    scrollActive = true;
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => { scrollActive = false; }, 250);
+                });
+                clearInterval(lenisCheck);
+            }
+        }, 200);
 
         function draw() {
             requestAnimationFrame(draw);
             tick++;
 
-            if (!isTouchDevice) {
-                // Плавно сглаживаем направление курсора (только для non-touch)
-                smDirX += (dirX - smDirX) * 0.04;
-                smDirY += (dirY - smDirY) * 0.04;
+            // Читаем дельту скролла прямо в rAF — синхронно с рендером.
+            // Никакого накопления/трения. iOS сам плавно гасит через momentum scroll.
+            const curScrollY = window.scrollY;
+            const rawDy = curScrollY - lastScrollY;
+            lastScrollY = curScrollY;
 
-                // Плавно переключаем режим (только для non-touch)
-                const targetAlpha = isScrolling ? 0 : 1;
-                cursorAlpha += (targetAlpha - cursorAlpha) * 0.06;
-            } else {
-                // Для touch-устройств курсорный эффект отключен
-                smDirX = 0;
-                smDirY = 0;
-                cursorAlpha = 0;
+            if (rawDy !== 0) {
+                scrollActive = true;
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => { scrollActive = false; }, 250);
             }
+
+            // Ограничение от резких рывков на мобиле при инерционном скролле
+            const scrollDy = Math.max(-60, Math.min(60, rawDy));
+
+            // Плавное сглаживание направления курсора (только desktop)
+            if (!isTouchDevice) {
+                smDirX += (dirX - smDirX) * 0.05;
+                smDirY += (dirY - smDirY) * 0.05;
+            }
+
+            // Плавный переход между режимами
+            const targetBlend = (scrollActive || isTouchDevice) ? 0 : 1;
+            cursorBlend += (targetBlend - cursorBlend) * 0.05;
 
             ctx.clearRect(0, 0, W, H);
 
-            stars.forEach(s => {
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
                 const L = LAYERS[s.li];
 
-                // Движение под влиянием курсора (только если cursorAlpha > 0)
-                if (cursorAlpha > 0.01) {
-                    const vx = smDirX * L.speed * L.cursor * cursorAlpha;
-                    const vy = smDirY * L.speed * L.cursor * cursorAlpha;
-                    s.x = ((s.x + vx) % W + W) % W;
-                    s.y = ((s.y + vy) % H + H) % H;
+                let moveX = 0;
+                let moveY = 0;
+
+                // Бесконечный полёт к курсору (ближние звёзды — значительно быстрее)
+                if (cursorBlend > 0.001) {
+                    moveX += smDirX * L.cursorSpeed * cursorBlend;
+                    moveY += smDirY * L.cursorSpeed * cursorBlend;
+                }
+
+                // Параллакс при скролле (ближние обгоняют, дальние отстают)
+                if (scrollDy !== 0) {
+                    moveY += scrollDy * L.scrollFactor;
+                }
+
+                if (moveX !== 0 || moveY !== 0) {
+                    s.x = ((s.x + moveX) % W + W) % W;
+                    s.y = ((s.y + moveY) % H + H) % H;
                 }
 
                 // Мерцание
                 const tw = 0.60 + 0.40 * Math.sin(tick * s.ts + s.tp);
                 const a  = s.al * tw;
 
-                // Свечение для ближних крупных звёзд
-                if (s.li === 2 && s.sz > 1.9) {
-                    const gr = s.sz * 5;
+                // Свечение для крупных ближних звёзд
+                if (s.li >= 7 && s.sz > 1.8) {
+                    const gr = s.sz * 4;
                     const g  = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, gr);
-                    g.addColorStop(0,   'rgba(0,225,255,'   + (a * 0.55).toFixed(3) + ')');
-                    g.addColorStop(0.4, 'rgba(59,130,246,'  + (a * 0.18).toFixed(3) + ')');
+                    g.addColorStop(0,   'rgba(0,225,255,'  + (a * 0.55).toFixed(3) + ')');
+                    g.addColorStop(0.4, 'rgba(59,130,246,' + (a * 0.18).toFixed(3) + ')');
                     g.addColorStop(1,   'rgba(0,0,0,0)');
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, gr, 0, 6.2832);
@@ -158,18 +172,21 @@
                     ctx.fill();
                 }
 
-                // Ядро
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.sz, 0, 6.2832);
                 ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(3) + ')';
                 ctx.fill();
-            });
+            }
         }
 
         resize();
         initStars();
         draw();
 
-        window.addEventListener('resize', () => { resize(); initStars(); });
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { resize(); initStars(); }, 150);
+        });
     });
 }());

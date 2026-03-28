@@ -4,7 +4,7 @@
 
 (function () {
 
-    // ========== ОПРЕДЕЛЕНИЕ ПРОИЗВОДИТЕЛЬНОСТИ ==========
+    // Определение уровня производительности
     function detectPerformanceLevel() {
         // Быстрый тест производительности через замер времени рендеринга
         return new Promise((resolve) => {
@@ -16,8 +16,8 @@
                 if (performance.now() - startTime >= 200) {
                     const fps = frames / 0.2;
 
-                    // Определяем уровень качества
-                    let level = 'medium'; // по умолчанию
+                    // Определяем уровень качества, по умолчанию medium
+                    let level = 'medium';
 
                     // Аппаратные подсказки
                     const cores = navigator.hardwareConcurrency || 2;
@@ -42,7 +42,6 @@
         });
     }
 
-    // ========== НАСТРОЙКИ КАЧЕСТВА ==========
     let QUALITY = 'medium'; // будет установлено после детекта
 
     // Параметры геометрии в зависимости от качества
@@ -253,9 +252,9 @@
         return inside;
     }
 
-    /* ────────────────────────────────────────────────────────
-     * 3. Классификация контуров по глубине вложения (even-odd)
-     * ──────────────────────────────────────────────────────── */
+
+     // 3. Классификация контуров по глубине вложения (even-odd)
+
     function classifyPaths(paths, nPoints) {
         const samples = paths.map(p => p.getPoints(nPoints));
         const holePoints   = [];
@@ -372,7 +371,6 @@
         return group;
     }
 
-    /* ── Освещение (адаптивное) ───────────────────────── */
     function addLights(scene) {
         const shadowParams = getShadowParams();
         const shadowsOn = shadowParams.shadowsEnabled;
@@ -468,7 +466,6 @@
         detectPerformanceLevel().then(level => {
             QUALITY = level;
 
-            // Создаём рендереры с новым качеством
             rdrs = ['4px','1.5px',null].map(b => makeRenderer(container, b));
 
             function resize() {
@@ -481,7 +478,7 @@
             resize();
             window.addEventListener('resize', resize);
 
-            // Загружаем шрифт и запускаем
+            // Подключение шрифта (принимает только json формат)
             const FONT_URLS = [
                 '/static/css/Erica_One/Erica_One_Regular.json',
                 '/css/Erica_One/Erica_One_Regular.json',
@@ -559,7 +556,6 @@
 
     document.addEventListener('DOMContentLoaded', init);
 
-    /* ── Магнитные кнопки ────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cta-btn').forEach(btn => {
             let ox=0,oy=0,tx=0,ty=0,inside=false,rafId=null;
