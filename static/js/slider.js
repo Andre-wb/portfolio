@@ -86,8 +86,12 @@ class ProjectGallery {
                 '/static/assets/realestate/realestate6.png',
             ],
             'orbityx': [
-                '/static/assets/orbityx/orbityx1.png',
                 '/static/assets/orbityx/orbityx2.png',
+                '/static/assets/orbityx/orbityx3.png',
+                '/static/assets/orbityx/orbityx4.png',
+                '/static/assets/orbityx/orbityx5.png',
+                '/static/assets/orbityx/orbityx6.png',
+                '/static/assets/orbityx/orbityx7.png',
             ],
         }
 
