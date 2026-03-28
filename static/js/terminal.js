@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await sleep(160 + Math.random() * 120);
         }
         await sleep(120);
-        out.innerHTML += `<span class="out-green">Successfully resolved dependencies</span><br>`;
+        out.innerHTML += `<span class="out-accent">Successfully resolved dependencies</span><br>`;
         scrollTerminal();
     }
 
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 80);
         });
         dots.textContent = '';
-        out.innerHTML = `<span class="out-muted">${label}</span> <span class="out-green">done</span>`;
+        out.innerHTML = `<span class="out-muted">${label}</span> <span class="out-accent">done</span>`;
         scrollTerminal();
         await sleep(120);
     }
@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
             'Python · FastAPI · Flask · SQLAlchemy',
             'Rust · PyO3 · AES-GCM · X25519 · Argon2id',
             'JavaScript · WebSocket · WebRTC',
-            'SQLite · PostgreSQL',
         ]);
 
         // ── achievements ────────────────────────────────────
@@ -158,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await typeCommand('status');
         await sleep(200);
         await fakeLoading('Checking availability...');
-        addOutput('<span class="out-green">●</span> Открыт к заказам и предложениям о работе');
+        addOutput('<span class="out-accent">●</span> Открыт к заказам и предложениям о работе');
         scrollTerminal();
 
         // Финальный курсор

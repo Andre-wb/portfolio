@@ -263,7 +263,7 @@ header {
     border: none;
     cursor: pointer;
     z-index: 5;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(20px);
     padding: 5px;
     border-radius: 10px;
 }
@@ -496,14 +496,14 @@ header {
     transition: 0.2s;
 }
 header nav {
-    padding: 16px 10px;
+    padding: 17px 15px;
     display: flex;
     align-items: center;
     justify-content: space-around;
     border-radius: 2em;
     border: none;
     min-width: 300px;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px);
     gap: 2em;
 }
 .body-section {
@@ -1493,7 +1493,7 @@ header nav {
 }
 
 .out-accent { color: var(--accent2); font-family: 'JetBrains Mono', monospace;}
-.out-green  { color: var(--green); font-family: 'JetBrains Mono', monospace;}
+.out-result { color: var(--accent2); font-family: 'JetBrains Mono', monospace;}
 .out-muted  { font-family: 'JetBrains Mono', monospace;}
 .terminal-link { font-family: 'JetBrains Mono', monospace; text-decoration: underline; color: var(--accent2); }
 

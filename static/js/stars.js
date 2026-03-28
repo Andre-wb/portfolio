@@ -29,7 +29,6 @@
             { cnt: 220, scroll: 0.42, speed: 7, cursor: 0.70, sz: [0.60, 1.52], al: [0.32, 0.68] },
             { cnt: 180, scroll: 0.55, speed: 8, cursor: 0.92, sz: [0.82, 1.95], al: [0.42, 0.83] },
             { cnt: 130, scroll: 0.70, speed: 9, cursor: 1.20, sz: [1.10, 2.48], al: [0.54, 1.00] },
-            { cnt:  80, scroll: 0.88, speed: 10, cursor: 1.55, sz: [1.48, 3.20], al: [0.68, 1.12] }
         ];
 
         let stars = [], W = 0, H = 0;

@@ -14,7 +14,12 @@ body::before {
           radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,58,237,.18) 0%, transparent 55%),
           radial-gradient(ellipse 60% 50% at 80% 90%, rgba(59,130,246,.12) 0%, transparent 55%);
 }
-
+* {
+  position: relative;
+}
+input, textarea {
+  resize: none !important;
+}
 .progress-wrap {
   position: fixed; top:0; left:0; right:0; z-index:200;
   background: rgba(8,8,26,.85);
@@ -123,12 +128,13 @@ body::before {
 .opt-label { flex:1; }
 
 .opt-sub-input {
-  display:none; width:100%;
+  width:100%;
   padding:11px 14px;
   background:rgba(0,0,0,.25); border:1px solid var(--accent);
   border-radius:10px; color:var(--text); font-family:inherit; font-size:14px;
   resize:vertical; min-height:54px;
   transition: border-color .2s;
+  margin-top: 10px
 }
 .opt-sub-input.show { display:block; animation:fadeIn .2s ease; }
 .opt-sub-input:focus { outline:none; border-color:var(--accent2); box-shadow:0 0 0 3px var(--accent-glow); }
