@@ -6,9 +6,7 @@
 (function () {
     'use strict';
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 1. УЛУЧШЕННЫЙ ДЕТЕКТОР ПРОИЗВОДИТЕЛЬНОСТИ
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     const PERF = {
         level: 'medium',      // 'low' | 'medium' | 'high'
@@ -21,31 +19,25 @@
         droppedFrames: 0,
         lastAdaptation: 0,
 
-        // Быстрые проверки без замера FPS (для мгновенной реакции)
         quickChecks() {
             const ua = navigator.userAgent;
             const cores = navigator.hardwareConcurrency || 2;
             const memory = navigator.deviceMemory || 4;
 
-            // Battery API - если заряд < 20% или экономия включена
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(b => {
                     this.isPowerSave = b.charging === false && (b.level < 0.2 || b.saveData);
                 });
             }
 
-            // Проверка на очень слабые устройства по User Agent
             const lowEndPatterns = /SM-A1|SM-J|Redmi [0-6]|Moto E|Moto G[0-4]|RMX[0-9]{3}[0-4]|Android [4-8]/i;
             const isLowEndUA = lowEndPatterns.test(ua);
 
-            // Проверка на iOS старше 15 (медленные)
             const iOSMatch = ua.match(/OS (\d+)_/);
             const isOldIOS = iOSMatch && parseInt(iOSMatch[1]) < 15;
 
-            // Проверка на маленький экран (обычно = слабое устройство)
             const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 600;
 
-            // Heuristics
             if (isLowEndUA || isOldIOS || (cores <= 4 && memory <= 2) || this.isPowerSave) {
                 return 'low';
             }
@@ -55,7 +47,6 @@
             return 'medium';
         },
 
-        // Точный замер FPS через requestAnimationFrame
         async measureFPS(duration = 300) {
             return new Promise((resolve) => {
                 let frames = 0;
@@ -72,12 +63,10 @@
                     if (now - startTime < duration) {
                         requestAnimationFrame(frame);
                     } else {
-                        // Убираем выбросы (первый кадр обычно долгий)
                         const cleanTimes = times.slice(2);
                         const avgFrameTime = cleanTimes.reduce((a, b) => a + b, 0) / cleanTimes.length;
                         const fps = 1000 / avgFrameTime;
 
-                        // Проверяем стабильность (jank = резкие скачки)
                         const variance = cleanTimes.reduce((sum, t) => sum + Math.pow(t - avgFrameTime, 2), 0) / cleanTimes.length;
                         const isStable = variance < 100;
 
@@ -93,19 +82,15 @@
             });
         },
 
-        // Инициализация с быстрой оценкой + точным замером
         async init() {
-            // Быстрая оценка для старта
             const quick = this.quickChecks();
 
-            // Точный замер (короткий, чтобы не блочить)
             const measured = await this.measureFPS(250);
 
             this.currentFPS = measured.fps;
             this.frameTime = measured.frameTime;
             this.droppedFrames = measured.dropped;
 
-            // Финальное определение уровня
             if (quick === 'low' || measured.fps < 35 || !measured.isStable) {
                 this.level = 'low';
                 this.adaptiveScale = 0.5;
@@ -124,7 +109,6 @@
             return this.level;
         },
 
-        // Динамическая адаптация во время работы
         adapt(frameTime) {
             const now = performance.now();
             if (now - this.lastAdaptation < 1000) return; // Не чаще раза в секунду
@@ -132,7 +116,6 @@
             this.frameTime = frameTime;
             const instantFPS = 1000 / frameTime;
 
-            // Если FPS падает ниже целевого - снижаем качество
             if (instantFPS < this.targetFPS * 0.85 && this.adaptiveScale > 0.5) {
                 this.adaptiveScale = Math.max(0.5, this.adaptiveScale - 0.1);
                 this.lastAdaptation = now;
@@ -140,7 +123,6 @@
                 return true; // Нужен resize рендера
             }
 
-            // Если стабильно хорошо - можно попробовать повысить
             if (instantFPS > this.targetFPS * 1.1 && this.adaptiveScale < 1.0 && this.level !== 'low') {
                 this.adaptiveScale = Math.min(1.0, this.adaptiveScale + 0.05);
                 this.lastAdaptation = now;
@@ -151,9 +133,7 @@
         }
     };
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 2. ПАРАМЕТРЫ КАЧЕСТВА ПО УРОВНЯМ
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     function getGeometryParams() {
         const base = {
@@ -238,15 +218,12 @@
     }
 
     function getPixelRatio() {
-        // Ключевое: динамическое снижение разрешения!
         const dpr = window.devicePixelRatio || 1;
         const maxDpr = PERF.level === 'low' ? 1 : (PERF.level === 'medium' ? 1.5 : 2);
         return Math.min(dpr, maxDpr) * PERF.adaptiveScale;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 3. КОНФИГУРАЦИЯ И УТИЛИТЫ
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     const VEL_SCALE = 25;
     const VEL_MAX = 5.0;
@@ -261,7 +238,6 @@
 
     const { PW, PH, PD, PR, FONT_SIZE } = SIZES[PERF.level] || SIZES.medium;
 
-    // Уменьшенный набор табличек для слабых устройств
     const ALL_CONFIGS = [
         { layer: 'back', text: 'PYTHON', pos: [-2.9, 1.7, -1.3], rot: [0.002, -0.004, 0.001], par: { x: -0.9, y: 0.7 }, color: 0x3b82f6 },
         { layer: 'back', text: 'CSS', pos: [2.9, -1.5, -1.0], rot: [-0.001, 0.003, -0.002], par: { x: 0.8, y: -0.6 }, color: 0x0ea5e9 },
@@ -272,9 +248,7 @@
 
     const CONFIGS = ALL_CONFIGS;
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ (оптимизировано)
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     function parseAllPaths(font, text, fontSize) {
         const scale = fontSize / font.data.resolution;
@@ -384,7 +358,6 @@
         const N_PTS = getClassificationPoints();
         const rawPaths = parseAllPaths(font, text, FONT_SIZE);
 
-        // Центрирование
         const allPts = rawPaths.flatMap(p => p.getPoints(N_PTS));
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
@@ -407,14 +380,12 @@
         const { holePoints, islandPoints } = classifyPaths(centeredPaths, N_PTS);
         const extrudeParams = getGeometryParams();
 
-        // Табличка с отверстиями
         const plaqueShape = makeRoundedRect(PW, PH, PR);
         holePoints.forEach(pts => plaqueShape.holes.push(new THREE.Path(pts)));
 
         const plaqueGeo = new THREE.ExtrudeGeometry(plaqueShape, extrudeParams);
         plaqueGeo.translate(0, 0, -PD / 2);
 
-        // Острова
         const islandGeos = islandPoints.map(pts => {
             const shape = new THREE.Shape(pts);
             const geo = new THREE.ExtrudeGeometry(shape, {
@@ -462,18 +433,14 @@
         return group;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 5. ОСВЕЩЕНИЕ (упрощённое для слабых устройств)
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     function addLights(scene) {
         const shadowParams = getShadowParams();
         const shadowsOn = shadowParams.shadowsEnabled;
 
-        // Ambient - основной свет для low
         scene.add(new THREE.AmbientLight(0xffffff, PERF.level === 'low' ? 0.9 : 0.5));
 
-        // Key light
         const key = new THREE.DirectionalLight(0x00e1ff, PERF.level === 'low' ? 1.0 : 1.2);
         key.position.set(5, 8, 6);
         if (shadowsOn) {
@@ -489,7 +456,6 @@
         }
         scene.add(key);
 
-        // Только для medium/high
         if (PERF.level !== 'low') {
             const rim = new THREE.DirectionalLight(0x3b82f6, 0.6);
             rim.position.set(-3, -4, -3);
@@ -501,9 +467,7 @@
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 6. РЕНДЕРИНГ С АДАПТИВНЫМ РАЗРЕШЕНИЕМ
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     function makeRenderer(container, blur) {
         const cv = document.createElement('canvas');
@@ -551,9 +515,7 @@
         return { scene, meshes };
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
     // 7. ИНИЦИАЛИЗАЦИЯ И АНИМАЦИЯ С FPS ЛИМИТОМ
-    // ═══════════════════════════════════════════════════════════════════════════════
 
     function init() {
         if (typeof THREE === 'undefined') {
@@ -579,7 +541,6 @@
         const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
         camera.position.z = 8;
 
-        // Создаём рендереры с учётом качества
         const blurAmounts = PERF.level === 'low' ? [null, null, null] : (PERF.level === 'medium' ? ['2px', null, null] : ['4px', '1.5px', null]);
         const rdrs = blurAmounts.map(b => makeRenderer(container, b));
 
@@ -599,14 +560,13 @@
 
         resize();
 
-        // Throttled resize
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(resize, 200);
         });
 
-        // Предзагрузка шрифта с fallback
+        // Шрифты (принимает только .json)
         const FONT_URLS = [
             '/static/css/Erica_One/Erica_One_Regular.json',
             '/css/Erica_One/Erica_One_Regular.json',
