@@ -18,20 +18,25 @@
             section.style.position = 'relative';
         section.prepend(canvas);
         const ctx = canvas.getContext('2d');
-        // Слои звезд с настройкой их количества, скорости и т.д. для параллакс эффекта
+
         const LAYERS = [
-            { cnt: 400, scroll: 0.03, speed: 1, cursor: 0.08, sz: [0.12, 0.40], al: [0.04, 0.18] },
-            { cnt: 380, scroll: 0.06, speed: 2, cursor: 0.12, sz: [0.14, 0.48], al: [0.06, 0.22] },
-            { cnt: 360, scroll: 0.10, speed: 3, cursor: 0.18, sz: [0.18, 0.58], al: [0.09, 0.28] },
-            { cnt: 340, scroll: 0.15, speed: 4, cursor: 0.26, sz: [0.24, 0.72], al: [0.13, 0.35] },
-            { cnt: 300, scroll: 0.22, speed: 5, cursor: 0.38, sz: [0.32, 0.92], al: [0.18, 0.44] },
-            { cnt: 260, scroll: 0.31, speed: 6, cursor: 0.52, sz: [0.44, 1.18], al: [0.24, 0.55] },
-            { cnt: 220, scroll: 0.42, speed: 7, cursor: 0.70, sz: [0.60, 1.52], al: [0.32, 0.68] },
-            { cnt: 180, scroll: 0.55, speed: 8, cursor: 0.92, sz: [0.82, 1.95], al: [0.42, 0.83] },
-            { cnt: 130, scroll: 0.70, speed: 9, cursor: 1.20, sz: [1.10, 2.48], al: [0.54, 1.00] },
+            { cnt: 400, scroll: 0.03, speed: 1, cursor: 0.08, sz: [0.12, 0.40], al: [0.2, 0.4] },
+            { cnt: 380, scroll: 0.06, speed: 2, cursor: 0.12, sz: [0.14, 0.48], al: [0.3, 0.6] },
+            { cnt: 360, scroll: 0.10, speed: 3, cursor: 0.18, sz: [0.18, 0.58], al: [0.4, 0.8] },
+            { cnt: 340, scroll: 0.15, speed: 4, cursor: 0.26, sz: [0.24, 0.72], al: [0.5, 1.0] },
+            { cnt: 300, scroll: 0.22, speed: 5, cursor: 0.38, sz: [0.32, 0.92], al: [0.6, 1.2] },
+            { cnt: 260, scroll: 0.31, speed: 6, cursor: 0.52, sz: [0.44, 1.18], al: [0.7, 1.4] },
+            { cnt: 220, scroll: 0.42, speed: 7, cursor: 0.70, sz: [0.60, 1.52], al: [0.8, 1.6] },
+            { cnt: 180, scroll: 0.55, speed: 8, cursor: 0.92, sz: [0.82, 1.95], al: [0.9, 1.8] },
+            { cnt: 130, scroll: 0.70, speed: 9, cursor: 1.20, sz: [1.10, 2.48], al: [1.0, 2.0] },
         ];
 
         let stars = [], W = 0, H = 0;
+        let lastScrollY = window.scrollY;
+        let isScrolling = false;
+        let scrollTimer = null;
+        let scrollDelta = 0;
+        let targetScrollDelta = 0;
 
         function resize() {
             W = canvas.width  = section.offsetWidth;
@@ -55,19 +60,23 @@
             });
         }
 
-        let lastScrollY = window.scrollY;
-        let isScrolling = false;
-        let scrollTimer = null;
-
+        // Оптимизированный обработчик скролла - только вычисляем дельту
         function onScroll() {
-            const dy = window.scrollY - lastScrollY;
-            lastScrollY = window.scrollY;
-            stars.forEach(s => {
-                s.y = ((s.y + dy * LAYERS[s.li].scroll) % H + H) % H;
-            });
+            const currentScrollY = window.scrollY;
+            const dy = currentScrollY - lastScrollY;
+            lastScrollY = currentScrollY;
+
+            if (dy !== 0) {
+                targetScrollDelta = dy;
+            }
+
             isScrolling = true;
             clearTimeout(scrollTimer);
-            scrollTimer = setTimeout(() => { isScrolling = false; }, 150);
+            scrollTimer = setTimeout(() => {
+                isScrolling = false;
+                targetScrollDelta = 0;
+                scrollDelta = 0;
+            }, 150);
         }
 
         window.addEventListener('scroll', onScroll, { passive: true });
@@ -91,12 +100,19 @@
         }
 
         let cursorAlpha = 0;
-
         let tick = 0;
 
         function draw() {
             requestAnimationFrame(draw);
             tick++;
+
+            // Плавное затухание скролл-дельты
+            if (isScrolling) {
+                scrollDelta += (targetScrollDelta - scrollDelta) * 0.3;
+            } else {
+                scrollDelta *= 0.95;
+                if (Math.abs(scrollDelta) < 0.01) scrollDelta = 0;
+            }
 
             if (!isTouchDevice) {
                 smDirX += (dirX - smDirX) * 0.04;
@@ -112,15 +128,29 @@
 
             ctx.clearRect(0, 0, W, H);
 
-            stars.forEach(s => {
+            // Оптимизация: обновляем звезды без лишних проверок в цикле
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
                 const L = LAYERS[s.li];
 
-                // Зависимость движения от курсора (это если cursorAlpha > 0)
-                if (cursorAlpha > 0.01) {
-                    const vx = smDirX * L.speed * L.cursor * cursorAlpha;
-                    const vy = smDirY * L.speed * L.cursor * cursorAlpha;
-                    s.x = ((s.x + vx) % W + W) % W;
-                    s.y = ((s.y + vy) % H + H) % H;
+                let moveX = 0;
+                let moveY = 0;
+
+                // Движение от курсора
+                if (!isTouchDevice && cursorAlpha > 0.01) {
+                    moveX = smDirX * L.speed * L.cursor * cursorAlpha;
+                    moveY = smDirY * L.speed * L.cursor * cursorAlpha;
+                }
+
+                // Движение от скролла (параллакс) - применяем мгновенно
+                if (scrollDelta !== 0) {
+                    moveY += scrollDelta * L.scroll;
+                }
+
+                // Применяем движение
+                if (moveX !== 0 || moveY !== 0) {
+                    s.x = ((s.x + moveX) % W + W) % W;
+                    s.y = ((s.y + moveY) % H + H) % H;
                 }
 
                 // Мерцание звезд
@@ -144,13 +174,20 @@
                 ctx.arc(s.x, s.y, s.sz, 0, 6.2832);
                 ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(3) + ')';
                 ctx.fill();
-            });
+            }
         }
 
         resize();
         initStars();
         draw();
 
-        window.addEventListener('resize', () => { resize(); initStars(); });
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                resize();
+                initStars();
+            }, 150);
+        });
     });
 }());
