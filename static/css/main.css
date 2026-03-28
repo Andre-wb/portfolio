@@ -1908,53 +1908,6 @@ footer {
     transform: translateX(-4px);
 }
 
-.footer-contact {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.footer-contact li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: var(--muted);
-}
-
-.footer-contact-icon {
-    width: 32px;
-    height: 32px;
-    display: grid;
-    place-items: center;
-    background: var(--surface2);
-    border-radius: 8px;
-    color: var(--accent2);
-    flex-shrink: 0;
-}
-
-.footer-contact-icon svg {
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-}
-
-.footer-contact a {
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.footer-contact a:hover {
-    color: var(--accent2);
-}
-
 .footer-bottom {
     padding-top: 30px;
     margin-top: 20px;
