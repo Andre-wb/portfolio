@@ -1,263 +1,357 @@
 'use strict';
 
-// Архитектура вырезки букв в 3д табличках из CTA блока
+// Улучшенная система адаптивного качества 3D табличек CTA
+// Автоопределение производительности + динамическое снижение качества при просадках
 
 (function () {
+    'use strict';
 
-    // Определение уровня производительности
-    function detectPerformanceLevel() {
-        // Быстрый тест производительности через замер времени рендеринга
-        return new Promise((resolve) => {
-            const startTime = performance.now();
-            let frames = 0;
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 1. УЛУЧШЕННЫЙ ДЕТЕКТОР ПРОИЗВОДИТЕЛЬНОСТИ
+    // ═══════════════════════════════════════════════════════════════════════════════
 
-            function testFrame() {
-                frames++;
-                if (performance.now() - startTime >= 200) {
-                    const fps = frames / 0.2;
+    const PERF = {
+        level: 'medium',      // 'low' | 'medium' | 'high'
+        targetFPS: 60,
+        currentFPS: 60,
+        frameTime: 16.67,
+        adaptiveScale: 1,     // Динамическое снижение разрешения (0.5 - 1.0)
+        isPowerSave: false,   // Режим экономии заряда
+        isThermalThrottled: false,
+        droppedFrames: 0,
+        lastAdaptation: 0,
 
-                    // Определяем уровень качества, по умолчанию medium
-                    let level = 'medium';
+        // Быстрые проверки без замера FPS (для мгновенной реакции)
+        quickChecks() {
+            const ua = navigator.userAgent;
+            const cores = navigator.hardwareConcurrency || 2;
+            const memory = navigator.deviceMemory || 4;
 
-                    // Аппаратные подсказки
-                    const cores = navigator.hardwareConcurrency || 2;
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    const isLowEndMobile = isMobile && (cores <= 4 || /SM-|Moto|Redmi|RMX/i.test(navigator.userAgent));
-
-                    if (fps > 50 && cores >= 6 && !isLowEndMobile) {
-                        level = 'high';
-                    } else if (fps < 30 || (isMobile && cores <= 4)) {
-                        level = 'low';
-                    } else if (fps < 40 || isMobile) {
-                        level = 'medium';
-                    }
-
-                    console.log(`[CTA] Производительность: ${Math.round(fps)} FPS, ядер: ${cores}, уровень: ${level}`);
-                    resolve(level);
-                    return;
-                }
-                requestAnimationFrame(testFrame);
+            // Battery API - если заряд < 20% или экономия включена
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(b => {
+                    this.isPowerSave = b.charging === false && (b.level < 0.2 || b.saveData);
+                });
             }
-            requestAnimationFrame(testFrame);
-        });
-    }
 
-    let QUALITY = 'medium'; // будет установлено после детекта
+            // Проверка на очень слабые устройства по User Agent
+            const lowEndPatterns = /SM-A1|SM-J|Redmi [0-6]|Moto E|Moto G[0-4]|RMX[0-9]{3}[0-4]|Android [4-8]/i;
+            const isLowEndUA = lowEndPatterns.test(ua);
 
-    // Параметры геометрии в зависимости от качества
+            // Проверка на iOS старше 15 (медленные)
+            const iOSMatch = ua.match(/OS (\d+)_/);
+            const isOldIOS = iOSMatch && parseInt(iOSMatch[1]) < 15;
+
+            // Проверка на маленький экран (обычно = слабое устройство)
+            const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 600;
+
+            // Heuristics
+            if (isLowEndUA || isOldIOS || (cores <= 4 && memory <= 2) || this.isPowerSave) {
+                return 'low';
+            }
+            if (cores >= 8 && memory >= 8 && !isSmallScreen) {
+                return 'high';
+            }
+            return 'medium';
+        },
+
+        // Точный замер FPS через requestAnimationFrame
+        async measureFPS(duration = 300) {
+            return new Promise((resolve) => {
+                let frames = 0;
+                let lastTime = performance.now();
+                const startTime = lastTime;
+                const times = [];
+
+                function frame(now) {
+                    const delta = now - lastTime;
+                    lastTime = now;
+                    times.push(delta);
+                    frames++;
+
+                    if (now - startTime < duration) {
+                        requestAnimationFrame(frame);
+                    } else {
+                        // Убираем выбросы (первый кадр обычно долгий)
+                        const cleanTimes = times.slice(2);
+                        const avgFrameTime = cleanTimes.reduce((a, b) => a + b, 0) / cleanTimes.length;
+                        const fps = 1000 / avgFrameTime;
+
+                        // Проверяем стабильность (jank = резкие скачки)
+                        const variance = cleanTimes.reduce((sum, t) => sum + Math.pow(t - avgFrameTime, 2), 0) / cleanTimes.length;
+                        const isStable = variance < 100;
+
+                        resolve({
+                            fps: Math.round(fps),
+                            frameTime: avgFrameTime,
+                            isStable,
+                            dropped: frames < (duration / 16.67) * 0.8 // Ожидали 60fps, получили меньше
+                        });
+                    }
+                }
+                requestAnimationFrame(frame);
+            });
+        },
+
+        // Инициализация с быстрой оценкой + точным замером
+        async init() {
+            // Быстрая оценка для старта
+            const quick = this.quickChecks();
+
+            // Точный замер (короткий, чтобы не блочить)
+            const measured = await this.measureFPS(250);
+
+            this.currentFPS = measured.fps;
+            this.frameTime = measured.frameTime;
+            this.droppedFrames = measured.dropped;
+
+            // Финальное определение уровня
+            if (quick === 'low' || measured.fps < 35 || !measured.isStable) {
+                this.level = 'low';
+                this.adaptiveScale = 0.5;
+                this.targetFPS = 30;
+            } else if (quick === 'high' && measured.fps > 55 && measured.isStable) {
+                this.level = 'high';
+                this.adaptiveScale = 1.0;
+                this.targetFPS = 60;
+            } else {
+                this.level = 'medium';
+                this.adaptiveScale = measured.fps < 45 ? 0.75 : 1.0;
+                this.targetFPS = measured.fps < 45 ? 30 : 60;
+            }
+
+            console.log(`[CTA] Performance: ${this.level}, FPS: ${measured.fps}, Scale: ${this.adaptiveScale}`);
+            return this.level;
+        },
+
+        // Динамическая адаптация во время работы
+        adapt(frameTime) {
+            const now = performance.now();
+            if (now - this.lastAdaptation < 1000) return; // Не чаще раза в секунду
+
+            this.frameTime = frameTime;
+            const instantFPS = 1000 / frameTime;
+
+            // Если FPS падает ниже целевого - снижаем качество
+            if (instantFPS < this.targetFPS * 0.85 && this.adaptiveScale > 0.5) {
+                this.adaptiveScale = Math.max(0.5, this.adaptiveScale - 0.1);
+                this.lastAdaptation = now;
+                console.log(`[CTA] Downgraded: scale=${this.adaptiveScale.toFixed(2)}`);
+                return true; // Нужен resize рендера
+            }
+
+            // Если стабильно хорошо - можно попробовать повысить
+            if (instantFPS > this.targetFPS * 1.1 && this.adaptiveScale < 1.0 && this.level !== 'low') {
+                this.adaptiveScale = Math.min(1.0, this.adaptiveScale + 0.05);
+                this.lastAdaptation = now;
+                return true;
+            }
+
+            return false;
+        }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 2. ПАРАМЕТРЫ КАЧЕСТВА ПО УРОВНЯМ
+    // ═══════════════════════════════════════════════════════════════════════════════
+
     function getGeometryParams() {
-        switch (QUALITY) {
-            case 'high':
-                return {
-                    bevelSegments: 100,
-                    curveSegments: 100,
-                    bevelEnabled: true,
-                    bevelThickness: 0.035,
-                    bevelSize: 0.035,
-                    depth: PD
-                };
-            case 'medium':
-                return {
-                    bevelSegments: 48,
-                    curveSegments: 48,
-                    bevelEnabled: true,
-                    bevelThickness: 0.03,
-                    bevelSize: 0.03,
-                    depth: PD
-                };
-            case 'low':
-                return {
-                    bevelSegments: 12,
-                    curveSegments: 24,
-                    bevelEnabled: false,
-                    bevelThickness: 0,
-                    bevelSize: 0,
-                    depth: PD
-                };
-            default:
-                return {
-                    bevelSegments: 48,
-                    curveSegments: 48,
-                    bevelEnabled: true,
-                    bevelThickness: 0.035,
-                    bevelSize: 0.035,
-                    depth: PD
-                };
-        }
+        const base = {
+            low: {
+                bevelSegments: 4,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 0,
+                bevelSize: 0,
+                depth: 0.3  // Тоньше = меньше полигонов
+            },
+            medium: {
+                bevelSegments: 24,
+                curveSegments: 32,
+                bevelEnabled: true,
+                bevelThickness: 0.025,
+                bevelSize: 0.025,
+                depth: 0.4
+            },
+            high: {
+                bevelSegments: 48,
+                curveSegments: 64,
+                bevelEnabled: true,
+                bevelThickness: 0.035,
+                bevelSize: 0.035,
+                depth: 0.5
+            }
+        };
+        return base[PERF.level] || base.medium;
     }
 
-    // Параметры теней и освещения
     function getShadowParams() {
-        switch (QUALITY) {
-            case 'high':
-                return {
-                    mapSize: 2048,
-                    blurSamples: 12,
-                    bias: -0.001,
-                    radius: 14,
-                    shadowsEnabled: true
-                };
-            case 'medium':
-                return {
-                    mapSize: 1024,
-                    blurSamples: 6,
-                    bias: -0.0005,
-                    radius: 8,
-                    shadowsEnabled: true
-                };
-            case 'low':
-                return {
-                    mapSize: 512,
-                    blurSamples: 2,
-                    bias: -0.0001,
-                    radius: 4,
-                    shadowsEnabled: false
-                };
-        }
+        const base = {
+            low: {
+                mapSize: 512,
+                blurSamples: 1,
+                bias: 0,
+                radius: 2,
+                shadowsEnabled: false  // Отключаем тени полностью!
+            },
+            medium: {
+                mapSize: 1024,
+                blurSamples: 4,
+                bias: -0.0005,
+                radius: 6,
+                shadowsEnabled: true
+            },
+            high: {
+                mapSize: 2048,
+                blurSamples: 8,
+                bias: -0.001,
+                radius: 12,
+                shadowsEnabled: true
+            }
+        };
+        return base[PERF.level] || base.medium;
     }
 
-    // Настройка материалов
     function getMaterialParams() {
-        switch (QUALITY) {
-            case 'high':
-                return {
-                    metalness: 0.55,
-                    roughness: 0.20,
-                    side: THREE.DoubleSide
-                };
-            case 'medium':
-                return {
-                    metalness: 0.5,
-                    roughness: 0.35,
-                    side: THREE.DoubleSide
-                };
-            case 'low':
-                return {
-                    metalness: 0.4,
-                    roughness: 0.6,
-                    side: THREE.DoubleSide
-                };
-        }
+        const base = {
+            low: {
+                metalness: 0.3,
+                roughness: 0.8,  // Шероховатые = меньше отражений
+                side: THREE.FrontSide  // Только лицевая сторона!
+            },
+            medium: {
+                metalness: 0.45,
+                roughness: 0.4,
+                side: THREE.DoubleSide
+            },
+            high: {
+                metalness: 0.55,
+                roughness: 0.2,
+                side: THREE.DoubleSide
+            }
+        };
+        return base[PERF.level] || base.medium;
     }
 
-    // Количество точек для классификации контуров
     function getClassificationPoints() {
-        switch (QUALITY) {
-            case 'high': return 48;
-            case 'medium': return 32;
-            case 'low': return 16;
-            default: return 32;
-        }
+        return { low: 8, medium: 24, high: 48 }[PERF.level] || 24;
     }
 
-    // Настройка размера шрифта, табличек и текста в них
+    function getPixelRatio() {
+        // Ключевое: динамическое снижение разрешения!
+        const dpr = window.devicePixelRatio || 1;
+        const maxDpr = PERF.level === 'low' ? 1 : (PERF.level === 'medium' ? 1.5 : 2);
+        return Math.min(dpr, maxDpr) * PERF.adaptiveScale;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 3. КОНФИГУРАЦИЯ И УТИЛИТЫ
+    // ═══════════════════════════════════════════════════════════════════════════════
+
     const VEL_SCALE = 25;
-    const VEL_MAX   = 5.0;
+    const VEL_MAX = 5.0;
     const VEL_DECAY = 0.90;
 
-    const PW        = 3.8;
-    const PH        = 1.30;
-    const PD        = 0.5;
-    const PR        = 0.16;
-    const FONT_SIZE = 0.6;
+    // Упрощённые размеры для слабых устройств
+    const SIZES = {
+        low: { PW: 3.2, PH: 1.1, PD: 0.3, PR: 0.12, FONT_SIZE: 0.5 },
+        medium: { PW: 3.6, PH: 1.2, PD: 0.4, PR: 0.14, FONT_SIZE: 0.55 },
+        high: { PW: 3.8, PH: 1.30, PD: 0.5, PR: 0.16, FONT_SIZE: 0.6 }
+    };
 
-    const CONFIGS = [
-        { layer:'back',  text:'PYTHON',
-            pos:[-2.9, 1.7,-1.3], rot:[ 0.002,-0.004, 0.001], par:{ x:-0.9, y: 0.7}, color:0x3b82f6 },
-        { layer:'back',  text:'CSS',
-            pos:[ 2.9,-1.5,-1.0], rot:[-0.001, 0.003,-0.002], par:{ x: 0.8, y:-0.6}, color:0x0ea5e9 },
-        { layer:'mid',   text:'RUST',
-            pos:[-1.9,-1.3, 0.0], rot:[ 0.003,-0.005, 0.002], par:{ x: 1.2, y:-1.0}, color:0x10b981 },
-        { layer:'mid',   text:'JS',
-            pos:[ 2.5, 1.3, 0.3], rot:[-0.002, 0.003,-0.003], par:{ x:-1.1, y: 0.9}, color:0x6366f1 },
-        { layer:'front', text:'HTML',
-            pos:[ 0.2,-0.1, 1.5], rot:[ 0.004, 0.006,-0.002], par:{ x: 1.4, y: 1.2}, color:0x00e1ff },
+    const { PW, PH, PD, PR, FONT_SIZE } = SIZES[PERF.level] || SIZES.medium;
+
+    // Уменьшенный набор табличек для слабых устройств
+    const ALL_CONFIGS = [
+        { layer: 'back', text: 'PYTHON', pos: [-2.9, 1.7, -1.3], rot: [0.002, -0.004, 0.001], par: { x: -0.9, y: 0.7 }, color: 0x3b82f6 },
+        { layer: 'back', text: 'CSS', pos: [2.9, -1.5, -1.0], rot: [-0.001, 0.003, -0.002], par: { x: 0.8, y: -0.6 }, color: 0x0ea5e9 },
+        { layer: 'mid', text: 'RUST', pos: [-1.9, -1.3, 0.0], rot: [0.003, -0.005, 0.002], par: { x: 1.2, y: -1.0 }, color: 0x10b981 },
+        { layer: 'mid', text: 'JS', pos: [2.5, 1.3, 0.3], rot: [-0.002, 0.003, -0.003], par: { x: -1.1, y: 0.9 }, color: 0x6366f1 },
+        { layer: 'front', text: 'HTML', pos: [0.2, -0.1, 1.5], rot: [0.004, 0.006, -0.002], par: { x: 1.4, y: 1.2 }, color: 0x00e1ff },
     ];
 
-    // 1. Парсинг файла со шрифтом (.json)
+    const CONFIGS = ALL_CONFIGS;
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ (оптимизировано)
+    // ═══════════════════════════════════════════════════════════════════════════════
+
     function parseAllPaths(font, text, fontSize) {
-        const scale  = fontSize / font.data.resolution;
+        const scale = fontSize / font.data.resolution;
         const glyphs = font.data.glyphs;
-        let offsetX  = 0;
-        const paths  = [];
+        let offsetX = 0;
+        const paths = [];
 
         for (let ci = 0; ci < text.length; ci++) {
-            const char  = text[ci];
+            const char = text[ci];
             const glyph = glyphs[char] || glyphs['?'];
-            if (!glyph) continue;
-
-            if (glyph.o) {
-                const outline = glyph._outline ||
-                    (glyph._outline = glyph.o.split(' '));
-
-                let j = 0, path = null;
-
-                while (j < outline.length) {
-                    const cmd = outline[j++];
-                    switch (cmd) {
-                        case 'm': {
-                            if (path) paths.push(path);
-                            const x = parseFloat(outline[j++]) * scale + offsetX;
-                            const y = parseFloat(outline[j++]) * scale;
-                            path = new THREE.Path();
-                            path.moveTo(x, y);
-                            break;
-                        }
-                        case 'l': {
-                            const x = parseFloat(outline[j++]) * scale + offsetX;
-                            const y = parseFloat(outline[j++]) * scale;
-                            path.lineTo(x, y);
-                            break;
-                        }
-                        case 'q': {
-                            const cpx = parseFloat(outline[j++]) * scale + offsetX;
-                            const cpy = parseFloat(outline[j++]) * scale;
-                            const x   = parseFloat(outline[j++]) * scale + offsetX;
-                            const y   = parseFloat(outline[j++]) * scale;
-                            path.quadraticCurveTo(cpx, cpy, x, y);
-                            break;
-                        }
-                        case 'b': {
-                            const cp1x = parseFloat(outline[j++]) * scale + offsetX;
-                            const cp1y = parseFloat(outline[j++]) * scale;
-                            const cp2x = parseFloat(outline[j++]) * scale + offsetX;
-                            const cp2y = parseFloat(outline[j++]) * scale;
-                            const x    = parseFloat(outline[j++]) * scale + offsetX;
-                            const y    = parseFloat(outline[j++]) * scale;
-                            path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
-                            break;
-                        }
-                    }
-                }
-                if (path) paths.push(path);
+            if (!glyph || !glyph.o) {
+                offsetX += (glyph?.ha || 600) * scale;
+                continue;
             }
 
+            const outline = glyph._outline || (glyph._outline = glyph.o.split(' '));
+            let j = 0;
+            let path = null;
+
+            while (j < outline.length) {
+                const cmd = outline[j++];
+                switch (cmd) {
+                    case 'm': {
+                        if (path) paths.push(path);
+                        const x = parseFloat(outline[j++]) * scale + offsetX;
+                        const y = parseFloat(outline[j++]) * scale;
+                        path = new THREE.Path();
+                        path.moveTo(x, y);
+                        break;
+                    }
+                    case 'l': {
+                        const x = parseFloat(outline[j++]) * scale + offsetX;
+                        const y = parseFloat(outline[j++]) * scale;
+                        path.lineTo(x, y);
+                        break;
+                    }
+                    case 'q': {
+                        const cpx = parseFloat(outline[j++]) * scale + offsetX;
+                        const cpy = parseFloat(outline[j++]) * scale;
+                        const x = parseFloat(outline[j++]) * scale + offsetX;
+                        const y = parseFloat(outline[j++]) * scale;
+                        path.quadraticCurveTo(cpx, cpy, x, y);
+                        break;
+                    }
+                    case 'b': {
+                        const cp1x = parseFloat(outline[j++]) * scale + offsetX;
+                        const cp1y = parseFloat(outline[j++]) * scale;
+                        const cp2x = parseFloat(outline[j++]) * scale + offsetX;
+                        const cp2y = parseFloat(outline[j++]) * scale;
+                        const x = parseFloat(outline[j++]) * scale + offsetX;
+                        const y = parseFloat(outline[j++]) * scale;
+                        path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+                        break;
+                    }
+                }
+            }
+            if (path) paths.push(path);
             offsetX += glyph.ha * scale;
         }
-
         return paths;
     }
 
-    // 2. Проверка наличия точки внутри полигона
     function pointInPolygon(pt, poly) {
         let inside = false;
         for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
             const xi = poly[i].x, yi = poly[i].y;
             const xj = poly[j].x, yj = poly[j].y;
-            if (((yi > pt.y) !== (yj > pt.y)) &&
-                (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi)) {
+            if (((yi > pt.y) !== (yj > pt.y)) && (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi)) {
                 inside = !inside;
             }
         }
         return inside;
     }
 
-
-     // 3. Классификация контуров по глубине вложения (even-odd)
-
     function classifyPaths(paths, nPoints) {
         const samples = paths.map(p => p.getPoints(nPoints));
-        const holePoints   = [];
+        const holePoints = [];
         const islandPoints = [];
 
         for (let i = 0; i < samples.length; i++) {
@@ -267,41 +361,42 @@
                 if (i !== j && pointInPolygon(testPt, samples[j])) depth++;
             }
             if (depth % 2 === 0) holePoints.push(samples[i]);
-            else                  islandPoints.push(samples[i]);
+            else islandPoints.push(samples[i]);
         }
-
         return { holePoints, islandPoints };
     }
 
-    // 4. Скругление и сглаживание углов
     function makeRoundedRect(w, h, r) {
         const s = new THREE.Shape();
-        s.moveTo(-w/2+r, -h/2);
-        s.lineTo( w/2-r, -h/2); s.quadraticCurveTo( w/2,-h/2,  w/2,-h/2+r);
-        s.lineTo( w/2,   h/2-r); s.quadraticCurveTo( w/2, h/2,  w/2-r, h/2);
-        s.lineTo(-w/2+r, h/2);   s.quadraticCurveTo(-w/2, h/2, -w/2,  h/2-r);
-        s.lineTo(-w/2,  -h/2+r); s.quadraticCurveTo(-w/2,-h/2, -w/2+r,-h/2);
+        s.moveTo(-w / 2 + r, -h / 2);
+        s.lineTo(w / 2 - r, -h / 2);
+        s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
+        s.lineTo(w / 2, h / 2 - r);
+        s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+        s.lineTo(-w / 2 + r, h / 2);
+        s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
+        s.lineTo(-w / 2, -h / 2 + r);
+        s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
         return s;
     }
 
-    // 5. Геометрии таблички и островов
     function buildGeometries(font, text) {
         const N_PTS = getClassificationPoints();
-
         const rawPaths = parseAllPaths(font, text, FONT_SIZE);
 
-        // Центрируем
+        // Центрирование
         const allPts = rawPaths.flatMap(p => p.getPoints(N_PTS));
-        let minX = Infinity, maxX = -Infinity;
-        let minY = Infinity, maxY = -Infinity;
-        allPts.forEach(p => {
-            if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
-            if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
-        });
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+        for (const p of allPts) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
 
-        // Сдвигаем все пути к центру
         const centeredPaths = rawPaths.map(path => {
             const shifted = new THREE.Path();
             const pts = path.getPoints(N_PTS);
@@ -310,28 +405,25 @@
         });
 
         const { holePoints, islandPoints } = classifyPaths(centeredPaths, N_PTS);
-
         const extrudeParams = getGeometryParams();
 
-        // ── Табличка: добавляем все внешние контуры букв как отверстия
+        // Табличка с отверстиями
         const plaqueShape = makeRoundedRect(PW, PH, PR);
-        holePoints.forEach(pts => {
-            plaqueShape.holes.push(new THREE.Path(pts));
-        });
+        holePoints.forEach(pts => plaqueShape.holes.push(new THREE.Path(pts)));
 
         const plaqueGeo = new THREE.ExtrudeGeometry(plaqueShape, extrudeParams);
         plaqueGeo.translate(0, 0, -PD / 2);
 
-        // ── Острова (O, P, B, R и т.д.): отдельные меши, та же глубина
+        // Острова
         const islandGeos = islandPoints.map(pts => {
             const shape = new THREE.Shape(pts);
-            const geo   = new THREE.ExtrudeGeometry(shape, {
-                depth:         PD,
-                bevelEnabled:  extrudeParams.bevelEnabled,
+            const geo = new THREE.ExtrudeGeometry(shape, {
+                depth: PD,
+                bevelEnabled: extrudeParams.bevelEnabled,
                 bevelThickness: extrudeParams.bevelThickness,
-                bevelSize:      extrudeParams.bevelSize,
-                bevelSegments:  extrudeParams.bevelSegments,
-                curveSegments:  extrudeParams.curveSegments,
+                bevelSize: extrudeParams.bevelSize,
+                bevelSegments: extrudeParams.bevelSegments,
+                curveSegments: extrudeParams.curveSegments,
             });
             geo.translate(0, 0, -PD / 2);
             return geo;
@@ -340,21 +432,20 @@
         return { plaqueGeo, islandGeos };
     }
 
-    // 6. Группа: табличка + острова, один материал
     function buildGroup(cfg, font) {
         const group = new THREE.Group();
         const { plaqueGeo, islandGeos } = buildGeometries(font, cfg.text);
 
         const matParams = getMaterialParams();
         const mat = new THREE.MeshStandardMaterial({
-            color:     cfg.color,
+            color: cfg.color,
             metalness: matParams.metalness,
             roughness: matParams.roughness,
-            side:      matParams.side,
+            side: matParams.side,
         });
 
-        const plaque = new THREE.Mesh(plaqueGeo, mat);
         const shadowParams = getShadowParams();
+        const plaque = new THREE.Mesh(plaqueGeo, mat);
         plaque.castShadow = plaque.receiveShadow = shadowParams.shadowsEnabled;
         group.add(plaque);
 
@@ -365,74 +456,92 @@
         });
 
         group.position.set(...cfg.pos);
-        group.userData.rot  = cfg.rot;
-        group.userData.par  = cfg.par;
+        group.userData.rot = cfg.rot;
+        group.userData.par = cfg.par;
         group.userData.base = group.position.clone();
         return group;
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 5. ОСВЕЩЕНИЕ (упрощённое для слабых устройств)
+    // ═══════════════════════════════════════════════════════════════════════════════
 
     function addLights(scene) {
         const shadowParams = getShadowParams();
         const shadowsOn = shadowParams.shadowsEnabled;
 
-        scene.add(new THREE.AmbientLight(0xffffff, QUALITY === 'low' ? 0.7 : 0.55));
+        // Ambient - основной свет для low
+        scene.add(new THREE.AmbientLight(0xffffff, PERF.level === 'low' ? 0.9 : 0.5));
 
-        const key = new THREE.DirectionalLight(0x00e1ff, QUALITY === 'low' ? 0.9 : 1.4);
+        // Key light
+        const key = new THREE.DirectionalLight(0x00e1ff, PERF.level === 'low' ? 1.0 : 1.2);
         key.position.set(5, 8, 6);
         if (shadowsOn) {
             key.castShadow = true;
             key.shadow.mapSize.set(shadowParams.mapSize, shadowParams.mapSize);
-            key.shadow.camera.left = key.shadow.camera.bottom = -10;
-            key.shadow.camera.right = key.shadow.camera.top   =  10;
-            key.shadow.camera.near = 0.5; key.shadow.camera.far = 40;
+            key.shadow.camera.left = key.shadow.camera.bottom = -8;
+            key.shadow.camera.right = key.shadow.camera.top = 8;
+            key.shadow.camera.near = 0.5;
+            key.shadow.camera.far = 30;
             key.shadow.radius = shadowParams.radius;
             key.shadow.blurSamples = shadowParams.blurSamples;
             key.shadow.bias = shadowParams.bias;
         }
         scene.add(key);
 
-        // На low отключаем дополнительный rim light
-        if (QUALITY !== 'low') {
-            const rim = new THREE.DirectionalLight(0x3b82f6, 0.9);
-            rim.position.set(-4, -5, -4);
+        // Только для medium/high
+        if (PERF.level !== 'low') {
+            const rim = new THREE.DirectionalLight(0x3b82f6, 0.6);
+            rim.position.set(-3, -4, -3);
             scene.add(rim);
-        }
 
-        const fill = new THREE.DirectionalLight(0xffffff, QUALITY === 'low' ? 0.3 : 0.4);
-        fill.position.set(0, 2, 8);
-        scene.add(fill);
-
-        // На low отключаем точечный свет
-        if (QUALITY !== 'low') {
-            const pt = new THREE.PointLight(0x0ea5e9, 0.7, 15);
-            pt.position.set(0, 0, 4);
-            scene.add(pt);
+            const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+            fill.position.set(0, 2, 6);
+            scene.add(fill);
         }
     }
 
-    /* ── Рендер ────────────────────────────────────────── */
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 6. РЕНДЕРИНГ С АДАПТИВНЫМ РАЗРЕШЕНИЕМ
+    // ═══════════════════════════════════════════════════════════════════════════════
+
     function makeRenderer(container, blur) {
         const cv = document.createElement('canvas');
         Object.assign(cv.style, {
-            position:'absolute', top:'0', left:'0',
-            width:'100%', height:'100%',
-            pointerEvents:'none',
-            filter: blur ? 'blur('+blur+')' : 'none',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            filter: blur ? `blur(${blur})` : 'none',
+            // GPU ускорение
+            transform: 'translateZ(0)',
+            willChange: 'transform',
         });
         container.appendChild(cv);
-        const r = new THREE.WebGLRenderer({ canvas:cv, antialias: QUALITY !== 'low', alpha:true });
-        r.setPixelRatio(QUALITY === 'low' ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));
+
+        const r = new THREE.WebGLRenderer({
+            canvas: cv,
+            antialias: PERF.level === 'high', // Только для high!
+            alpha: true,
+            powerPreference: PERF.level === 'low' ? 'low-power' : 'high-performance',
+        });
+
+        r.setPixelRatio(getPixelRatio());
         r.setClearColor(0, 0);
+
         const shadowParams = getShadowParams();
         r.shadowMap.enabled = shadowParams.shadowsEnabled;
         if (shadowParams.shadowsEnabled) {
-            r.shadowMap.type = QUALITY === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+            r.shadowMap.type = PERF.level === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
         }
+
         return r;
     }
 
     function buildLayer(cfgs, font) {
-        const scene  = new THREE.Scene();
+        const scene = new THREE.Scene();
         addLights(scene);
         const meshes = cfgs.map(c => {
             const g = buildGroup(c, font);
@@ -442,9 +551,15 @@
         return { scene, meshes };
     }
 
-    /* ── Инициализация с определением производительности ── */
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 7. ИНИЦИАЛИЗАЦИЯ И АНИМАЦИЯ С FPS ЛИМИТОМ
+    // ═══════════════════════════════════════════════════════════════════════════════
+
     function init() {
-        if (typeof THREE === 'undefined') { setTimeout(init, 50); return; }
+        if (typeof THREE === 'undefined') {
+            setTimeout(init, 50);
+            return;
+        }
 
         const wrapper = document.getElementById('ctaCanvas');
         if (!wrapper) return;
@@ -452,132 +567,242 @@
         const container = wrapper.parentElement;
         container.style.position = 'relative';
         container.style.overflow = 'visible';
-        wrapper.style.display    = 'none';
+        wrapper.style.display = 'none';
 
+        // Сначала детектим производительность, потом создаём 3D
+        PERF.init().then(() => {
+            start(container, wrapper);
+        });
+    }
+
+    function start(container, wrapper) {
         const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
         camera.position.z = 8;
 
-        let rdrs = [];
-        let layers = [];
-        let animationActive = false;
-        let rafId = null;
+        // Создаём рендереры с учётом качества
+        const blurAmounts = PERF.level === 'low' ? [null, null, null] : (PERF.level === 'medium' ? ['2px', null, null] : ['4px', '1.5px', null]);
+        const rdrs = blurAmounts.map(b => makeRenderer(container, b));
 
-        // Сначала определяем производительность, потом запускаем 3D
-        detectPerformanceLevel().then(level => {
-            QUALITY = level;
+        function resize() {
+            const w = container.clientWidth || 400;
+            const h = container.clientHeight || 400;
+            const pixelRatio = getPixelRatio();
 
-            rdrs = ['4px','1.5px',null].map(b => makeRenderer(container, b));
-
-            function resize() {
-                const w = container.clientWidth  || 400;
-                const h = container.clientHeight || 400;
-                rdrs.forEach(r => r.setSize(w, h, false));
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            // Подключение шрифта (принимает только json формат)
-            const FONT_URLS = [
-                '/static/css/Erica_One/Erica_One_Regular.json',
-                '/css/Erica_One/Erica_One_Regular.json',
-            ];
-
-            const loader = new THREE.FontLoader();
-            let tried = 0;
-
-            function tryLoad() {
-                if (tried >= FONT_URLS.length) return;
-                loader.load(
-                    FONT_URLS[tried++],
-                    font  => start(camera, rdrs, font),
-                    undefined,
-                    ()    => tryLoad()
-                );
-            }
-            tryLoad();
-        });
-
-        function start(camera, rdrs, font) {
-            layers = [
-                buildLayer(CONFIGS.filter(c => c.layer==='back'),  font),
-                buildLayer(CONFIGS.filter(c => c.layer==='mid'),   font),
-                buildLayer(CONFIGS.filter(c => c.layer==='front'), font),
-            ];
-
-            let mx=0, my=0, smx=0, smy=0;
-            let prevMx=0, prevMy=0, cursorVel=0;
-
-            window.addEventListener('mousemove', e => {
-                mx =  (e.clientX / innerWidth  - 0.5) * 2;
-                my = -(e.clientY / innerHeight - 0.5) * 2;
-                cursorVel = Math.min(Math.hypot(mx-prevMx, my-prevMy)*VEL_SCALE, VEL_MAX);
-                prevMx=mx; prevMy=my;
+            rdrs.forEach(r => {
+                r.setPixelRatio(pixelRatio);
+                r.setSize(w, h, false);
             });
 
-            function animate() {
-                if (!animationActive) return;
-                rafId = requestAnimationFrame(animate);
-                smx += (mx-smx)*0.04; smy += (my-smy)*0.04;
-                cursorVel *= VEL_DECAY;
-                const spd = 1 + cursorVel;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
 
-                camera.position.x += (smx*0.25 - camera.position.x)*0.025;
-                camera.position.y += (smy*0.20 - camera.position.y)*0.025;
-                camera.lookAt(0, 0, 0);
+        resize();
 
-                layers.forEach(({scene, meshes}, i) => {
-                    meshes.forEach(m => {
-                        m.rotation.x += m.userData.rot[0]*spd;
-                        m.rotation.y += m.userData.rot[1]*spd;
-                        m.rotation.z += m.userData.rot[2]*spd;
-                        m.position.x = m.userData.base.x + smx*m.userData.par.x*0.28;
-                        m.position.y = m.userData.base.y + smy*m.userData.par.y*0.28;
-                    });
-                    rdrs[i].render(scene, camera);
+        // Throttled resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(resize, 200);
+        });
+
+        // Предзагрузка шрифта с fallback
+        const FONT_URLS = [
+            '/static/css/Erica_One/Erica_One_Regular.json',
+            '/css/Erica_One/Erica_One_Regular.json',
+            'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', // Fallback
+        ];
+
+        const loader = new THREE.FontLoader();
+        let tried = 0;
+
+        function tryLoad() {
+            if (tried >= FONT_URLS.length) {
+                console.warn('[CTA] Font load failed');
+                return;
+            }
+            loader.load(
+                FONT_URLS[tried++],
+                font => initScene(camera, rdrs, font, container),
+                undefined,
+                () => tryLoad()
+            );
+        }
+        tryLoad();
+    }
+
+    function initScene(camera, rdrs, font, container) {
+        const layers = [
+            buildLayer(CONFIGS.filter(c => c.layer === 'back'), font),
+            buildLayer(CONFIGS.filter(c => c.layer === 'mid'), font),
+            buildLayer(CONFIGS.filter(c => c.layer === 'front'), font),
+        ];
+
+        // Интерактивность
+        let mx = 0, my = 0, smx = 0, smy = 0;
+        let prevMx = 0, prevMy = 0, cursorVel = 0;
+        let isHovering = false;
+
+        // Throttled mousemove (16ms ≈ 60fps)
+        let lastMouseMove = 0;
+        window.addEventListener('mousemove', e => {
+            const now = performance.now();
+            if (now - lastMouseMove < 16) return;
+            lastMouseMove = now;
+
+            mx = (e.clientX / innerWidth - 0.5) * 2;
+            my = -(e.clientY / innerHeight - 0.5) * 2;
+            cursorVel = Math.min(Math.hypot(mx - prevMx, my - prevMy) * VEL_SCALE, VEL_MAX);
+            prevMx = mx;
+            prevMy = my;
+            isHovering = true;
+        });
+
+        // Отключаем анимацию когда курсор не двигается
+        let hoverTimeout;
+        window.addEventListener('mousemove', () => {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = setTimeout(() => { isHovering = false; }, 100);
+        });
+
+        // Animation loop с FPS limit
+        let animationActive = false;
+        let rafId = null;
+        let lastFrameTime = 0;
+        const targetFrameInterval = 1000 / PERF.targetFPS;
+
+        function animate(now) {
+            if (!animationActive) return;
+            rafId = requestAnimationFrame(animate);
+
+            // FPS limiting
+            const elapsed = now - lastFrameTime;
+            if (elapsed < targetFrameInterval) return;
+            lastFrameTime = now - (elapsed % targetFrameInterval);
+
+            // Адаптация качества
+            const frameTime = performance.now() - now;
+            const needsResize = PERF.adapt(frameTime);
+            if (needsResize) {
+                const w = container.clientWidth || 400;
+                const h = container.clientHeight || 400;
+                rdrs.forEach(r => {
+                    r.setPixelRatio(getPixelRatio());
+                    r.setSize(w, h, false);
                 });
             }
 
-            animationActive = true;
-            animate();
+            // Плавное следование за мышью (не обновляем если не двигается)
+            if (isHovering || Math.abs(smx - mx) > 0.001) {
+                smx += (mx - smx) * 0.04;
+                smy += (my - smy) * 0.04;
+            }
 
-            const sec = document.getElementById('cta');
-            if (sec) new IntersectionObserver(en => {
-                if (en[0].isIntersecting) {
-                    if (!rafId && animationActive) animate();
-                } else {
+            cursorVel *= VEL_DECAY;
+            const spd = 1 + cursorVel;
+
+            // Камера
+            camera.position.x += (smx * 0.25 - camera.position.x) * 0.025;
+            camera.position.y += (smy * 0.20 - camera.position.y) * 0.025;
+            camera.lookAt(0, 0, 0);
+
+            // Рендер слоёв
+            layers.forEach(({ scene, meshes }, i) => {
+                meshes.forEach(m => {
+                    m.rotation.x += m.userData.rot[0] * spd;
+                    m.rotation.y += m.userData.rot[1] * spd;
+                    m.rotation.z += m.userData.rot[2] * spd;
+                    m.position.x = m.userData.base.x + smx * m.userData.par.x * 0.28;
+                    m.position.y = m.userData.base.y + smy * m.userData.par.y * 0.28;
+                });
+                if (rdrs[i]) rdrs[i].render(scene, camera);
+            });
+        }
+
+        // Intersection Observer для паузы
+        const sec = document.getElementById('cta');
+        if (sec) {
+            new IntersectionObserver(entries => {
+                const visible = entries[0].isIntersecting;
+                if (visible && !animationActive) {
+                    animationActive = true;
+                    lastFrameTime = performance.now();
+                    rafId = requestAnimationFrame(animate);
+                } else if (!visible && animationActive) {
+                    animationActive = false;
                     if (rafId) cancelAnimationFrame(rafId);
                     rafId = null;
                 }
-            }, { threshold:0.05 }).observe(sec);
+            }, { threshold: 0.05, rootMargin: '50px' }).observe(sec);
+        } else {
+            animationActive = true;
+            rafId = requestAnimationFrame(animate);
         }
+
+        // Visibility API - пауза когда вкладка неактивна
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                animationActive = false;
+                if (rafId) cancelAnimationFrame(rafId);
+            } else if (sec && !animationActive) {
+                // Проверим видимость секции перед возобновлением
+                const rect = sec.getBoundingClientRect();
+                if (rect.bottom > 0 && rect.top < window.innerHeight) {
+                    animationActive = true;
+                    rafId = requestAnimationFrame(animate);
+                }
+            }
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 8. МАГНИТНЫЕ КНОПКИ (оптимизировано)
+    // ═══════════════════════════════════════════════════════════════════════════════
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cta-btn').forEach(btn => {
-            let ox=0,oy=0,tx=0,ty=0,inside=false,rafId=null;
-            const EASE=0.12, STR=0.38;
+            let ox = 0, oy = 0, tx = 0, ty = 0;
+            let inside = false;
+            let rafId = null;
+            const EASE = 0.12;
+            const STR = 0.38;
+
+            // Проверяем поддержку hover (не тач)
+            const isTouch = window.matchMedia('(pointer: coarse)').matches;
+            if (isTouch) return; // Отключаем на тач-устройствах
+
             function loop() {
-                ox+=(tx-ox)*EASE; oy+=(ty-oy)*EASE;
-                btn.style.transform='translate('+ox.toFixed(2)+'px,'+oy.toFixed(2)+'px)';
-                if (Math.abs(ox)>0.05||Math.abs(oy)>0.05||inside) rafId=requestAnimationFrame(loop);
-                else { btn.style.transform=''; rafId=null; }
+                ox += (tx - ox) * EASE;
+                oy += (ty - oy) * EASE;
+                btn.style.transform = `translate(${ox.toFixed(2)}px,${oy.toFixed(2)}px)`;
+
+                if (Math.abs(ox) > 0.05 || Math.abs(oy) > 0.05 || inside) {
+                    rafId = requestAnimationFrame(loop);
+                } else {
+                    btn.style.transform = '';
+                    rafId = null;
+                }
             }
-            btn.addEventListener('mouseenter',()=>{ inside=true; });
-            btn.addEventListener('mousemove',e=>{
-                const r=btn.getBoundingClientRect();
-                tx=(e.clientX-(r.left+r.width/2))*STR;
-                ty=(e.clientY-(r.top+r.height/2))*STR;
-                if (!rafId) rafId=requestAnimationFrame(loop);
+
+            btn.addEventListener('mouseenter', () => { inside = true; });
+
+            btn.addEventListener('mousemove', e => {
+                const r = btn.getBoundingClientRect();
+                tx = (e.clientX - (r.left + r.width / 2)) * STR;
+                ty = (e.clientY - (r.top + r.height / 2)) * STR;
+                if (!rafId) rafId = requestAnimationFrame(loop);
             });
-            btn.addEventListener('mouseleave',()=>{
-                inside=false; tx=0; ty=0;
-                if (!rafId) rafId=requestAnimationFrame(loop);
+
+            btn.addEventListener('mouseleave', () => {
+                inside = false;
+                tx = 0;
+                ty = 0;
+                if (!rafId) rafId = requestAnimationFrame(loop);
             });
         });
     });
 
-}());
+    // Старт
+    document.addEventListener('DOMContentLoaded', init);
+
+})();
