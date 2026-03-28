@@ -35,8 +35,12 @@
         let lastScrollY = window.scrollY;
         let isScrolling = false;
         let scrollTimer = null;
-        let scrollDelta = 0;
-        let targetScrollDelta = 0;
+
+        // Для плавного затухания движения
+        let activeScrollVelocity = 0;
+        let targetScrollVelocity = 0;
+        let scrollFriction = 0.92; // Коэффициент затухания
+        let maxScrollDelta = 30; // Ограничение максимальной дельты за кадр
 
         function resize() {
             W = canvas.width  = section.offsetWidth;
@@ -60,22 +64,24 @@
             });
         }
 
-        // Оптимизированный обработчик скролла - только вычисляем дельту
+        // Оптимизированный обработчик скролла
         function onScroll() {
             const currentScrollY = window.scrollY;
-            const dy = currentScrollY - lastScrollY;
+            let dy = currentScrollY - lastScrollY;
             lastScrollY = currentScrollY;
 
+            // Ограничиваем максимальную дельту для предотвращения рывков
+            dy = Math.min(Math.max(dy, -maxScrollDelta), maxScrollDelta);
+
             if (dy !== 0) {
-                targetScrollDelta = dy;
+                targetScrollVelocity = dy;
             }
 
             isScrolling = true;
             clearTimeout(scrollTimer);
             scrollTimer = setTimeout(() => {
                 isScrolling = false;
-                targetScrollDelta = 0;
-                scrollDelta = 0;
+                targetScrollVelocity = 0;
             }, 150);
         }
 
@@ -106,12 +112,17 @@
             requestAnimationFrame(draw);
             tick++;
 
-            // Плавное затухание скролл-дельты
+            // Плавное затухание скорости скролла
             if (isScrolling) {
-                scrollDelta += (targetScrollDelta - scrollDelta) * 0.3;
+                // При активном скролле быстро применяем целевую скорость
+                activeScrollVelocity += (targetScrollVelocity - activeScrollVelocity) * 0.4;
             } else {
-                scrollDelta *= 0.95;
-                if (Math.abs(scrollDelta) < 0.01) scrollDelta = 0;
+                // После остановки скролла плавно затухаем
+                activeScrollVelocity *= scrollFriction;
+                // Если скорость стала очень маленькой, обнуляем
+                if (Math.abs(activeScrollVelocity) < 0.1) {
+                    activeScrollVelocity = 0;
+                }
             }
 
             if (!isTouchDevice) {
@@ -128,7 +139,7 @@
 
             ctx.clearRect(0, 0, W, H);
 
-            // Оптимизация: обновляем звезды без лишних проверок в цикле
+            // Обновляем звезды
             for (let i = 0; i < stars.length; i++) {
                 const s = stars[i];
                 const L = LAYERS[s.li];
@@ -142,9 +153,9 @@
                     moveY = smDirY * L.speed * L.cursor * cursorAlpha;
                 }
 
-                // Движение от скролла (параллакс) - применяем мгновенно
-                if (scrollDelta !== 0) {
-                    moveY += scrollDelta * L.scroll;
+                // Движение от скролла (параллакс) - плавно применяем скорость
+                if (activeScrollVelocity !== 0) {
+                    moveY += activeScrollVelocity * L.scroll;
                 }
 
                 // Применяем движение
