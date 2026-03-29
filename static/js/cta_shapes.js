@@ -93,7 +93,7 @@
 
             if (quick === 'low' || measured.fps < 35 || !measured.isStable) {
                 this.level = 'low';
-                this.adaptiveScale = 0.5;
+                this.adaptiveScale = 0.75;
                 this.targetFPS = 30;
             } else if (quick === 'high' && measured.fps > 55 && measured.isStable) {
                 this.level = 'high';
@@ -138,12 +138,12 @@
     function getGeometryParams() {
         const base = {
             low: {
-                bevelSegments: 4,
-                curveSegments: 12,
-                bevelEnabled: false,
-                bevelThickness: 0,
-                bevelSize: 0,
-                depth: 0.3  // Тоньше = меньше полигонов
+                bevelSegments: 8,        // было 4
+                curveSegments: 24,       // было 12
+                bevelEnabled: true,      // было false
+                bevelThickness: 0.02,    // было 0
+                bevelSize: 0.02,         // было 0
+                depth: 0.35              // было 0.3
             },
             medium: {
                 bevelSegments: 24,
@@ -168,11 +168,11 @@
     function getShadowParams() {
         const base = {
             low: {
-                mapSize: 512,
-                blurSamples: 1,
-                bias: 0,
-                radius: 2,
-                shadowsEnabled: false  // Отключаем тени полностью!
+                mapSize: 1024,
+                blurSamples: 2,
+                bias: -0.00025,
+                radius: 4,
+                shadowsEnabled: false
             },
             medium: {
                 mapSize: 1024,
@@ -196,8 +196,8 @@
         const base = {
             low: {
                 metalness: 0.3,
-                roughness: 0.8,  // Шероховатые = меньше отражений
-                side: THREE.FrontSide  // Только лицевая сторона!
+                roughness: 0.6,
+                side: THREE.FrontSide
             },
             medium: {
                 metalness: 0.45,
@@ -214,12 +214,12 @@
     }
 
     function getClassificationPoints() {
-        return { low: 8, medium: 24, high: 48 }[PERF.level] || 24;
+        return { low: 16, medium: 24, high: 48 }[PERF.level] || 24;
     }
 
     function getPixelRatio() {
         const dpr = window.devicePixelRatio || 1;
-        const maxDpr = PERF.level === 'low' ? 1 : (PERF.level === 'medium' ? 1.5 : 2);
+        const maxDpr = PERF.level === 'low' ? 2 : (PERF.level === 'medium' ? 1.5 : 2);
         return Math.min(dpr, maxDpr) * PERF.adaptiveScale;
     }
 
@@ -231,7 +231,7 @@
 
     // Упрощённые размеры для слабых устройств
     const SIZES = {
-        low: { PW: 3.2, PH: 1.1, PD: 0.3, PR: 0.12, FONT_SIZE: 0.5 },
+        low: { PW: 3.6, PH: 1.2, PD: 0.4, PR: 0.14, FONT_SIZE: 0.55 },
         medium: { PW: 3.6, PH: 1.2, PD: 0.4, PR: 0.14, FONT_SIZE: 0.55 },
         high: { PW: 3.8, PH: 1.30, PD: 0.5, PR: 0.16, FONT_SIZE: 0.6 }
     };

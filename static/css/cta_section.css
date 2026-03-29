@@ -40,18 +40,22 @@
 
 .cta-title {
     font-family: 'Unbounded', sans-serif;
-    font-size: clamp(50px, 6vw, 100px);
+    font-size: clamp(40px, 5vw, 80px);
     font-weight: 500;
     line-height: 1.05;
     color: var(--text);
     transform: scaleX(1.15);
+    @media (min-width: 2300px) {
+        max-width: 40vw;
+        font-size: 4.5vw;
+    }
     transform-origin: left;
     margin-bottom: 32px;
 }
 
 .cta-desc {
     font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(12px, 1vw, 16px);
     color: var(--muted);
     line-height: 1.85;
     max-width: 560px;
@@ -112,18 +116,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 60vh;
-    @media (max-width: 2300px) {
-        height: 53vh;
-    }
+    height: 55vh;
     @media (max-width: 2100px) {
+        height: 50vh;
+    }
+    @media (max-width: 1600px) {
         height: 45vh;
     }
-    @media (max-width: 1700px) {
-        height: 35vh;
-    }
     @media (max-width: 1400px) {
-        height: 25vh;
+        height: 35vh;
     }
     position: relative;
     z-index: 1;
@@ -144,7 +145,7 @@
         padding: 0 6vw;
     }
     .cta-right {
-        height: clamp(280px, 50vw, 420px);
+        height: clamp(300px, 55vw, 500px);
         width: 100%;
     }
     .cta-title {
@@ -168,5 +169,8 @@
     .cta-btn {
         width: 100%;
         text-align: center;
+    }
+    .cta-right {
+        height: clamp(240px, 50vw, 420px);
     }
 }
