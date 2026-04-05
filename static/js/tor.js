@@ -584,7 +584,7 @@ function updateProgress() {
     const fill  = document.getElementById('progressFill');
     const label = document.getElementById('progressLabel');
     if (fill)  fill.style.width = pct + '%';
-    if (label) label.textContent = `${cur} / ${total}`;
+    if (label) label.textContent = `${String(cur).padStart(2,'0')} / ${String(total).padStart(2,'0')}`;
     const backBtn = document.getElementById('progressBackBtn');
     if (backBtn) backBtn.disabled = state.history.length <= 1;
 }
@@ -611,7 +611,9 @@ function buildCardHTML(step) {
     else if (step.type === 'single') body = buildOptions(step, false);
     else if (step.type === 'multi')  body = buildOptions(step, true);
     return `
-    <div class="q-step">Вопрос ${cur} из ${total}</div>
+    <div data-corner="tr"></div>
+    <div data-corner="bl"></div>
+    <div class="q-step">Вопрос ${String(cur).padStart(2,'0')} из ${String(total).padStart(2,'0')}</div>
     <h2 class="q-title">${step.question}</h2>
     ${step.subtitle ? `<p class="q-subtitle">${step.subtitle}</p>` : ''}
     ${body}
@@ -937,10 +939,6 @@ function generateTZ() {
         sub('Дополнительно:');
         add('  ' + a.extra_info);
     }
-
-    add('');
-    add('Составлено через сайт Андрея Караваева');
-
     return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
@@ -1177,7 +1175,7 @@ function renderResult() {
     resultScreen.classList.remove('hidden');
 
     if (progressFill)  progressFill.style.width = '100%';
-    if (progressLabel) progressLabel.textContent = 'Готово';
+    if (progressLabel) progressLabel.textContent = 'ГОТОВО';
     if (backBtn)       backBtn.disabled = false;
 
     const torText   = generateTZ();
@@ -1188,37 +1186,44 @@ function renderResult() {
     const ctLabelMap = { telegram: 'Telegram', email: 'Email', phone: 'Телефон', custom: 'Другой способ' };
     window._contact = ct ? `${ctLabelMap[ct.value] || ct.value}: ${ct.text || ''}` : '';
 
+    const encoded  = encodeURIComponent(torText.slice(0, 4000));
+    const tgDirect = `https://t.me/${TG_USERNAME}?text=${encoded}`;
+
     resultScreen.innerHTML = `
     <div class="result-wrap">
       <div class="result-hero">
-        <h1>ТЗ сформировано!</h1>
-        <p>Ваше техническое задание готово. Прикрепите файлы если есть, затем отправьте.</p>
+        <h1>// Техническое задание готово</h1>
       </div>
       <div class="tor-card">
         <div class="tor-card-header">
-          <span>Техническое задание</span>
-          <span style="font-size:11px;color:var(--muted2)">прокрутите вниз</span>
+          <span>Сформированный текст:</span>
         </div>
         <pre class="tor-text" id="torPre">${escH(torText)}</pre>
       </div>
 
       <div class="file-upload-card">
-        <div class="file-upload-label">Прикрепить файлы (необязательно)</div>
-        <p class="file-upload-hint">Макеты, изображения, документы — всё что поможет понять проект. До 10 файлов, до 50 МБ каждый.</p>
-        <label class="file-drop-zone" id="fileDropZone">
-          <input type="file" id="fileInput" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
-            onchange="handleFileSelect(this.files)" />
-          <div class="file-drop-icon">📎</div>
-          <div class="file-drop-text">Нажмите или перетащите файлы сюда</div>
-        </label>
-        <div class="file-list" id="fileList"></div>
+<!--    Кнопки отключены из-за блокировки API телеграма    <div class="file-upload-label">Прикрепить файлы (необязательно)</div>-->
+<!--        <p class="file-upload-hint">Макеты, изображения, документы — всё что поможет понять проект. До 10 файлов, до 50 МБ каждый.</p>-->
+<!--        <label class="file-drop-zone" id="fileDropZone">-->
+<!--          <input type="file" id="fileInput" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"-->
+<!--            onchange="handleFileSelect(this.files)" />-->
+<!--          <div class="file-drop-icon">📎</div>-->
+<!--          <div class="file-drop-text">Нажмите или перетащите файлы сюда</div>-->
+<!--        </label>-->
+<!--        <div class="file-list" id="fileList"></div>-->
       </div>
 
       <div class="actions">
         <button class="act-btn act-copy" id="copyBtn" onclick="doCopy()">Скопировать ТЗ</button>
-        <button class="act-btn act-bot" id="botBtn" onclick="doSendBot()">Отправить через бота (я напишу вам сам)</button>
+        <a class="act-btn act-direct" href="${tgDirect}" target="_blank" rel="noopener">
+          Написать напрямую в Telegram (с текстом ТЗ)
+        </a>
+<!--   Кнопка временно удалена из-за блокировки телеграм API    -->
+<!--        <button class="act-btn act-bot" id="botBtn" onclick="doSendBot()">-->
+<!--          Отправить через бота — я напишу вам сам-->
+<!--        </button>-->
         <div id="sendStatus" class="send-status"></div>
-        <button class="act-btn act-restart" onclick="doRestart()">Начать заново</button>
+        <button class="act-btn act-restart btn-ghost" onclick="doRestart()">Начать заново</button>
       </div>
     </div>
   `;

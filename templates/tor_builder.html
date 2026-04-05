@@ -1,44 +1,76 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Конструктор ТЗ</title>
-    <link rel="stylesheet" href="/static/css/tor_builder.css"/>
-    <script src="/static/js/tor.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор ТЗ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/tor_builder.css" />
 </head>
 <body>
-<div class="progress-wrap" id="progressWrap">
-    <div class="progress-inner">
-        <button class="progress-back-btn" id="progressBackBtn" onclick="goBack()" title="Назад">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="progress-bar-outer">
-            <div class="progress-bar-fill" id="progressFill"></div>
-        </div>
-        <span class="progress-label" id="progressLabel">1 / 1</span>
-    </div>
-</div>
 
-<div class="app" id="app">
+  <div class="bp-grid" aria-hidden="true"></div>
+
+  <header class="topbar" id="progressWrap">
+    <div class="topbar-inner">
+      <div class="topbar-brand">
+        <div class="brand-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <span class="brand-label">ТЗ_КОНСТРУКТОР</span>
+      </div>
+
+      <div class="topbar-progress">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+          <div class="progress-ticks" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <span class="step-label" id="progressLabel">01 / 01</span>
+        <button class="back-icon-btn" id="progressBackBtn" onclick="goBack()" title="Назад">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app" id="app">
 
     <div class="screen" id="quizScreen">
-        <div class="card" id="questionCard">
-        </div>
+      <div class="card" id="questionCard">
+      </div>
+
+      <div class="bottom-nav" id="bottomNav">
+        <button class="btn btn-ghost" id="backBtn" onclick="goBack()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Назад
+        </button>
+        <button class="btn btn-primary" id="nextBtn" onclick="goNext()">
+          Далее
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class="screen hidden" id="resultScreen">
-    </div>
+    <div class="screen hidden" id="resultScreen"></div>
 
-</div>
+  </main>
 
-<div class="bottom-nav" id="bottomNav">
-    <button class="btn btn-ghost" id="backBtn" onclick="goBack()">← Назад</button>
-    <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Далее →</button>
-</div>
-
-<script>
+  <script>
     window.TG_USERNAME = "{{ telegram_username }}";
-</script>
+  </script>
+  <script src="/static/js/tor.js"></script>
 </body>
 </html>
