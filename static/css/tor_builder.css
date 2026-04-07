@@ -336,13 +336,10 @@ input[type="number"], textarea { cursor: text; }
   letter-spacing: -1px;
   transition: border-color .2s, box-shadow .2s;
   -moz-appearance: textfield;
+  min-height: 65px;
 }
 .num-input::-webkit-outer-spin-button,
 .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-.num-input:focus {
-  outline: none; border-color: var(--blue);
-  box-shadow: 0 0 0 3px var(--blue-glow);
-}
 .num-suffix {
   position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
   font-family: var(--font-mono); font-size: 16px; font-weight: 700;
@@ -425,7 +422,7 @@ input[type="number"], textarea { cursor: text; }
 
 .result-hero {
   text-align: center; padding: 32px 0 28px;
-  border-bottom: 1px solid var(--line); margin-bottom: 28px;
+  margin-bottom: 28px;
 }
 .result-hero h1 {
   font-family: var(--font-mono); font-size: 13px; font-weight: 700;
@@ -458,9 +455,14 @@ input[type="number"], textarea { cursor: text; }
 }
 
 .tor-text {
-  font-family: var(--font-mono); font-size: 12px; line-height: 1.9;
-  color: var(--text); white-space: pre-wrap; word-break: break-word;
-  max-height: 440px; overflow-y: auto; padding-right: 8px;
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 440px;
+  overflow-y: auto;
+  resize: none;
+  width:100%;
+  min-height:300px;
 }
 .tor-text::-webkit-scrollbar { width: 3px; }
 .tor-text::-webkit-scrollbar-track { background: transparent; }

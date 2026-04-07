@@ -1,5 +1,3 @@
-'use strict';
-
 const TG_USERNAME = window.TG_USERNAME || 'andr3ywb';
 const BOT_API_URL = '/send-tor';
 const LS_KEY      = 'tor_quiz_v5';
@@ -31,7 +29,6 @@ const STEPS = [
         show: () => true,
     },
 
-    // САЙТ
     {
         id: 'site_type',
         question: 'Какой тип сайта вам нужен?',
@@ -199,7 +196,6 @@ const STEPS = [
         show: a => a.project_type?.value === 'site',
     },
 
-    // ВЕБ-ПРИЛОЖЕНИЕ
     {
         id: 'webapp_type',
         question: 'Какой тип веб-приложения?',
@@ -301,7 +297,6 @@ const STEPS = [
         show: a => a.project_type?.value === 'webapp',
     },
 
-    // TELEGRAM-БОТ
     {
         id: 'bot_task',
         question: 'Какова основная задача Telegram-бота?',
@@ -387,7 +382,6 @@ const STEPS = [
         show: a => a.project_type?.value === 'tgbot',
     },
 
-    // TELEGRAM-БОТ + САЙТ
     {
         id: 'botsite_site_type',
         question: 'Какой тип сайта нужен?',
@@ -486,7 +480,6 @@ const STEPS = [
         show: a => a.project_type?.value === 'tgbot_site',
     },
 
-    // ОБЩИЙ БЛОК
     {
         id: 'deadline',
         question: 'Когда нужен запуск проекта?',
@@ -622,36 +615,18 @@ function buildCardHTML(step) {
 }
 
 function buildTextArea(step) {
-    const fid = `files_main_${step.id}`;
     return `
-    <div class="input-toggle-wrap">
-      <div class="input-toggle-bar">
-        <button type="button" class="itoggle active" id="tog_text_main"
-          onclick="switchInputMode('main','text','${step.id}')">Текст</button>
-        <button type="button" class="itoggle" id="tog_file_main"
-          onclick="switchInputMode('main','file','${step.id}')">Файлы</button>
-      </div>
-      <div id="mode_text_main">
+    <div class="input-wrap">
         <textarea class="txt-area" id="mainTextInput"
           placeholder="${esc(step.placeholder || 'Введите ваш ответ...')}"
           rows="5"></textarea>
-      </div>
-      <div id="mode_file_main" class="file-inline-zone" style="display:none">
-        <label class="file-drop-zone-inline">
-          <input type="file" id="${fid}" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
-            onchange="addInlineFiles(this.files,'${step.id}','main')" />
-          <span class="file-drop-icon-sm">📎</span>
-          <span class="file-drop-text-sm">Нажмите или перетащите файлы (до 10 шт., до 50 МБ каждый)</span>
-        </label>
-        <div class="file-list-inline" id="flist_main_${step.id}"></div>
-      </div>
     </div>`;
 }
 
 function buildNumberInput(step) {
     return `
     <div class="num-wrap">
-      <input type="number" class="num-input" id="mainNumInput"
+      <input type="number" class="num-input txt-area" id="mainNumInput"
         placeholder="${esc(step.placeholder || '0')}"
         min="${step.min || 0}" step="500" />
       <span class="num-suffix">₽</span>
@@ -661,28 +636,10 @@ function buildNumberInput(step) {
 function buildOptions(step, isMulti) {
     const items = step.options.map(opt => {
         const subId  = `sub_${step.id}_${opt.value}`;
-        const fileId = `files_${step.id}_${opt.value}`;
         const sub = opt.hasText ? `
-      <div class="input-toggle-wrap sub-wrap" id="wrap_${subId}" style="display:none">
-        <div class="input-toggle-bar small">
-          <button type="button" class="itoggle active" id="tog_text_${subId}"
-            onclick="switchInputMode('${subId}','text','${step.id}')">Текст</button>
-          <button type="button" class="itoggle" id="tog_file_${subId}"
-            onclick="switchInputMode('${subId}','file','${step.id}')">Файлы</button>
-        </div>
-        <div id="mode_text_${subId}">
-          <textarea class="opt-sub-input" id="${subId}" data-opt="${opt.value}"
-            placeholder="${esc(opt.textPlaceholder || 'Уточните...')}" rows="2"></textarea>
-        </div>
-        <div id="mode_file_${subId}" class="file-inline-zone" style="display:none">
-          <label class="file-drop-zone-inline">
-            <input type="file" id="${fileId}" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"
-              onchange="addInlineFiles(this.files,'${step.id}','${subId}')" />
-            <span class="file-drop-icon-sm">📎</span>
-            <span class="file-drop-text-sm">Нажмите — до 10 файлов, до 50 МБ каждый</span>
-          </label>
-          <div class="file-list-inline" id="flist_${subId}"></div>
-        </div>
+      <div class="sub-wrap" id="wrap_${subId}" style="display:none;margin-top:8px;">
+        <textarea class="opt-sub-input" id="${subId}" data-opt="${opt.value}"
+          placeholder="${esc(opt.textPlaceholder || 'Уточните...')}" rows="2"></textarea>
       </div>` : '';
         return `
       <div class="opt-wrap">
@@ -736,8 +693,6 @@ function restoreAnswer(step) {
             }
         });
     }
-    // Restore inline file lists
-    renderAllInlineFileLists();
 }
 
 function bindEvents(step) {
@@ -765,7 +720,6 @@ function selectSingle(stepId, value, btnEl) {
     const step = getStep(stepId);
     if (!step) return;
     document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-    // Hide all sub-wraps
     document.querySelectorAll('.sub-wrap').forEach(s => s.style.display = 'none');
     btnEl.classList.add('selected');
     const subId = `sub_${stepId}_${value}`;
@@ -872,7 +826,6 @@ function updateNavBtns() {
     if (nextBtn) nextBtn.textContent = nextStep(state.currentStepId) ? 'Далее →' : 'Готово';
 }
 
-// Хелпер: форматирование хостинга
 function hostingLine(ans) {
     if (!ans?.value) return 'Не указано';
     const map = {
@@ -1196,21 +1149,9 @@ function renderResult() {
       </div>
       <div class="tor-card">
         <div class="tor-card-header">
-          <span>Сформированный текст:</span>
+          <span>Сформированный текст (можно редактировать):</span>
         </div>
-        <pre class="tor-text" id="torPre">${escH(torText)}</pre>
-      </div>
-
-      <div class="file-upload-card">
-<!--    Кнопки отключены из-за блокировки API телеграма    <div class="file-upload-label">Прикрепить файлы (необязательно)</div>-->
-<!--        <p class="file-upload-hint">Макеты, изображения, документы — всё что поможет понять проект. До 10 файлов, до 50 МБ каждый.</p>-->
-<!--        <label class="file-drop-zone" id="fileDropZone">-->
-<!--          <input type="file" id="fileInput" multiple accept="*/*" style="display:block;opacity:0;width:0;height:0;position:absolute"-->
-<!--            onchange="handleFileSelect(this.files)" />-->
-<!--          <div class="file-drop-icon">📎</div>-->
-<!--          <div class="file-drop-text">Нажмите или перетащите файлы сюда</div>-->
-<!--        </label>-->
-<!--        <div class="file-list" id="fileList"></div>-->
+        <textarea class="tor-text txt-area" id="torPre">${escH(torText)}</textarea>
       </div>
 
       <div class="actions">
@@ -1218,32 +1159,16 @@ function renderResult() {
         <a class="act-btn act-direct" href="${tgDirect}" target="_blank" rel="noopener">
           Написать напрямую в Telegram (с текстом ТЗ)
         </a>
-<!--   Кнопка временно удалена из-за блокировки телеграм API    -->
-<!--        <button class="act-btn act-bot" id="botBtn" onclick="doSendBot()">-->
-<!--          Отправить через бота — я напишу вам сам-->
-<!--        </button>-->
         <div id="sendStatus" class="send-status"></div>
         <button class="act-btn act-restart btn-ghost" onclick="doRestart()">Начать заново</button>
       </div>
     </div>
   `;
-
-    // Drag & drop
-    const zone = document.getElementById('fileDropZone');
-    if (zone) {
-        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-        zone.addEventListener('drop', e => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            handleFileSelect(e.dataTransfer.files);
-        });
-        // label naturally triggers input click
-    }
 }
 
 async function doCopy() {
-    const text = window._torText || '';
+    const pre = document.getElementById('torPre');
+    const text = pre ? pre.value : '';
     const btn = document.getElementById('copyBtn');
     try {
         await navigator.clipboard.writeText(text);
@@ -1256,128 +1181,6 @@ async function doCopy() {
     if (btn) { btn.textContent = 'Скопировано!'; setTimeout(() => { btn.textContent = 'Скопировать ТЗ'; }, 2500); }
 }
 
-// Хранилище выбранных файлов
-window._resultFiles = [];
-
-function handleFileSelect(fileList) {
-    Array.from(fileList).forEach(f => {
-        if (window._resultFiles.length >= 10) return;
-        if (f.size > 50 * 1024 * 1024) { alert(`Файл "${f.name}" слишком большой (макс. 50 МБ)`); return; }
-        window._resultFiles.push(f);
-    });
-    renderFileList();
-}
-
-function renderFileList() {
-    const list = document.getElementById('fileList');
-    if (!list) return;
-    list.innerHTML = window._resultFiles.map((f, i) => `
-    <div class="file-item">
-      <span class="file-name">${escH(f.name)}</span>
-      <span class="file-size">${(f.size / 1024).toFixed(0)} КБ</span>
-      <button class="file-remove" onclick="removeFile(${i})" title="Удалить">✕</button>
-    </div>
-  `).join('');
-}
-
-function removeFile(idx) {
-    window._resultFiles.splice(idx, 1);
-    renderFileList();
-}
-
-async function doSendBot() {
-    const btn    = document.getElementById('botBtn');
-    const status = document.getElementById('sendStatus');
-    if (btn) { btn.disabled = true; btn.textContent = 'Отправляю…'; }
-    if (status) status.className = 'send-status';
-
-    try {
-        const fd = new FormData();
-        fd.append('tor_text', window._torText || '');
-        fd.append('contact',  window._contact || '');
-        getAllCollectedFiles().forEach(f => fd.append('files', f, f.name));
-
-        const res  = await fetch(BOT_API_URL, { method: 'POST', body: fd });
-        const data = await res.json();
-
-        if (data.success) {
-            if (status) {
-                const fileCount = (window._selectedFiles || []).length;
-                const fileMsg   = fileCount ? ` Файлов отправлено: ${fileCount}.` : '';
-                status.textContent = `ТЗ успешно отправлено!${fileMsg} Я напишу вам в ближайшее время.`;
-                status.className = 'send-status ok';
-            }
-            if (btn) btn.textContent = 'Отправлено!';
-        } else { throw new Error(data.error || 'Ошибка API'); }
-    } catch (e) {
-        if (status) { status.textContent = `Не удалось отправить: ${e.message}`; status.className = 'send-status err'; }
-        if (btn) { btn.disabled = false; btn.textContent = 'Попробовать снова'; }
-    }
-}
-
-// File storage: { contextId -> [File, ...] }
-window._inlineFiles = {};
-
-function switchInputMode(ctxId, mode, stepId) {
-    const textDiv = document.getElementById(`mode_text_${ctxId}`);
-    const fileDiv = document.getElementById(`mode_file_${ctxId}`);
-    const togText = document.getElementById(`tog_text_${ctxId}`);
-    const togFile = document.getElementById(`tog_file_${ctxId}`);
-    if (!textDiv || !fileDiv) return;
-
-    if (mode === 'text') {
-        textDiv.style.display = '';
-        fileDiv.style.display = 'none';
-        togText?.classList.add('active');
-        togFile?.classList.remove('active');
-    } else {
-        textDiv.style.display = 'none';
-        fileDiv.style.display = '';
-        togText?.classList.remove('active');
-        togFile?.classList.add('active');
-        renderInlineFileList(ctxId, stepId);
-    }
-}
-
-function addInlineFiles(fileList, stepId, ctxId) {
-    if (!window._inlineFiles[ctxId]) window._inlineFiles[ctxId] = [];
-    const bucket = window._inlineFiles[ctxId];
-    Array.from(fileList).forEach(f => {
-        if (bucket.length >= 10) { alert('Максимум 10 файлов на поле'); return; }
-        if (f.size > 50 * 1024 * 1024) { alert(`${f.name}: превышает 50 МБ`); return; }
-        bucket.push(f);
-    });
-    renderInlineFileList(ctxId, stepId);
-}
-
-function removeInlineFile(ctxId, idx) {
-    if (window._inlineFiles[ctxId]) window._inlineFiles[ctxId].splice(idx, 1);
-    renderInlineFileList(ctxId);
-}
-
-function renderInlineFileList(ctxId) {
-    const list = document.getElementById(`flist_${ctxId}`);
-    if (!list) return;
-    const files = window._inlineFiles[ctxId] || [];
-    list.innerHTML = files.map((f, i) => `
-    <div class="file-item-inline">
-      <span class="file-name">${escH(f.name)}</span>
-      <span class="file-size">${(f.size/1024).toFixed(0)} КБ</span>
-      <button class="file-remove" onclick="removeInlineFile('${ctxId}',${i})" title="Удалить">✕</button>
-    </div>`).join('');
-}
-
-function renderAllInlineFileLists() {
-    Object.keys(window._inlineFiles || {}).forEach(ctxId => renderInlineFileList(ctxId));
-}
-
-function getAllCollectedFiles() {
-    const all = [];
-    Object.values(window._inlineFiles || {}).forEach(bucket => all.push(...bucket));
-    Object.values(window._resultFiles  || {}).forEach(f => all.push(f));
-    return all;
-}
-
 function doRestart() {
     if (!confirm('Вы уверены? Весь прогресс и ответы будут удалены.')) return;
     clearState();
@@ -1387,7 +1190,7 @@ function doRestart() {
 function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function esc(s)  { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doSendBot, doRestart, handleFileSelect, removeFile, removeInlineFile, addInlineFiles, switchInputMode });
+Object.assign(window, { goNext, goBack, selectSingle, toggleMulti, doCopy, doRestart });
 
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
