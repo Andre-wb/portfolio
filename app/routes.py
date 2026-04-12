@@ -27,6 +27,11 @@ async def root(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("main.html", {"request": request})
 
 
+@router.get("/qr_code", response_class=HTMLResponse)
+async def root(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse("qr_code.html", {"request": request})
+
+
 @router.get("/tor_builder", response_class=HTMLResponse)
 async def tor_builder(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
