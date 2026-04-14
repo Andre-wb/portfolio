@@ -1,6 +1,6 @@
-# ТЗ Генератор
+# Мой сайт портфолио
 
-FastAPI + vanilla JS приложение-опросник для создания технического задания.
+FastAPI + vanilla JS сайт-визитка + приложение-опросник для создания технического задания.
 
 ## Быстрый старт
 
@@ -9,7 +9,7 @@ FastAPI + vanilla JS приложение-опросник для создани
 pip install -r requirements.txt
 
 # 2. Настроить .env
-cp .env .env.local
+touch .env
 # Заполнить TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_USERNAME
 
 # 3. Запустить
@@ -30,7 +30,6 @@ python main.py
 ```
 portfolio/
 ├── app/
-│   ├── __init__.py
 │   ├── routes.py        ← API endpoints
 │   └── tor_logic.py     ← TOR formatting 
 ├── static/
@@ -45,10 +44,9 @@ portfolio/
 
 ## Функции
 
+- 🔭 3D визуальные эффекты 
 - 🌳 Полное дерево вопросов (Сайт / Веб-приложение / Telegram-бот / Бот+Сайт)
 - ⬅️ Навигация назад без потери ответов
 - 📊 Динамический прогресс-бар
 - 📋 Генерация TOR на основе ответов
 - 📋 Кнопка «Скопировать ТЗ»
-- ✈️ Прямая ссылка для отправки ТЗ в Telegram
-- 🤖 Отправка через Telegram-бота (клиент не пишет вам сам)
