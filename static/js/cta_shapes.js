@@ -138,12 +138,12 @@
     function getGeometryParams() {
         const base = {
             low: {
-                bevelSegments: 8,        // было 4
-                curveSegments: 24,       // было 12
-                bevelEnabled: true,      // было false
-                bevelThickness: 0.02,    // было 0
-                bevelSize: 0.02,         // было 0
-                depth: 0.35              // было 0.3
+                bevelSegments: 8,
+                curveSegments: 24,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.02,
+                depth: 0.35
             },
             medium: {
                 bevelSegments: 24,
@@ -487,7 +487,7 @@
 
         const r = new THREE.WebGLRenderer({
             canvas: cv,
-            antialias: PERF.level === 'high', // Только для high!
+            antialias: PERF.level === 'high',
             alpha: true,
             powerPreference: PERF.level === 'low' ? 'low-power' : 'high-performance',
         });
@@ -715,9 +715,7 @@
         });
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 8. МАГНИТНЫЕ КНОПКИ (оптимизировано)
-    // ═══════════════════════════════════════════════════════════════════════════════
+    // 8. МАГНИТНЫЕ КНОПКИ
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cta-btn').forEach(btn => {
