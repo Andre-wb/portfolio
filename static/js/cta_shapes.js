@@ -248,7 +248,7 @@
 
     const CONFIGS = ALL_CONFIGS;
 
-    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ (оптимизировано)
+    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ
 
     function parseAllPaths(font, text, fontSize) {
         const scale = fontSize / font.data.resolution;
