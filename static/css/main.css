@@ -577,6 +577,7 @@ header nav {
     }
     .introduce-about {
         grid-row: 2;
+        place-items: center;
         width: 100%;
         overflow: visible;
     }
