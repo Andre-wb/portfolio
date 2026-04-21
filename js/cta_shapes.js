@@ -1,6 +1,6 @@
 'use strict';
 
-// Система адаптивного качества 3D табличек CTA
+// Улучшенная система адаптивного качества 3D табличек CTA
 // Автоопределение производительности + динамическое снижение качества при просадках
 
 (function () {
@@ -138,12 +138,12 @@
     function getGeometryParams() {
         const base = {
             low: {
-                bevelSegments: 8,
-                curveSegments: 24,
-                bevelEnabled: true,
-                bevelThickness: 0.02,
-                bevelSize: 0.02,
-                depth: 0.35
+                bevelSegments: 8,        // было 4
+                curveSegments: 24,       // было 12
+                bevelEnabled: true,      // было false
+                bevelThickness: 0.02,    // было 0
+                bevelSize: 0.02,         // было 0
+                depth: 0.35              // было 0.3
             },
             medium: {
                 bevelSegments: 24,
@@ -248,7 +248,7 @@
 
     const CONFIGS = ALL_CONFIGS;
 
-    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ
+    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ (оптимизировано)
 
     function parseAllPaths(font, text, fontSize) {
         const scale = fontSize / font.data.resolution;
@@ -487,7 +487,7 @@
 
         const r = new THREE.WebGLRenderer({
             canvas: cv,
-            antialias: PERF.level === 'high',
+            antialias: PERF.level === 'high', // Только для high!
             alpha: true,
             powerPreference: PERF.level === 'low' ? 'low-power' : 'high-performance',
         });
@@ -568,8 +568,7 @@
 
         // Шрифты (принимает только .json)
         const FONT_URLS = [
-            '/static/css/Erica_One/Erica_One_Regular.json',
-            '/css/Erica_One/Erica_One_Regular.json',
+            'css/Erica_One/Erica_One_Regular.json',
             'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', // Fallback
         ];
 
@@ -715,7 +714,9 @@
         });
     }
 
-    // 8. МАГНИТНЫЕ КНОПКИ
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // 8. МАГНИТНЫЕ КНОПКИ (оптимизировано)
+    // ═══════════════════════════════════════════════════════════════════════════════
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cta-btn').forEach(btn => {

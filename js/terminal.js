@@ -135,8 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(200);
         await fakeLoading('Fetching records...');
         await printLines([
-            '<span class="out-accent">🥈</span> 2 место — хакатон <a class="terminal-link" href="/static/assets/кибер_рывок.pdf" target="_blank" rel="noopener noreferrer">Кибер Рывок</a> [2026]',
-            '<span class="out-accent">🏆</span> Участие — хакатон <a class="terminal-link" href="/static/assets/nuclear_it_hack.pdf" target="_blank" rel="noopener noreferrer">Nuclear IT Hack</a> [2026]',
+            '<span class="out-accent">🥈</span> 2 место — хакатон <a class="terminal-link" href="/assetsрывок.pdf" target="_blank" rel="noopener noreferrer">Кибер Рывок</a> [2026]',
+            '<span class="out-accent">🏆</span> Участие — хакатон <a class="terminal-link" href="/assetsr_it_hack.pdf" target="_blank" rel="noopener noreferrer">Nuclear IT Hack</a> [2026]',
             '<span class="out-accent">💼</span> Коммерческий заказ — сайт для специалиста по приёмке квартир',
         ], 130);
 

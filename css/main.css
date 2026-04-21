@@ -46,18 +46,18 @@ body {
     right: 0;
 }
 @font-face {
-    font-family: 'Unbounded';
-    src: url('Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
-    font-weight: 200 900;
-    font-style: normal;
-    font-display: swap;
+    font-family:'Unbounded';
+    src:url('Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
+    font-weight:200 900;
+    font-style:normal;
+    font-display:swap;
 }
 @font-face {
-    font-family: 'JetBrains Mono';
-    src: url('JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
-    font-weight: 200 900;
-    font-style: normal;
-    font-display: swap;
+    font-family:'JetBrains Mono';
+    src:url('JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+    font-weight:200 900;
+    font-style:normal;
+    font-display:swap;
 }
 .introduce-about h1 {
     font-size: 6vw;
@@ -577,7 +577,6 @@ header nav {
     }
     .introduce-about {
         grid-row: 2;
-        place-items: center;
         width: 100%;
         overflow: visible;
     }

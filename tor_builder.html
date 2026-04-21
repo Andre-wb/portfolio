@@ -7,10 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/css/tor_builder.css" />
-  <link rel="icon" type="image/x-icon" href="/static/assets/icon.svg">
-  <link rel="icon" type="image/png" href="/static/assets/icon.svg">
-  <link rel="apple-touch-icon" href="/static/assets/icon.svg">
+  <link rel="stylesheet" href="css/tor_builder.css" />
+  <link rel="icon" type="image/x-icon" href="assets/icon.svg">
+  <link rel="icon" type="image/png" href="assets/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
 </head>
 <body>
 
@@ -19,15 +19,14 @@
   <header class="topbar" id="progressWrap">
     <div class="topbar-inner">
       <div class="topbar-brand">
-        <a class="brand-icon" href="/">
+        <a class="brand-icon" href="index.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
             <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
           </svg>
         </a>
-        <a class="brand-label" href="/">НА_ГЛАВНУЮ</a>
+        <a class="brand-label" href="index.html">НА_ГЛАВНУЮ</a>
       </div>
-
       <div class="topbar-progress">
         <div class="progress-track">
           <div class="progress-fill" id="progressFill"></div>
@@ -72,8 +71,8 @@
   </main>
 
   <script>
-    window.TG_USERNAME = "{{ telegram_username }}";
+    window.TG_USERNAME = "@andr3ywb";
   </script>
-  <script src="/static/js/tor.js"></script>
+  <script src="js/tor.js"></script>
 </body>
 </html>
