@@ -7,4 +7,6 @@ body {
 }
 .qr-code {
     border-radius: 50px;
+    height: 100vh;
+    aspect-ratio: 1/1;
 }
