@@ -159,3 +159,10 @@
 }
 .legal-nav a:hover { color: var(--accent2); }
 .legal-nav a::before { content: '→'; color: var(--muted2); font-size: 12px; }
+
+a {
+    color: var(--accent2);
+}
+strong {
+    color: var(--text)
+}
