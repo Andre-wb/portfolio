@@ -14,3 +14,22 @@ body {
     border-radius: 50px;
     object-fit: contain;
 }
+
+.qr-code-link {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 15px;
+    background: #00e1ff;
+    text-decoration: none;
+    color: #000;
+    padding: 10px 10px;
+    border-radius: 30px;
+    font-weight: 500;
+}
+
+strong {
+    font-size: 18px;
+    font-weight: 500;
+}
