@@ -19,6 +19,12 @@
     --radius-lg:   20px;
     --shadow:      0 24px 80px -8px #03050b, 0 0 0 1px rgba(59, 130, 246, 0.15);
 }
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
 ::selection {
     background: var(--accent2);
     color: var(--bg);
