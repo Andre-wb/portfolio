@@ -2,6 +2,13 @@
     font-family: 'JetBrains Mono', monospace !important;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
 .legal-wrap {
     width: 100%;
     max-width: 820px;
