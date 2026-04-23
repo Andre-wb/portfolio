@@ -1,0 +1,71 @@
+/*
+   BASE — CSS-переменные, @font-face
+   Подключается на каждой странице сайта
+*/
+
+:root {
+    --bg:          #03050b;
+    --surface:     #0b0e17;
+    --surface2:    #141a29;
+    --border:      rgba(88, 166, 255, 0.12);
+    --border-hi:   rgba(88, 166, 255, 0.3);
+    --accent:      #3b82f6;
+    --accent2:     #00e1ff;
+    --accent-glow: rgba(59, 130, 246, 0.4);
+    --blue:        #3b82f6;
+    --teal:        #0ea5e9;
+    --green:       #10b981;
+    --red:         #ef4444;
+    --text:        #fff;
+    --muted:       #94a3b8;
+    --muted2:      #5f6c84;
+    --radius:      14px;
+    --radius-lg:   20px;
+    --shadow:      0 24px 80px -8px #03050b, 0 0 0 1px rgba(59, 130, 246, 0.15);
+}
+
+::selection {
+    background: var(--accent2);
+    color: var(--bg);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Unbounded, sans-serif;
+}
+
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1;
+    position: relative;
+    min-height: 100vh;
+    left: 0;
+    right: 0;
+}
+
+@font-face {
+    font-family: 'Unbounded';
+    src: url('Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
+    font-weight: 200 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+    font-weight: 200 900;
+    font-style: normal;
+    font-display: swap;
+}

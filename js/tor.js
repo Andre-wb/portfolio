@@ -1182,9 +1182,50 @@ async function doCopy() {
 }
 
 function doRestart() {
-    if (!confirm('Вы уверены? Весь прогресс и ответы будут удалены.')) return;
-    clearState();
-    render();
+    const modal = document.getElementById('customConfirmModal');
+    if (!modal) {
+        // Если модального окна нет на странице, используем стандартный confirm
+        if (confirm('Вы уверены? Весь прогресс и ответы будут удалены.')) {
+            clearState();
+            render();
+        }
+        return;
+    }
+
+    const confirmMessage = document.getElementById('confirmMessageText');
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const closeModal = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        if (okBtn) okBtn.removeEventListener('click', handleOk);
+        if (cancelBtn) cancelBtn.removeEventListener('click', handleCancel);
+    };
+    const handleOk = () => {
+        clearState();
+        render();
+        closeModal();
+    };
+    const handleCancel = () => {
+        closeModal();
+    };
+    if (confirmMessage) {
+        confirmMessage.textContent = 'Вы уверены? Весь прогресс и ответы будут удалены.';
+    }
+    if (okBtn) okBtn.addEventListener('click', handleOk);
+    if (cancelBtn) cancelBtn.addEventListener('click', handleCancel);
+    const backdrop = modal.querySelector('.custom-confirm-backdrop');
+    if (backdrop) {
+        const backdropHandler = (e) => {
+            if (e.target === backdrop) {
+                closeModal();
+                backdrop.removeEventListener('click', backdropHandler);
+            }
+        };
+        backdrop.addEventListener('click', backdropHandler);
+    }
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

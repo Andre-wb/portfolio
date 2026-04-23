@@ -1,0 +1,774 @@
+/* ==========================================================
+   PROJECTS — секция проектов, анимации карточек,
+               project-visuals, gallery modal
+   ========================================================== */
+
+/* ---------- Секция ---------- */
+
+.projects-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+    overflow: visible;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+}
+
+.projects-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10vh 5vw 20vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Заголовок секции ---------- */
+
+.section-title-wrapper {
+    position: relative;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15vh;
+    perspective: 1200px;
+}
+
+.section-title {
+    font-size: clamp(48px, 12vw, 140px);
+    font-weight: 200;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    transform-style: preserve-3d;
+    will-change: transform, filter, opacity;
+    text-align: center;
+    line-height: 1;
+    position: relative;
+    transition: none !important;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--accent2);
+    transition: width 0.8s ease;
+    box-shadow: 0 0 20px var(--accent2);
+}
+
+.section-title.visible::after {
+    width: 200px;
+}
+
+.section-title.visible {
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+                filter 0.6s ease-out,
+                opacity 0.4s ease-out !important;
+}
+
+/* ---------- Карточки проектов ---------- */
+
+.project-card {
+    position: relative;
+    width: 100%;
+    min-height: 60vh;
+    margin-bottom: 25vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4vw;
+    align-items: center;
+    transform-style: preserve-3d;
+    will-change: transform, opacity, filter;
+    opacity: 0.3;
+    transition: none !important;
+}
+
+.project-card:nth-child(even) {
+    direction: rtl;
+}
+
+.project-card:nth-child(even) > * {
+    direction: ltr;
+}
+
+.project-card.visible {
+    opacity: 1;
+    transform: rotateX(0deg) translateZ(0) scale(1);
+    filter: blur(0);
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+                filter 0.6s ease-out,
+                opacity 0.4s ease-out !important;
+}
+
+/* ---------- Контент карточки ---------- */
+
+.project-content {
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.project-content > * {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.project-card.visible .project-content > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.project-card.visible .project-meta   { transition-delay: 0.1s; }
+.project-card.visible .project-name   { transition-delay: 0.2s; }
+.project-card.visible .project-desc   { transition-delay: 0.3s; }
+.project-card.visible .project-stack  { transition-delay: 0.4s; }
+.project-card.visible .project-links  { transition-delay: 0.5s; }
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.project-number {
+    color: var(--accent2);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.project-status {
+    color: var(--muted2);
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+}
+
+.project-name {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.project-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(16px, 1.5vw, 20px);
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 90%;
+    font-weight: 300;
+}
+
+.project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2.5rem;
+}
+
+.tech-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+    padding: 0.4rem 0.9rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.tech-tag:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    transform: translateY(-2px);
+}
+
+.project-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.project-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-link.primary {
+    background: var(--accent2);
+    color: var(--bg);
+    font-weight: 500;
+}
+
+.project-link.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 225, 255, 0.3);
+}
+
+.project-link:not(.primary) {
+    color: var(--text);
+    border: 1px solid var(--border);
+    background: transparent;
+}
+
+.project-link:not(.primary):hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+.project-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ---------- Визуальная панель карточки ---------- */
+
+.project-visual {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.visual-inner {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+}
+
+.project-card.visible .project-visual .visual-inner {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ---------- Project visual: network mesh (Vortex) ---------- */
+
+.network-mesh {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 30% 30%, var(--accent-glow) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(0, 225, 255, 0.2) 0%, transparent 50%);
+    opacity: 0.6;
+}
+
+.node {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--accent2);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--accent2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.node-1 { top: 30%; left: 30%; animation-delay: 0s; }
+.node-2 { top: 60%; left: 60%; animation-delay: 0.6s; }
+.node-3 { top: 45%; left: 45%; animation-delay: 1.2s; }
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%       { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* ---------- Project visual: orbital system (Orbityx) ---------- */
+
+.orbital-system {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.orbit {
+    position: absolute;
+    border: 1px solid var(--border-hi);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.orbit-1 {
+    width: 100%;
+    height: 100%;
+    animation: rotate 10s linear infinite;
+}
+
+.orbit-2 {
+    width: 60%;
+    height: 60%;
+    animation: rotate 7s linear infinite reverse;
+}
+
+.orbit::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.planet {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 30px var(--accent-glow);
+}
+
+@keyframes rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ---------- Project visual: radar (Artifex) ---------- */
+
+.radar-screen {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border: 2px solid var(--border-hi);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--surface2) 0%, var(--surface) 100%);
+    overflow: hidden;
+}
+
+.radar-sweep {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    background: linear-gradient(45deg, transparent 50%, rgba(239, 68, 68, 0.3) 100%);
+    transform-origin: 0 0;
+    animation: sweep 4s linear infinite;
+    border-radius: 0 0 100% 0;
+}
+
+.blip {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--red);
+    animation: blip 2s ease-in-out infinite;
+}
+
+.blip-1 { top: 30%; left: 60%; animation-delay: 1s; }
+.blip-2 { top: 70%; left: 30%; animation-delay: 2.5s; }
+
+@keyframes sweep {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes blip {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50%       { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Project visual: candle chart (LethalHome) ---------- */
+
+.candle-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 150px;
+    padding: 20px;
+}
+
+.candle {
+    width: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    position: relative;
+    animation: grow 1s ease-out forwards;
+    transform-origin: bottom;
+    transform: scaleY(0);
+}
+
+.candle.green { background: var(--green); border-color: var(--green); }
+.candle.red   { background: var(--red);   border-color: var(--red); }
+.candle.tall  { height: 120px; animation-delay: 0.2s; }
+.candle:not(.tall) { height: 80px; }
+.candle:nth-child(1) { animation-delay: 0s; }
+.candle:nth-child(2) { animation-delay: 0.1s; }
+.candle:nth-child(3) { animation-delay: 0.2s; height: 100px; }
+.candle:nth-child(4) { animation-delay: 0.3s; }
+.candle:nth-child(5) { animation-delay: 0.4s; height: 60px; }
+
+.candle::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: inherit;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
+}
+
+.candle::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: inherit;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -8px;
+}
+
+@keyframes grow {
+    to { transform: scaleY(1); }
+}
+
+/* ---------- Project visual: 3D building ---------- */
+
+.building-3d {
+    position: relative;
+    width: 120px;
+    height: 180px;
+    transform-style: preserve-3d;
+    transform: rotateX(-20deg) rotateY(45deg);
+    animation: buildingFloat 6s ease-in-out infinite;
+}
+
+.floor {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    left: 0;
+}
+
+.floor-1 { bottom: 0;    transform: translateZ(0); }
+.floor-2 { bottom: 55px; transform: translateZ(10px); }
+.floor-3 { bottom: 110px; transform: translateZ(20px); }
+
+.roof {
+    position: absolute;
+    bottom: 165px;
+    left: 50%;
+    transform: translateX(-50%) translateZ(30px);
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 40px solid var(--accent);
+    filter: drop-shadow(0 0 15px var(--accent-glow));
+}
+
+@keyframes buildingFloat {
+    0%, 100% { transform: rotateX(-20deg) rotateY(45deg) translateY(0); }
+    50%       { transform: rotateX(-20deg) rotateY(45deg) translateY(-10px); }
+}
+
+/* ---------- Gallery modal ---------- */
+
+.gallery-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.gallery-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gallery-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 5, 11, 0.95);
+    backdrop-filter: blur(20px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.gallery-modal.active .gallery-backdrop {
+    opacity: 1;
+}
+
+.gallery-container {
+    position: relative;
+    width: 90vw;
+    max-width: 1200px;
+    height: 80vh;
+    z-index: 1001;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gallery-modal.active .gallery-container {
+    transform: scale(1) translateY(0);
+}
+
+.gallery-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.gallery-close:hover {
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: rotate(90deg);
+}
+
+.gallery-close svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text);
+    stroke-width: 2;
+    fill: none;
+}
+
+.gallery-slider {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.gallery-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gallery-slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.gallery-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-nav {
+    position: absolute;
+    bottom: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.gallery-btn {
+    width: 50px;
+    height: 50px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.3s ease;
+}
+
+.gallery-btn:hover:not(:disabled) {
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: scale(1.1);
+}
+
+.gallery-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.gallery-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--text);
+    stroke-width: 2;
+    fill: none;
+}
+
+.gallery-dots {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.gallery-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--border-hi);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.gallery-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    transition: border-color 0.3s ease;
+}
+
+.gallery-dot:hover {
+    background: var(--accent);
+}
+
+.gallery-dot.active {
+    background: var(--accent2);
+    box-shadow: 0 0 10px var(--accent2);
+}
+
+.gallery-dot.active::after {
+    border-color: var(--accent2);
+}
+
+.gallery-counter {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.gallery-counter span:first-child {
+    color: var(--accent2);
+    font-weight: 600;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 1024px) {
+    .section-title-wrapper {
+        height: 40vh;
+    }
+
+    .project-card {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        gap: 2rem;
+    }
+
+    .project-card:nth-child(even) {
+        direction: ltr;
+    }
+
+    .project-visual {
+        min-height: 300px;
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .gallery-container {
+        width: 95vw;
+        height: 60vh;
+    }
+
+    .gallery-nav {
+        bottom: -60px;
+        gap: 1rem;
+    }
+
+    .gallery-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .gallery-close {
+        top: -45px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-container {
+        padding: 5vh 4vw 10vh;
+    }
+
+    .project-content {
+        padding: 1rem;
+    }
+
+    .project-stack {
+        gap: 0.4rem;
+    }
+
+    .tech-tag {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+}

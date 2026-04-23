@@ -14,7 +14,27 @@
   <link rel="apple-touch-icon" href="assets/icon.svg">
 </head>
 <body>
-
+<div id="customConfirmModal" class="custom-confirm-overlay">
+  <div class="custom-confirm-backdrop"></div>
+  <div class="confirm-window">
+    <div class="confirm-header">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 9v4M12 17h.01" stroke-linecap="round"/>
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+        </svg>
+      </div>
+      <span class="confirm-title">Подтверждение действия</span>
+    </div>
+    <div class="confirm-message" id="confirmMessageText">
+      Вы уверены? Весь прогресс и ответы будут удалены.
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-btn-secondary" id="confirmCancelBtn">Отмена</button>
+      <button class="confirm-btn confirm-btn-primary" id="confirmOkBtn">Да, продолжить</button>
+    </div>
+  </div>
+</div>
   <div class="bp-grid" aria-hidden="true"></div>
 
   <header class="topbar" id="progressWrap">

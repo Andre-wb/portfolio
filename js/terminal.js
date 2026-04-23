@@ -57,13 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Имитация прогресс-бара pip install
     async function fakePipInstall(packages) {
         const out = addOutput('');
+        out.innerHTML += `<span class="out-muted">Технологии, с которыми я работаю:</span><br>`;
+        scrollTerminal();
         for (const pkg of packages) {
-            out.innerHTML += `<span class="out-muted">Collecting </span><span class="out-accent">${pkg}</span><br>`;
+            out.innerHTML += `<span class="out-accent">${pkg}</span><br>`;
             scrollTerminal();
             await sleep(160 + Math.random() * 120);
         }
         await sleep(120);
-        out.innerHTML += `<span class="out-accent">Successfully resolved dependencies</span><br>`;
+        out.innerHTML += `<span class="out-accent">✓ Инструменты готовы</span><br>`;
         scrollTerminal();
     }
 
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 80);
         });
         dots.textContent = '';
-        out.innerHTML = `<span class="out-muted">${label}</span> <span class="out-accent">done</span>`;
+        out.innerHTML = `<span class="out-muted">${label}</span> <span class="out-accent">готово</span>`;
         scrollTerminal();
         await sleep(120);
     }
@@ -133,8 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         removeCursor();
         await typeCommand('achievements');
         await sleep(200);
-        await fakeLoading('Fetching records...');
+        await fakeLoading('Загрузка достижений...');
         await printLines([
+            '<span class="out-muted">Мои награды и проекты:</span>',
             '<span class="out-accent">🥈</span> 2 место — хакатон <a class="terminal-link" href="assets/кибер_рывок.pdf" target="_blank" rel="noopener noreferrer">Кибер Рывок</a> [2026]',
             '<span class="out-accent">🏆</span> Участие — хакатон <a class="terminal-link" href="assets/nuclear_it_hack.pdf" target="_blank" rel="noopener noreferrer">Nuclear IT Hack</a> [2026]',
             '<span class="out-accent">💼</span> Коммерческий заказ — сайт для специалиста по приёмке квартир',
@@ -147,20 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(220);
         await printLines([
             'Blockchain-разработка · Rust-экосистема',
-            'безопасность · P2P-сети · Fullstack-разработка',
+            'кибербезопасность · P2P-сети · Fullstack-разработка',
             'Участие в хакатонах и open-source проектах.',
         ], 120);
 
-        // ── status ──────────────────────────────────────────
-        await sleep(500);
-        removeCursor();
-        await typeCommand('status');
-        await sleep(200);
-        await fakeLoading('Checking availability...');
-        addOutput('<span class="out-accent">●</span> Открыт к заказам и предложениям о работе');
-        scrollTerminal();
-
-        // Финальный курсор
         await sleep(350);
         appendIdleLine();
     }

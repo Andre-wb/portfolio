@@ -1,0 +1,318 @@
+/* ==========================================================
+   FOOTER — подвал сайта + кнопка «наверх»
+   ========================================================== */
+
+footer {
+    width: 100%;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 5vw 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+/* ---------- Бренд ---------- */
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--accent2);
+    letter-spacing: -0.02em;
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+}
+
+.footer-logo::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), transparent);
+}
+
+.footer-tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 280px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.footer-social-link {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--accent2);
+    transition: all 0.3s ease;
+}
+
+.footer-social-link svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.footer-social-link:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px var(--accent-glow);
+    background: var(--accent2);
+    color: var(--bg);
+}
+
+/* ---------- Колонки ---------- */
+
+.footer-col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+    position: relative;
+    display: inline-block;
+}
+
+.footer-col h4::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 30px;
+    height: 1px;
+    background: var(--accent2);
+    transition: width 0.3s ease;
+}
+
+.footer-col:hover h4::after {
+    width: 50px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links li a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.footer-links li a::before {
+    content: '→';
+    position: absolute;
+    left: -16px;
+    opacity: 0;
+    transition: all 0.2s ease;
+    color: var(--accent2);
+    font-size: 0.8rem;
+}
+
+.footer-links li a:hover {
+    color: var(--accent2);
+    transform: translateX(12px);
+}
+
+.footer-links li a:hover::before {
+    opacity: 1;
+    transform: translateX(-4px);
+}
+
+/* ---------- Нижняя полоса ---------- */
+
+.footer-bottom {
+    padding-top: 30px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-copyright {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted2);
+}
+
+.footer-copyright a {
+    color: var(--accent2);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-copyright a:hover {
+    text-decoration: underline;
+}
+
+.footer-meta {
+    display: flex;
+    gap: 24px;
+}
+
+.footer-meta a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted2);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-meta a:hover {
+    color: var(--accent2);
+}
+
+/* ---------- Кнопка «наверх» ---------- */
+
+.scroll-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    color: var(--accent2);
+}
+
+.scroll-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-top:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px var(--accent-glow);
+    background: var(--accent2);
+    color: var(--bg);
+}
+
+.scroll-top svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+    }
+
+    .footer-brand {
+        grid-column: span 2;
+    }
+
+    .footer-tagline {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        padding: 40px 5vw 30px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .footer-brand {
+        grid-column: span 1;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .footer-meta {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .scroll-top {
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-social-link {
+        width: 36px;
+        height: 36px;
+    }
+
+    .footer-contact li {
+        font-size: 0.75rem;
+    }
+
+    .footer-contact-icon {
+        width: 28px;
+        height: 28px;
+    }
+}
