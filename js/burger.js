@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileNav = document.querySelector('.mobile-nav');
     const closeBtn = document.querySelector('.mobile-nav-close');
     const overlay = document.querySelector('.mobile-nav-overlay');
+    const menuBtn = document.querySelectorAll('.mobile-link')
 
     function openMenu() {
         mobileNav.classList.add('active');
@@ -27,6 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             openMenu();
         }
+    });
+
+    menuBtn.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (mobileNav.classList.contains('active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
     });
 
     closeBtn.addEventListener('click', closeMenu);
