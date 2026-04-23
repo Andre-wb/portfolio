@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await sleep(160 + Math.random() * 120);
         }
         await sleep(120);
-        out.innerHTML += `<span class="out-accent">✓ Инструменты готовы</span><br>`;
+        out.innerHTML += `<span class="out-accent">✅ Инструменты готовы</span><br>`;
         scrollTerminal();
     }
 
