@@ -237,6 +237,7 @@
     width: 32vw;
     height: auto;
     display: block;
+    /* Webkit-версия для старых Safari / Android Chrome < 78 */
     -webkit-mask-image:
             linear-gradient(
                     to bottom,
@@ -245,7 +246,16 @@
                     black 70%,
                     rgba(0,0,0,0.9) 87%,
                     transparent 100%
+            ),
+            linear-gradient(
+                    to right,
+                    transparent 0%,
+                    black 12%,
+                    black 88%,
+                    transparent 100%
             );
+    -webkit-mask-composite: destination-in; /* старый WebKit */
+    /* Стандарт */
     mask-image:
             linear-gradient(
                     to bottom,
@@ -254,7 +264,16 @@
                     black 70%,
                     rgba(0,0,0,0.9) 87%,
                     transparent 100%
+            ),
+            linear-gradient(
+                    to right,
+                    transparent 0%,
+                    black 12%,
+                    black 88%,
+                    transparent 100%
             );
+    mask-composite: intersect;
+    filter: drop-shadow(0 10px 60px var(--surface2));
 }
 
 @media (max-width: 1024px) {
