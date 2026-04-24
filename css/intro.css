@@ -123,11 +123,31 @@
     justify-content: space-between;
 }
 
+/* Блокируем выход scaleX(1.3) за пределы экрана */
+.introduce-about {
+    min-width: 0;
+    overflow: visible; /* intentional: clip только по x у секции */
+}
+
 .social-links {
     display: flex;
     align-items: center;
-    gap: 16px;
+    /* fallback для Chrome < 84 где gap в flex не работает */
     margin-top: 32px;
+}
+
+/* gap fallback через margin */
+.social-links > * + * {
+    margin-left: 16px;
+}
+
+@supports (gap: 1px) {
+    .social-links {
+        gap: 16px;
+    }
+    .social-links > * + * {
+        margin-left: 0;
+    }
 }
 
 .social-link {
@@ -171,6 +191,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Предотвращаем горизонтальный выход за счёт transform: scaleX(1.3) на h1 */
+    overflow: hidden;
 }
 
 .body-section-container {
@@ -213,7 +235,25 @@
     width: 35vw;
     height: auto;
     display: block;
-    -webkit-mask-composite: destination-in;
+    /* Webkit-версия для старых Safari / Android Chrome < 78 */
+    -webkit-mask-image:
+        linear-gradient(
+            to bottom,
+            black 0%,
+            black 55%,
+            black 70%,
+            rgba(0,0,0,0.9) 87%,
+            transparent 100%
+        ),
+        linear-gradient(
+            to right,
+            transparent 0%,
+            black 12%,
+            black 88%,
+            transparent 100%
+        );
+    -webkit-mask-composite: destination-in; /* старый WebKit */
+    /* Стандарт */
     mask-image:
         linear-gradient(
             to bottom,

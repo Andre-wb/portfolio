@@ -6,7 +6,10 @@ header {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    /* ВАЖНО: 100vw вызывает горизонтальный скролл на iOS Safari —
+       используем width: 100% вместо 100vw */
+    width: 100%;
+    max-width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
