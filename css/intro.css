@@ -276,6 +276,16 @@
     filter: drop-shadow(0 10px 60px var(--surface2));
 }
 
+@media (min-width: 2000px) {
+    .profile-photo {
+        width: 28vw;
+}
+
+@media (min-width: 3000px) {
+    .profile-photo {
+        width: 22vw;
+    }
+}
 @media (max-width: 1024px) {
     .profile-photo {
         width: 45vw;
