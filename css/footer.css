@@ -1,5 +1,5 @@
 /* ==========================================================
-   FOOTER — подвал сайта + кнопка «наверх»
+   FOOTER — подвал сайта
    ========================================================== */
 
 footer {
@@ -206,48 +206,6 @@ footer {
 
 .footer-meta a:hover {
     color: var(--accent2);
-}
-
-/* ---------- Кнопка «наверх» ---------- */
-
-.scroll-top {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 48px;
-    height: 48px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    color: var(--accent2);
-}
-
-.scroll-top.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.scroll-top:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent2);
-    box-shadow: 0 0 20px var(--accent-glow);
-    background: var(--accent2);
-    color: var(--bg);
-}
-
-.scroll-top svg {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
 }
 
 /* ---------- Адаптив ---------- */
