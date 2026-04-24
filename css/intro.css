@@ -199,7 +199,7 @@
 
 .body-section-container {
     display: grid;
-    grid-template-columns: 1fr clamp(320px, 40vw, 600px);
+    grid-template-columns: 1fr clamp(420px, 45vw, 700px);
     align-items: center;
     width: 100%;
     max-width: 100%;
