@@ -40,6 +40,9 @@ html {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    /* scrollbar-gutter: stable резервирует место под скроллбар заранее,
+       предотвращая прыжок контента при его появлении (Firefox показывает скроллбар всегда) */
+    scrollbar-gutter: stable;
 }
 
 body {
@@ -53,14 +56,21 @@ body {
     min-height: 100vh;
     left: 0;
     right: 0;
-    /* Блокируем горизонтальный скролл: критично для iOS Safari */
     overflow-x: hidden;
     max-width: 100%;
 }
 
+/* ── Firefox: стилизация скроллбара ───────────────────────────────────────
+   Firefox не поддерживает ::-webkit-scrollbar, но поддерживает scrollbar-*
+   Chrome / Safari игнорируют эти свойства — безопасно для всех браузеров  */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hi) transparent;
+}
+
 @font-face {
     font-family: 'Unbounded';
-    src: url('Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
+    src: url('../Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
     font-weight: 200 900;
     font-style: normal;
     font-display: swap;
@@ -68,8 +78,20 @@ body {
 
 @font-face {
     font-family: 'JetBrains Mono';
-    src: url('JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+    src: url('../JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
     font-weight: 200 900;
     font-style: normal;
     font-display: swap;
+}
+
+/* ── prefers-reduced-motion ───────────────────────────────────────────────
+   Пользователи Firefox на Windows часто включают «уменьшить движение»
+   в настройках ОС. Уважаем это и отключаем все анимации.              */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

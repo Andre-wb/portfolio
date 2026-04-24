@@ -111,8 +111,10 @@
 }
 
 @keyframes slideInFromBottom {
-    0%   { opacity: 0; transform: translateY(30px); filter: blur(5px); }
-    100% { opacity: 1; transform: translateY(0);    filter: blur(0); }
+    /* filter: blur() убран — в Firefox он рендерится на CPU и убивает плавность.
+       Opacity + translateY дают тот же эффект без нагрузки. */
+    0%   { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- Hero layout ---------- */

@@ -21,6 +21,10 @@
     overflow-x: hidden;
     overflow-y: auto;
     box-shadow: var(--shadow);
+    /* Выносим на отдельный GPU-слой — Firefox не перерисовывает
+       scrollable-контейнер вместе с остальной страницей при скролле */
+    will-change: contents;
+    contain: layout style;
 }
 
 .terminal-topbar {
@@ -75,6 +79,12 @@
 .terminal-body::-webkit-scrollbar       { width: 4px; }
 .terminal-body::-webkit-scrollbar-track { background: transparent; }
 .terminal-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+/* Firefox */
+.terminal-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hi) transparent;
+}
 
 /* ---------- Строки ---------- */
 

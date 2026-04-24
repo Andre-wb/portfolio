@@ -41,7 +41,9 @@
     color: var(--text);
     letter-spacing: -0.02em;
     transform-style: preserve-3d;
-    will-change: transform, filter, opacity;
+    /* will-change только на transform и opacity — не добавляем filter,
+       Firefox резервирует отдельный GPU-слой на каждый will-change */
+    will-change: transform, opacity;
     text-align: center;
     line-height: 1;
     position: relative;
@@ -67,8 +69,8 @@
 
 .section-title.visible {
     transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
-                filter 0.6s ease-out,
                 opacity 0.4s ease-out !important;
+    /* filter убран из transition */
 }
 
 /* ---------- Карточки проектов ---------- */
@@ -82,8 +84,10 @@
     grid-template-columns: 1fr 1fr;
     gap: 4vw;
     align-items: center;
-    transform-style: preserve-3d;
-    will-change: transform, opacity, filter;
+    /* preserve-3d нужен только для JS-анимации — убираем постоянный 3D-контекст,
+       который заставляет Firefox держать каждую карточку на отдельном compositor layer */
+    transform-style: flat;
+    will-change: transform, opacity;
     opacity: 0.3;
     transition: none !important;
 }
@@ -101,8 +105,8 @@
     transform: rotateX(0deg) translateZ(0) scale(1);
     filter: blur(0);
     transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
-                filter 0.6s ease-out,
                 opacity 0.4s ease-out !important;
+    /* filter transition убран — Firefox анимирует blur через CPU */
 }
 
 /* ---------- Контент карточки ---------- */
