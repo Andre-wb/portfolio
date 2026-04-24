@@ -70,7 +70,7 @@ body {
 
 @font-face {
     font-family: 'Unbounded';
-    src: url('../Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
+    src: url('Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype');
     font-weight: 200 900;
     font-style: normal;
     font-display: swap;
@@ -78,7 +78,7 @@ body {
 
 @font-face {
     font-family: 'JetBrains Mono';
-    src: url('../JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
+    src: url('JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf') format('truetype');
     font-weight: 200 900;
     font-style: normal;
     font-display: swap;
