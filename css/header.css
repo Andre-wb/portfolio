@@ -6,8 +6,6 @@ header {
     position: fixed;
     top: 0;
     left: 0;
-    /* ВАЖНО: 100vw вызывает горизонтальный скролл на iOS Safari —
-       используем width: 100% вместо 100vw */
     width: 100%;
     max-width: 100vw;
     display: flex;
@@ -82,7 +80,7 @@ header nav a:active {
 .burger-line {
     width: 100%;
     height: 2px;
-    background: var(--accent2);
+    background: var(--muted);
     transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
     border-radius: 2px;
 }
