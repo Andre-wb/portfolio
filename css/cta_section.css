@@ -25,7 +25,7 @@
 .cta-left {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 10px;
     z-index: 2;
     overflow: visible;
 }
