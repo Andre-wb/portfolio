@@ -1,0 +1,25 @@
+{
+  "name": "Андрей Караваев — Full-Stack разработчик",
+  "short_name": "АК",
+  "description": "Портфолио фулстек-разработчика Андрея Караваева. React, Node.js, Python и другие технологии.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/widget-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
