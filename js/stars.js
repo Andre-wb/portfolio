@@ -24,7 +24,7 @@
         const densityMultiplier = isSmallScreen ? 0.4 : 1;
         const alphaMultiplier = isSmallScreen ? 0.6 : 1;
 
-        // Layer 0 = far (small, dim, slow), Layer 8 = near (large, bright, fast)
+        // Layer 0 = более маленькие и тусклые, Layer 8 = более объемные и яркие
         //
         // scrollFactor: движение звезды в canvas при скролле.
         //   Итоговая скорость на экране = scrollDy * (1 - scrollFactor)

@@ -1,6 +1,5 @@
 'use strict';
 
-// Улучшенная система адаптивного качества 3D табличек CTA
 // Автоопределение производительности + динамическое снижение качества при просадках
 
 (function () {
@@ -138,12 +137,12 @@
     function getGeometryParams() {
         const base = {
             low: {
-                bevelSegments: 8,        // было 4
-                curveSegments: 24,       // было 12
-                bevelEnabled: true,      // было false
-                bevelThickness: 0.02,    // было 0
-                bevelSize: 0.02,         // было 0
-                depth: 0.35              // было 0.3
+                bevelSegments: 8,
+                curveSegments: 24,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.02,
+                depth: 0.35
             },
             medium: {
                 bevelSegments: 24,
@@ -229,7 +228,6 @@
     const VEL_MAX = 5.0;
     const VEL_DECAY = 0.90;
 
-    // Упрощённые размеры для слабых устройств
     const SIZES = {
         low: { PW: 3.6, PH: 1.2, PD: 0.4, PR: 0.14, FONT_SIZE: 0.55 },
         medium: { PW: 3.6, PH: 1.2, PD: 0.4, PR: 0.14, FONT_SIZE: 0.55 },
@@ -248,7 +246,7 @@
 
     const CONFIGS = ALL_CONFIGS;
 
-    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ (оптимизировано)
+    // 4. ПАРСИНГ ШРИФТА И ГЕОМЕТРИЯ
 
     function parseAllPaths(font, text, fontSize) {
         const scale = fontSize / font.data.resolution;
@@ -479,7 +477,6 @@
             height: '100%',
             pointerEvents: 'none',
             filter: blur ? `blur(${blur})` : 'none',
-            // GPU ускорение
             transform: 'translateZ(0)',
             willChange: 'transform',
         });
@@ -602,7 +599,6 @@
         let prevMx = 0, prevMy = 0, cursorVel = 0;
         let isHovering = false;
 
-        // Throttled mousemove (16ms ≈ 60fps)
         let lastMouseMove = 0;
         window.addEventListener('mousemove', e => {
             const now = performance.now();
@@ -617,14 +613,12 @@
             isHovering = true;
         });
 
-        // Отключаем анимацию когда курсор не двигается
         let hoverTimeout;
         window.addEventListener('mousemove', () => {
             clearTimeout(hoverTimeout);
             hoverTimeout = setTimeout(() => { isHovering = false; }, 100);
         });
 
-        // Animation loop с FPS limit
         let animationActive = false;
         let rafId = null;
         let lastFrameTime = 0;
@@ -634,12 +628,10 @@
             if (!animationActive) return;
             rafId = requestAnimationFrame(animate);
 
-            // FPS limiting
             const elapsed = now - lastFrameTime;
             if (elapsed < targetFrameInterval) return;
             lastFrameTime = now - (elapsed % targetFrameInterval);
 
-            // Адаптация качества
             const frameTime = performance.now() - now;
             const needsResize = PERF.adapt(frameTime);
             if (needsResize) {
@@ -651,7 +643,6 @@
                 });
             }
 
-            // Плавное следование за мышью (не обновляем если не двигается)
             if (isHovering || Math.abs(smx - mx) > 0.001) {
                 smx += (mx - smx) * 0.04;
                 smy += (my - smy) * 0.04;
@@ -660,12 +651,10 @@
             cursorVel *= VEL_DECAY;
             const spd = 1 + cursorVel;
 
-            // Камера
             camera.position.x += (smx * 0.25 - camera.position.x) * 0.025;
             camera.position.y += (smy * 0.20 - camera.position.y) * 0.025;
             camera.lookAt(0, 0, 0);
 
-            // Рендер слоёв
             layers.forEach(({ scene, meshes }, i) => {
                 meshes.forEach(m => {
                     m.rotation.x += m.userData.rot[0] * spd;
@@ -678,7 +667,6 @@
             });
         }
 
-        // Intersection Observer для паузы
         const sec = document.getElementById('cta');
         if (sec) {
             new IntersectionObserver(entries => {
@@ -698,13 +686,11 @@
             rafId = requestAnimationFrame(animate);
         }
 
-        // Visibility API - пауза когда вкладка неактивна
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 animationActive = false;
                 if (rafId) cancelAnimationFrame(rafId);
             } else if (sec && !animationActive) {
-                // Проверим видимость секции перед возобновлением
                 const rect = sec.getBoundingClientRect();
                 if (rect.bottom > 0 && rect.top < window.innerHeight) {
                     animationActive = true;
@@ -714,9 +700,7 @@
         });
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // 8. МАГНИТНЫЕ КНОПКИ (оптимизировано)
-    // ═══════════════════════════════════════════════════════════════════════════════
+    // 8. МАГНИТНЫЕ КНОПКИ
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cta-btn').forEach(btn => {
@@ -726,7 +710,6 @@
             const EASE = 0.12;
             const STR = 0.38;
 
-            // Проверяем поддержку hover (не тач)
             const isTouch = window.matchMedia('(pointer: coarse)').matches;
             if (isTouch) return; // Отключаем на тач-устройствах
 
@@ -761,7 +744,6 @@
         });
     });
 
-    // Старт
     document.addEventListener('DOMContentLoaded', init);
 
 })();

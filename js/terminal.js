@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(220);
         await printLines([
             'Blockchain-разработка · Rust-экосистема',
-            'кибербезопасность · P2P-сети · Fullstack-разработка',
+            'Кибербезопасность · P2P-сети · Fullstack-разработка',
             'Участие в хакатонах и open-source проектах.',
         ], 120);
 
