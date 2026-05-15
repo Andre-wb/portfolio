@@ -60,6 +60,8 @@ class ProjectGallery {
                 'assets/vortex/vortex7.png',
                 'assets/vortex/vortex8.png',
                 'assets/vortex/vortex9.png',
+                'assets/vortex/vortex10.png',
+                'assets/vortex/vortex11.png',
             ],
             'artifex': [
                 'assets/artifex/artifex1.png',
