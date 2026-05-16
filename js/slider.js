@@ -368,7 +368,7 @@ class ProjectGallery {
     render() {
         this.track.innerHTML = this.images.map(src => `
             <div class="gallery-slide">
-                <img src="${src}" alt="Screenshot" loading="lazy" draggable="false">
+                <img src="${src}" alt="Screenshot" draggable="false">
             </div>
         `).join('');
 
