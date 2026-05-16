@@ -3,8 +3,6 @@
                project-visuals, gallery modal
    ========================================================== */
 
-/* ---------- Секция ---------- */
-
 .projects-section {
     position: relative;
     width: 100%;
@@ -23,7 +21,6 @@
     z-index: 1;
 }
 
-/* ---------- Заголовок секции ---------- */
 
 .section-title-wrapper {
     position: relative;
@@ -41,8 +38,6 @@
     color: var(--text);
     letter-spacing: -0.02em;
     transform-style: preserve-3d;
-    /* will-change только на transform и opacity — не добавляем filter,
-       Firefox резервирует отдельный GPU-слой на каждый will-change */
     will-change: transform, opacity;
     text-align: center;
     line-height: 1;
@@ -70,10 +65,8 @@
 .section-title.visible {
     transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
                 opacity 0.4s ease-out !important;
-    /* filter убран из transition */
 }
 
-/* ---------- Карточки проектов ---------- */
 
 .project-card {
     position: relative;
@@ -109,7 +102,6 @@
     /* filter transition убран — Firefox анимирует blur через CPU */
 }
 
-/* ---------- Контент карточки ---------- */
 
 .project-content {
     padding: 2rem;
@@ -244,8 +236,6 @@
     pointer-events: none;
 }
 
-/* ---------- Визуальная панель карточки ---------- */
-
 .project-visual {
     position: relative;
     height: 100%;
@@ -276,8 +266,6 @@
     transform: scale(1);
 }
 
-/* ---------- Project visual: network mesh (Vortex) ---------- */
-
 .network-mesh {
     position: absolute;
     width: 100%;
@@ -306,8 +294,6 @@
     0%, 100% { transform: scale(1);   opacity: 1; }
     50%       { transform: scale(1.5); opacity: 0.5; }
 }
-
-/* ---------- Project visual: orbital system (Orbityx) ---------- */
 
 .orbital-system {
     position: relative;
@@ -366,8 +352,6 @@
     to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* ---------- Project visual: radar (Artifex) ---------- */
-
 .radar-screen {
     position: relative;
     width: 200px;
@@ -412,8 +396,6 @@
     0%, 100% { opacity: 0; transform: scale(0); }
     50%       { opacity: 1; transform: scale(1); }
 }
-
-/* ---------- Project visual: candle chart (LethalHome) ---------- */
 
 .candle-chart {
     display: flex;
@@ -469,8 +451,6 @@
     to { transform: scaleY(1); }
 }
 
-/* ---------- Project visual: 3D building ---------- */
-
 .building-3d {
     position: relative;
     width: 120px;
@@ -510,8 +490,6 @@
     0%, 100% { transform: rotateX(-20deg) rotateY(45deg) translateY(0); }
     50%       { transform: rotateX(-20deg) rotateY(45deg) translateY(-10px); }
 }
-
-/* ---------- Gallery modal ---------- */
 
 .gallery-modal {
     position: fixed;
@@ -610,9 +588,6 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    position: relative;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .gallery-slide img {
@@ -621,9 +596,6 @@
     object-fit: contain;
     border-radius: var(--radius);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transition: transform 0.2s ease;
-    width: auto;
-    height: auto;
 }
 
 .gallery-nav {
@@ -718,8 +690,6 @@
     font-weight: 600;
 }
 
-/* ---------- Адаптив ---------- */
-
 @media (max-width: 1024px) {
     .section-title-wrapper {
         height: 40vh;
@@ -762,30 +732,6 @@
         width: 40px;
         height: 40px;
     }
-
-    .gallery-slide {
-        overflow: auto;
-        cursor: zoom-in;
-    }
-
-    .gallery-slide img {
-        min-width: 100%;
-        min-height: 100%;
-        touch-action: pinch-zoom;
-    }
-
-    .gallery-slide.zoomed {
-        cursor: zoom-out;
-        overflow: scroll;
-    }
-
-    .gallery-slide.zoomed img {
-        min-width: auto;
-        min-height: auto;
-        width: 150%;
-        height: auto;
-    }
-
 }
 
 @media (max-width: 480px) {
@@ -804,5 +750,88 @@
     .tech-tag {
         font-size: 0.7rem;
         padding: 0.3rem 0.6rem;
+    }
+}
+
+
+.gallery-slide {
+    position: relative;
+    overflow: hidden;
+}
+
+.gallery-slide img {
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+@media (max-width: 768px) {
+    .gallery-slide {
+        touch-action: none;
+        overflow: hidden;
+        cursor: grab;
+    }
+
+    .gallery-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transform-origin: center center;
+    }
+
+    .gallery-slide img.zoomed {
+        cursor: grab;
+        transition: none;
+    }
+
+    .gallery-slide img.zoomed:active {
+        cursor: grabbing;
+    }
+
+    .gallery-slide::after {
+        content: '👆 Дважды тапни или разведи пальцы для зума';
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .gallery-modal.active .gallery-slide::after {
+        animation: zoomHint 3s ease forwards;
+    }
+
+    @keyframes zoomHint {
+        0%, 100% { opacity: 0; }
+        15%, 85% { opacity: 1; }
+    }
+}
+
+@media (min-width: 769px) {
+    .gallery-slide {
+        overflow: hidden;
+    }
+
+    .gallery-slide img {
+        transition: transform 0.2s ease-out;
+    }
+
+    .gallery-slide img.zoomed {
+        cursor: grab;
+    }
+
+    .gallery-slide img.zoomed:active {
+        cursor: grabbing;
     }
 }
