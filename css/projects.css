@@ -610,6 +610,9 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    position: relative;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .gallery-slide img {
@@ -618,6 +621,9 @@
     object-fit: contain;
     border-radius: var(--radius);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease;
+    width: auto;
+    height: auto;
 }
 
 .gallery-nav {
@@ -756,6 +762,30 @@
         width: 40px;
         height: 40px;
     }
+
+    .gallery-slide {
+        overflow: auto;
+        cursor: zoom-in;
+    }
+
+    .gallery-slide img {
+        min-width: 100%;
+        min-height: 100%;
+        touch-action: pinch-zoom;
+    }
+
+    .gallery-slide.zoomed {
+        cursor: zoom-out;
+        overflow: scroll;
+    }
+
+    .gallery-slide.zoomed img {
+        min-width: auto;
+        min-height: auto;
+        width: 150%;
+        height: auto;
+    }
+
 }
 
 @media (max-width: 480px) {
