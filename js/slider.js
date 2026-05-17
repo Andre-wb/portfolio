@@ -295,7 +295,7 @@ class ProjectGallery {
     }
 
     getImageUrl(basePath) {
-        const suffix = this.isMobile ? '_m.webp' : '.webp';
+        const suffix = this.isMobile ? '_m.png' : '.png';
         return basePath + suffix;
     }
 
