@@ -9,6 +9,8 @@ class ProjectGallery {
         this.currentIndex = 0;
         this.images = [];
 
+        this.isMobile = window.matchMedia('(max-width: 768px)').matches;
+
         this.zoomState = {
             scale: 1,
             panX: 0,
@@ -56,19 +58,15 @@ class ProjectGallery {
         });
 
         this.initSwipe();
-
         this.initZoom();
     }
-
 
     initZoom() {
         this.track.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
         this.track.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
         this.track.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
         this.track.addEventListener('touchcancel', (e) => this.handleTouchEnd(e), { passive: false });
-
         this.track.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
-
         this.track.addEventListener('dblclick', (e) => this.handleDoubleClick(e));
     }
 
@@ -79,7 +77,8 @@ class ProjectGallery {
     applyTransform(img) {
         if (!img) return;
         const { scale, panX, panY } = this.zoomState;
-        img.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        img.style.transformOrigin = 'center center';
+        img.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
     }
 
     resetZoom() {
@@ -138,7 +137,6 @@ class ProjectGallery {
         this.zoomState.panX = Math.max(-maxPanX, Math.min(maxPanX, this.zoomState.panX));
         this.zoomState.panY = Math.max(-maxPanY, Math.min(maxPanY, this.zoomState.panY));
     }
-
 
     handleTouchStart(e) {
         const img = this.getActiveImage();
@@ -233,10 +231,8 @@ class ProjectGallery {
         }
     }
 
-
     handleWheel(e) {
         e.preventDefault();
-
         const img = this.getActiveImage();
         if (!img) return;
 
@@ -260,7 +256,6 @@ class ProjectGallery {
             this.setZoom(2.5, e.clientX, e.clientY);
         }
     }
-
 
     initSwipe() {
         let touchStartX = 0;
@@ -299,55 +294,61 @@ class ProjectGallery {
         }, { passive: true });
     }
 
+    getImageUrl(basePath) {
+        const suffix = this.isMobile ? '_m.webp' : '.webp';
+        return basePath + suffix;
+    }
 
     open(projectId) {
-        const projectImages = {
+        const projectImagesBase = {
             'vortex': [
-                'assets/vortex/vortex1.png',
-                'assets/vortex/vortex2.png',
-                'assets/vortex/vortex3.png',
-                'assets/vortex/vortex5.png',
-                'assets/vortex/vortex6.png',
-                'assets/vortex/vortex7.png',
-                'assets/vortex/vortex8.png',
-                'assets/vortex/vortex9.png',
-                'assets/vortex/vortex10.png',
-                'assets/vortex/vortex11.png',
+                'assets/vortex/vortex1',
+                'assets/vortex/vortex2',
+                'assets/vortex/vortex3',
+                'assets/vortex/vortex5',
+                'assets/vortex/vortex6',
+                'assets/vortex/vortex7',
+                'assets/vortex/vortex8',
+                'assets/vortex/vortex9',
+                'assets/vortex/vortex10',
+                'assets/vortex/vortex11',
             ],
             'artifex': [
-                'assets/artifex/artifex1.png',
-                'assets/artifex/artifex2.png',
-                'assets/artifex/artifex3.png',
-                'assets/artifex/artifex4.png',
-                'assets/artifex/artifex5.png',
-                'assets/artifex/artifex6.png',
+                'assets/artifex/artifex1',
+                'assets/artifex/artifex2',
+                'assets/artifex/artifex3',
+                'assets/artifex/artifex4',
+                'assets/artifex/artifex5',
+                'assets/artifex/artifex6',
             ],
             'lethalhome': [
-                'assets/lethalhome/lethalhome4.png',
-                'assets/lethalhome/lethalhome5.png',
-                'assets/lethalhome/lethalhome6.png',
-                'assets/lethalhome/lethalhome7.png',
-                'assets/lethalhome/lethalhome8.png',
+                'assets/lethalhome/lethalhome4',
+                'assets/lethalhome/lethalhome5',
+                'assets/lethalhome/lethalhome6',
+                'assets/lethalhome/lethalhome7',
+                'assets/lethalhome/lethalhome8',
             ],
             'realestate': [
-                'assets/realestate/realestate1.png',
-                'assets/realestate/realestate2.png',
-                'assets/realestate/realestate3.png',
-                'assets/realestate/realestate4.png',
-                'assets/realestate/realestate5.png',
-                'assets/realestate/realestate6.png',
+                'assets/realestate/realestate1',
+                'assets/realestate/realestate2',
+                'assets/realestate/realestate3',
+                'assets/realestate/realestate4',
+                'assets/realestate/realestate5',
+                'assets/realestate/realestate6',
             ],
             'orbityx': [
-                'assets/orbityx/orbityx2.png',
-                'assets/orbityx/orbityx3.png',
-                'assets/orbityx/orbityx4.png',
-                'assets/orbityx/orbityx5.png',
-                'assets/orbityx/orbityx6.png',
-                'assets/orbityx/orbityx7.png',
+                'assets/orbityx/orbityx2',
+                'assets/orbityx/orbityx3',
+                'assets/orbityx/orbityx4',
+                'assets/orbityx/orbityx5',
+                'assets/orbityx/orbityx6',
+                'assets/orbityx/orbityx7',
             ],
         };
 
-        this.images = projectImages[projectId] || [];
+        const basePaths = projectImagesBase[projectId] || [];
+        this.images = basePaths.map(path => this.getImageUrl(path));
+
         this.currentIndex = 0;
         this.resetZoom();
         this.render();
@@ -368,7 +369,7 @@ class ProjectGallery {
     render() {
         this.track.innerHTML = this.images.map(src => `
             <div class="gallery-slide">
-                <img src="${src}" alt="Screenshot" draggable="false">
+                <img src="${src}" alt="Screenshot" draggable="false" loading="eager">
             </div>
         `).join('');
 

@@ -64,7 +64,7 @@
 
 .section-title.visible {
     transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
-                opacity 0.4s ease-out !important;
+    opacity 0.4s ease-out !important;
 }
 
 
@@ -77,8 +77,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 4vw;
     align-items: center;
-    /* preserve-3d нужен только для JS-анимации — убираем постоянный 3D-контекст,
-       который заставляет Firefox держать каждую карточку на отдельном compositor layer */
     transform-style: flat;
     will-change: transform, opacity;
     opacity: 0.3;
@@ -98,8 +96,7 @@
     transform: rotateX(0deg) translateZ(0) scale(1);
     filter: blur(0);
     transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1),
-                opacity 0.4s ease-out !important;
-    /* filter transition убран — Firefox анимирует blur через CPU */
+    opacity 0.4s ease-out !important;
 }
 
 
@@ -271,8 +268,8 @@
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 30% 30%, var(--accent-glow) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(0, 225, 255, 0.2) 0%, transparent 50%);
+            radial-gradient(circle at 30% 30%, var(--accent-glow) 0%, transparent 50%),
+            radial-gradient(circle at 70% 70%, rgba(0, 225, 255, 0.2) 0%, transparent 50%);
     opacity: 0.6;
 }
 
@@ -491,6 +488,7 @@
     50%       { transform: rotateX(-20deg) rotateY(45deg) translateY(-10px); }
 }
 
+
 .gallery-modal {
     position: fixed;
     inset: 0;
@@ -588,14 +586,27 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .gallery-slide img {
     max-width: 100%;
     max-height: 100%;
+    width: auto;
+    height: auto;
     object-fit: contain;
     border-radius: var(--radius);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gallery-slide img.zoomed {
+    transition: none;
 }
 
 .gallery-nav {
@@ -690,6 +701,7 @@
     font-weight: 600;
 }
 
+
 @media (max-width: 1024px) {
     .section-title-wrapper {
         height: 40vh;
@@ -714,7 +726,6 @@
 @media (max-width: 768px) {
     .gallery-container {
         width: 95vw;
-        height: 60vh;
     }
 
     .gallery-nav {
@@ -732,57 +743,15 @@
         width: 40px;
         height: 40px;
     }
-}
 
-@media (max-width: 480px) {
-    .projects-container {
-        padding: 5vh 4vw 10vh;
-    }
-
-    .project-content {
-        padding: 1rem;
-    }
-
-    .project-stack {
-        gap: 0.4rem;
-    }
-
-    .tech-tag {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.6rem;
-    }
-}
-
-
-.gallery-slide {
-    position: relative;
-    overflow: hidden;
-}
-
-.gallery-slide img {
-    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-    will-change: transform;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-@media (max-width: 768px) {
     .gallery-slide {
         touch-action: none;
-        overflow: hidden;
         cursor: grab;
-    }
-
-    .gallery-slide img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        transform-origin: center center;
+        padding: 1rem;
     }
 
     .gallery-slide img.zoomed {
         cursor: grab;
-        transition: none;
     }
 
     .gallery-slide img.zoomed:active {
@@ -833,5 +802,24 @@
 
     .gallery-slide img.zoomed:active {
         cursor: grabbing;
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-container {
+        padding: 5vh 4vw 10vh;
+    }
+
+    .project-content {
+        padding: 1rem;
+    }
+
+    .project-stack {
+        gap: 0.4rem;
+    }
+
+    .tech-tag {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
     }
 }
