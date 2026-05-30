@@ -321,12 +321,13 @@ class ProjectGallery {
                 'assets/artifex/artifex5',
                 'assets/artifex/artifex6',
             ],
-            'lethalhome': [
-                'assets/lethalhome/lethalhome4',
-                'assets/lethalhome/lethalhome5',
-                'assets/lethalhome/lethalhome6',
-                'assets/lethalhome/lethalhome7',
-                'assets/lethalhome/lethalhome8',
+            'hotfix': [
+                'assets/hotfix/hotfix1',
+                'assets/hotfix/hotfix2',
+                'assets/hotfix/hotfix3',
+                'assets/hotfix/hotfix4',
+                'assets/hotfix/hotfix5',
+                'assets/hotfix/hotfix6',
             ],
             'realestate': [
                 'assets/realestate/realestate1',

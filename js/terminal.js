@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(260);
         await fakePipInstall([
             'Python · FastAPI · Flask · SQLAlchemy',
-            'Rust · PyO3 · AES-GCM · X25519 · Argon2id',
+            'Rust · Axum · PostgreSQL · Tokio',
             'JavaScript · WebSocket · WebRTC',
         ]);
 
