@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(260);
         await fakePipInstall([
             'Python · FastAPI · Flask · SQLAlchemy',
-            'Rust · Axum · PostgreSQL · Tokio',
+            'Rust · Axum · Tauri · PostgreSQL',
             'JavaScript · WebSocket · WebRTC',
         ]);
 
@@ -138,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await fakeLoading('Загрузка достижений...');
         await printLines([
             '<span class="out-muted">Мои награды и проекты:</span>',
+            '<span class="out-accent">🥈</span> 2 место — хакатон <a class="terminal-link" href="assets/nuclear_it_hack_school.pdf" target="_blank" rel="noopener noreferrer">Nuclear IT Hack School</a> [2026]',
             '<span class="out-accent">🥈</span> 2 место — хакатон <a class="terminal-link" href="assets/кибер_рывок.pdf" target="_blank" rel="noopener noreferrer">Кибер Рывок</a> [2026]',
-            '<span class="out-accent">🏆</span> Участие — хакатон <a class="terminal-link" href="assets/nuclear_it_hack.pdf" target="_blank" rel="noopener noreferrer">Nuclear IT Hack</a> [2026]',
             '<span class="out-accent">💼</span> Коммерческий заказ — сайт для специалиста по приёмке квартир',
         ], 130);
 
@@ -149,8 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await typeCommand('interests');
         await sleep(220);
         await printLines([
-            'Blockchain-разработка · Rust-экосистема',
-            'Кибербезопасность · P2P-сети · Fullstack-разработка',
+            'Кибербезопасность · Rust-экосистема',
+            'Разработка ПО · Blockchain-разработка · Fullstack-разработка',
             'Участие в хакатонах и open-source проектах.',
         ], 120);
 

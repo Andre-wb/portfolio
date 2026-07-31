@@ -444,6 +444,119 @@
     bottom: -8px;
 }
 
+
+/* ==========================================================
+   STELLARIX — Audio Wave (увеличенная, с глубоким градиентом)
+   ========================================================== */
+
+/* Контейнер волны — занимает почти всё визуальное поле */
+.visual-inner .audio-wave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* Фоновое свечение под волной */
+.audio-wave::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(
+            ellipse at center,
+            rgba(0, 225, 255, 0.15) 0%,
+            rgba(0, 225, 255, 0.05) 40%,
+            transparent 70%
+    );
+    border-radius: 50%;
+    animation: waveGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes waveGlow {
+    0%   { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Каждая полоска — симметрично уменьшается с обоих концов */
+.audio-wave .wave-bar {
+    width: 10px;
+    min-height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(
+            180deg,
+            var(--accent2) 0%,
+            var(--accent) 50%,
+            rgba(0, 225, 255, 0.3) 100%
+    );
+    animation: waveBig 1.2s ease-in-out infinite alternate;
+    transform-origin: center;
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.2);
+    will-change: transform;
+    flex-shrink: 0;
+}
+
+/* Разная высота и задержки — теперь это max-height, а анимация
+   масштабирует от центра */
+.audio-wave .wave-bar:nth-child(1) { height: 40px; animation-delay: 0.0s; }
+.audio-wave .wave-bar:nth-child(2) { height: 60px; animation-delay: 0.1s; }
+.audio-wave .wave-bar:nth-child(3) { height: 85px; animation-delay: 0.2s; }
+.audio-wave .wave-bar:nth-child(4) { height: 70px; animation-delay: 0.3s; }
+.audio-wave .wave-bar:nth-child(5) { height: 50px; animation-delay: 0.4s; }
+.audio-wave .wave-bar:nth-child(6) { height: 30px; animation-delay: 0.5s; }
+
+/* Анимация с масштабированием от центра (симметрично) */
+@keyframes waveBig {
+    0% {
+        transform: scaleY(0.3);
+        opacity: 0.5;
+        border-radius: 6px 6px 6px 6px;
+    }
+    50% {
+        border-radius: 2px 2px 2px 2px;
+    }
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+        border-radius: 6px 6px 6px 6px;
+    }
+}
+
+/* Добавляем "отражение" под волнами — как в других визуалах */
+.audio-wave::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 30%;
+    background: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 225, 255, 0.05) 100%
+    );
+    border-radius: 50%;
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .audio-wave .wave-bar {
+        width: 6px;
+        border-radius: 4px;
+    }
+    .audio-wave .wave-bar:nth-child(1) { height: 25px; }
+    .audio-wave .wave-bar:nth-child(2) { height: 35px; }
+    .audio-wave .wave-bar:nth-child(3) { height: 50px; }
+    .audio-wave .wave-bar:nth-child(4) { height: 40px; }
+    .audio-wave .wave-bar:nth-child(5) { height: 30px; }
+    .audio-wave .wave-bar:nth-child(6) { height: 20px; }
+}
+
 @keyframes grow {
     to { transform: scaleY(1); }
 }

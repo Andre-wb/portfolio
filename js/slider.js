@@ -301,6 +301,14 @@ class ProjectGallery {
 
     open(projectId) {
         const projectImagesBase = {
+            'stellarix': [
+                'assets/stellarix/stellarix1',
+                'assets/stellarix/stellarix2',
+                'assets/stellarix/stellarix3',
+                'assets/stellarix/stellarix4',
+                'assets/stellarix/stellarix5',
+                'assets/stellarix/stellarix6',
+            ],
             'vortex': [
                 'assets/vortex/vortex1',
                 'assets/vortex/vortex2',
@@ -321,14 +329,6 @@ class ProjectGallery {
                 'assets/artifex/artifex5',
                 'assets/artifex/artifex6',
             ],
-            'hotfix': [
-                'assets/hotfix/hotfix1',
-                'assets/hotfix/hotfix2',
-                'assets/hotfix/hotfix3',
-                'assets/hotfix/hotfix4',
-                'assets/hotfix/hotfix5',
-                'assets/hotfix/hotfix6',
-            ],
             'realestate': [
                 'assets/realestate/realestate1',
                 'assets/realestate/realestate2',
@@ -337,13 +337,13 @@ class ProjectGallery {
                 'assets/realestate/realestate5',
                 'assets/realestate/realestate6',
             ],
-            'orbityx': [
-                'assets/orbityx/orbityx2',
-                'assets/orbityx/orbityx3',
-                'assets/orbityx/orbityx4',
-                'assets/orbityx/orbityx5',
-                'assets/orbityx/orbityx6',
-                'assets/orbityx/orbityx7',
+            'hotfix': [
+                'assets/hotfix/hotfix1',
+                'assets/hotfix/hotfix2',
+                'assets/hotfix/hotfix3',
+                'assets/hotfix/hotfix4',
+                'assets/hotfix/hotfix5',
+                'assets/hotfix/hotfix6',
             ],
         };
 
