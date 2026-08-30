@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await typeCommand('whoami');
         await sleep(220);
         await printLines([
-            'Андрей Караваев — fullstack-разработчик, 16 лет.',
+            'Андрей Караваев — fullstack-разработчик, 17 лет.',
             'Специализация: frontend, backend, системное программирование, кибербезопасность.',
         ], 120);
 
