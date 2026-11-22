@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await sleep(220);
         await printLines([
             'Андрей Караваев — fullstack-разработчик, 17 лет.',
-            'Специализация: frontend, backend, системное программирование, кибербезопасность.',
+            'Специализация: frontend, backend, системное программирование. ',
         ], 120);
 
         // ── stack ───────────────────────────────────────────
@@ -125,9 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         await typeCommand('stack');
         await sleep(260);
         await fakePipInstall([
-            'Python · FastAPI · Flask · SQLAlchemy',
-            'Rust · Axum · Tauri · PostgreSQL',
+            'Python · FastAPI · Flask · Tkinter',
+            'Rust · Axum · Tauri · Tokio',
             'JavaScript · WebSocket · WebRTC',
+            'PostgreSQL · SQLAlchemy · Sqlite'
         ]);
 
         // ── achievements ────────────────────────────────────
@@ -149,9 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await typeCommand('interests');
         await sleep(220);
         await printLines([
-            'Кибербезопасность · Rust-экосистема',
-            'Разработка ПО · Blockchain-разработка · Fullstack-разработка',
-            'Участие в хакатонах и open-source проектах.',
+            'Разработка ПО · Rust-экосистема · Blockchain',
+            'Fullstack-разработка · кибербезопасность · хакатоны',
         ], 120);
 
         await sleep(350);
